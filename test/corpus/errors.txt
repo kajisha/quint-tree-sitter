@@ -65,14 +65,14 @@ module Recovery {
       name: (identifier)
       body: (match_expression
         value: (identifier)
-        (match_arm
+        arm: (match_arm
           pattern: (variant_pattern
             name: (type_identifier)
             argument: (identifier_pattern
               name: (identifier))
             (MISSING ")"))
           body: (identifier))
-        (match_arm
+        arm: (match_arm
           pattern: (variant_pattern
             name: (type_identifier))
           body: (integer))))
@@ -150,13 +150,13 @@ module PatternSeparators {
       name: (identifier)
       body: (match_expression
         value: (identifier)
-        (match_arm
+        arm: (match_arm
           pattern: (variant_pattern
             name: (type_identifier)
             argument: (identifier_pattern
               name: (identifier)))
           body: (identifier))
-        (match_arm
+        arm: (match_arm
           pattern: (variant_pattern
             name: (type_identifier))
           body: (integer))
@@ -165,3 +165,51 @@ module PatternSeparators {
       qualifier: (operator_qualifier)
       name: (identifier)
       body: (integer))))
+
+==================
+error reserved match binder
+==================
+
+module ReservedMatch {
+  val result = match value { Some(match) => 1 | _ => 0 }
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (match_expression
+        value: (identifier)
+        arm: (match_arm
+          pattern: (variant_pattern
+            name: (type_identifier))
+          (ERROR)
+          body: (integer))
+        arm: (match_arm
+          pattern: (wildcard_pattern)
+          body: (integer))))))
+
+==================
+error reserved destructuring binder
+==================
+
+module ReservedDestructuring {
+  val (left, and) = pair
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    (ERROR
+      (operator_qualifier)
+      (identifier_pattern
+        name: (identifier))
+      (ERROR)
+      (identifier_pattern
+        name: (identifier)))))

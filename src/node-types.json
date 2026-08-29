@@ -1238,6 +1238,10 @@
             "named": true
           },
           {
+            "type": "declaration_expression",
+            "named": true
+          },
+          {
             "type": "delayed_assignment",
             "named": true
           },
@@ -2774,6 +2778,16 @@
     "type": "match_expression",
     "named": true,
     "fields": {
+      "arm": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "match_arm",
+            "named": true
+          }
+        ]
+      },
       "value": {
         "multiple": false,
         "required": true,
@@ -2880,16 +2894,6 @@
           }
         ]
       }
-    },
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "match_arm",
-          "named": true
-        }
-      ]
     }
   },
   {

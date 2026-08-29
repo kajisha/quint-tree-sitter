@@ -11,6 +11,7 @@ module Matching {
   }
   val lower = match value { present(item) => item | absent => 0 }
   val ignored = match value { Some(_) => 1 | _ => 0 }
+  val cleanKeywords = match value { from(as) => 1 | Set(List) => 2 | _ => 0 }
   val incremented = match value { Some(x) => x | None => 0 } + 1
   val argument = f(match value { Some(x) => x | None => 0 }, 2)
 }
@@ -39,17 +40,17 @@ module Matching {
           name: (identifier)))
       body: (match_expression
         value: (identifier)
-        (match_arm
+        arm: (match_arm
           pattern: (variant_pattern
             name: (type_identifier)
             argument: (identifier_pattern
               name: (identifier)))
           body: (identifier))
-        (match_arm
+        arm: (match_arm
           pattern: (variant_pattern
             name: (type_identifier))
           body: (integer))
-        (match_arm
+        arm: (match_arm
           pattern: (wildcard_pattern)
           body: (unary_expression
             operand: (integer)))))
@@ -58,13 +59,13 @@ module Matching {
       name: (identifier)
       body: (match_expression
         value: (identifier)
-        (match_arm
+        arm: (match_arm
           pattern: (variant_pattern
             name: (identifier)
             argument: (identifier_pattern
               name: (identifier)))
           body: (identifier))
-        (match_arm
+        arm: (match_arm
           pattern: (variant_pattern
             name: (identifier))
           body: (integer))))
@@ -73,12 +74,32 @@ module Matching {
       name: (identifier)
       body: (match_expression
         value: (identifier)
-        (match_arm
+        arm: (match_arm
           pattern: (variant_pattern
             name: (type_identifier)
             argument: (wildcard_pattern))
           body: (integer))
-        (match_arm
+        arm: (match_arm
+          pattern: (wildcard_pattern)
+          body: (integer))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (match_expression
+        value: (identifier)
+        arm: (match_arm
+          pattern: (variant_pattern
+            name: (identifier)
+            argument: (identifier_pattern
+              name: (identifier)))
+          body: (integer))
+        arm: (match_arm
+          pattern: (variant_pattern
+            name: (type_identifier)
+            argument: (identifier_pattern
+              name: (type_identifier)))
+          body: (integer))
+        arm: (match_arm
           pattern: (wildcard_pattern)
           body: (integer))))
     body: (operator_definition
@@ -87,13 +108,13 @@ module Matching {
       body: (binary_expression
         left: (match_expression
           value: (identifier)
-          (match_arm
+          arm: (match_arm
             pattern: (variant_pattern
               name: (type_identifier)
               argument: (identifier_pattern
                 name: (identifier)))
             body: (identifier))
-          (match_arm
+          arm: (match_arm
             pattern: (variant_pattern
               name: (type_identifier))
             body: (integer)))
@@ -106,13 +127,13 @@ module Matching {
         arguments: (argument_list
           (match_expression
             value: (identifier)
-            (match_arm
+            arm: (match_arm
               pattern: (variant_pattern
                 name: (type_identifier)
                 argument: (identifier_pattern
                   name: (identifier)))
               body: (identifier))
-            (match_arm
+            arm: (match_arm
               pattern: (variant_pattern
                 name: (type_identifier))
               body: (integer)))
@@ -129,6 +150,11 @@ module Destructuring {
   val { name, count } = { name: "q", count: 1 }
   pure val { width, height } = rectangle
   pure def sumPair(pair) = { pure val (x, y) = pair x + y }
+  pure def chained(input) = {
+    pure val normalized = input
+    pure val (left, right) = normalized
+    left + right
+  }
 }
 
 ---
@@ -202,4 +228,28 @@ module Destructuring {
             body: (identifier))
           body: (binary_expression
             left: (identifier)
-            right: (identifier)))))))
+            right: (identifier)))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      parameters: (parameter_list
+        (parameter
+          name: (identifier)))
+      body: (block_expression
+        body: (declaration_expression
+          declaration: (operator_definition
+            qualifier: (operator_qualifier)
+            name: (identifier)
+            body: (identifier))
+          body: (declaration_expression
+            declaration: (operator_definition
+              qualifier: (operator_qualifier)
+              pattern: (tuple_pattern
+                element: (identifier_pattern
+                  name: (identifier))
+                element: (identifier_pattern
+                  name: (identifier)))
+              body: (identifier))
+            body: (binary_expression
+              left: (identifier)
+              right: (identifier))))))))

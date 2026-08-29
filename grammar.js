@@ -36,6 +36,16 @@ module.exports = grammar({
 
   word: $ => $.identifier,
 
+  reserved: {
+    global: _ => [],
+    pattern: _ => [
+      'module', 'const', 'var', 'assume', 'val', 'pure', 'def', 'action', 'run',
+      'temporal', 'nondet', 'type', 'import', 'export', 'bool', 'int', 'str',
+      'if', 'else', 'match', 'and', 'or', 'iff', 'implies', 'leadsTo', 'all',
+      'any', 'true', 'false',
+    ],
+  },
+
   rules: {
     source_file: $ => seq(choice($.hash_bang_line, $._file_start), repeat($.module)),
     module: $ => seq(
@@ -426,8 +436,8 @@ module.exports = grammar({
       field('value', $._expression),
       '{',
       optional('|'),
-      $.match_arm,
-      repeat(seq('|', $.match_arm)),
+      field('arm', $.match_arm),
+      repeat(seq('|', field('arm', $.match_arm))),
       '}',
     ),
     match_arm: $ => seq(
@@ -467,9 +477,9 @@ module.exports = grammar({
       )),
     ),
     _pattern_identifier: $ => choice(
-      $.identifier,
+      reserved('pattern', $.identifier),
       $.type_identifier,
-      alias(choice('and', 'or', 'iff', 'implies', 'leadsTo', 'match', 'import', 'export', 'from', 'as'), $.identifier),
+      alias(choice('from', 'as'), $.identifier),
       alias(choice('Set', 'List'), $.type_identifier),
     ),
     lambda_expression: $ => choice(
@@ -497,7 +507,7 @@ module.exports = grammar({
     _lambda_name_component: $ => choice(
       $.identifier,
       $.type_identifier,
-      alias(choice('and', 'or', 'iff', 'implies', 'leadsTo', 'match', 'import', 'export', 'from', 'as'), $.identifier),
+      alias(choice('and', 'or', 'iff', 'implies', 'leadsTo', 'import', 'export', 'from', 'as'), $.identifier),
       alias(choice('Set', 'List'), $.type_identifier),
     ),
     _lambda_qualified_name: $ => seq(
@@ -644,7 +654,7 @@ module.exports = grammar({
     ),
     declaration_expression: $ => prec.right(PREC.BLOCK, seq(
       field('declaration', alias($._local_operator_definition, $.operator_definition)),
-      field('body', $._expression),
+      field('body', choice($.declaration_expression, $._expression)),
     )),
     _local_operator_definition: $ => choice(
       seq(

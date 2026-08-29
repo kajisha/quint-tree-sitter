@@ -14,6 +14,22 @@ function assertSingleNamedField(nodeType, fieldName) {
   )
 }
 
+function assertField(nodeType, fieldName, { required, multiple, types }) {
+  const field = nodesByType.get(nodeType)?.fields?.[fieldName]
+
+  assert.ok(field, `${nodeType}.${fieldName} must exist`)
+  assert.equal(field.required, required, `${nodeType}.${fieldName}.required`)
+  assert.equal(field.multiple, multiple, `${nodeType}.${fieldName}.multiple`)
+  assert.ok(field.types.every(type => type.named), `${nodeType}.${fieldName} types must be named`)
+  if (types) {
+    assert.deepEqual(
+      field.types.map(type => type.type).sort(),
+      [...types].sort(),
+      `${nodeType}.${fieldName}.types`,
+    )
+  }
+}
+
 for (const [nodeType, fieldName] of [
   ['import_declaration', 'module'],
   ['import_declaration', 'member'],
@@ -44,5 +60,48 @@ assert.equal(
   true,
   'operator_type.parameter remains repeated for multi-argument operators',
 )
+
+assertField('match_expression', 'value', { required: true, multiple: false })
+assertField('match_expression', 'arm', {
+  required: true,
+  multiple: true,
+  types: ['match_arm'],
+})
+assertField('match_arm', 'pattern', {
+  required: true,
+  multiple: false,
+  types: ['variant_pattern', 'wildcard_pattern'],
+})
+assertField('match_arm', 'body', { required: true, multiple: false })
+assertField('identifier_pattern', 'name', {
+  required: true,
+  multiple: false,
+  types: ['identifier', 'type_identifier'],
+})
+assertField('variant_pattern', 'name', {
+  required: true,
+  multiple: false,
+  types: ['identifier', 'type_identifier'],
+})
+assertField('variant_pattern', 'argument', {
+  required: false,
+  multiple: false,
+  types: ['identifier_pattern', 'wildcard_pattern'],
+})
+assertField('tuple_pattern', 'element', {
+  required: true,
+  multiple: true,
+  types: ['identifier_pattern', 'wildcard_pattern'],
+})
+assertField('record_pattern', 'field', {
+  required: true,
+  multiple: true,
+  types: ['identifier_pattern'],
+})
+assertField('operator_definition', 'pattern', {
+  required: false,
+  multiple: false,
+  types: ['record_pattern', 'tuple_pattern'],
+})
 
 console.log('node-types field cardinality: ok')

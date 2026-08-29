@@ -2541,8 +2541,12 @@
           ]
         },
         {
-          "type": "SYMBOL",
-          "name": "match_arm"
+          "type": "FIELD",
+          "name": "arm",
+          "content": {
+            "type": "SYMBOL",
+            "name": "match_arm"
+          }
         },
         {
           "type": "REPEAT",
@@ -2554,8 +2558,12 @@
                 "value": "|"
               },
               {
-                "type": "SYMBOL",
-                "name": "match_arm"
+                "type": "FIELD",
+                "name": "arm",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "match_arm"
+                }
               }
             ]
           }
@@ -2818,8 +2826,12 @@
       "type": "CHOICE",
       "members": [
         {
-          "type": "SYMBOL",
-          "name": "identifier"
+          "type": "RESERVED",
+          "content": {
+            "type": "SYMBOL",
+            "name": "identifier"
+          },
+          "context_name": "pattern"
         },
         {
           "type": "SYMBOL",
@@ -2830,38 +2842,6 @@
           "content": {
             "type": "CHOICE",
             "members": [
-              {
-                "type": "STRING",
-                "value": "and"
-              },
-              {
-                "type": "STRING",
-                "value": "or"
-              },
-              {
-                "type": "STRING",
-                "value": "iff"
-              },
-              {
-                "type": "STRING",
-                "value": "implies"
-              },
-              {
-                "type": "STRING",
-                "value": "leadsTo"
-              },
-              {
-                "type": "STRING",
-                "value": "match"
-              },
-              {
-                "type": "STRING",
-                "value": "import"
-              },
-              {
-                "type": "STRING",
-                "value": "export"
-              },
               {
                 "type": "STRING",
                 "value": "from"
@@ -3046,10 +3026,6 @@
               {
                 "type": "STRING",
                 "value": "leadsTo"
-              },
-              {
-                "type": "STRING",
-                "value": "match"
               },
               {
                 "type": "STRING",
@@ -4087,8 +4063,17 @@
             "type": "FIELD",
             "name": "body",
             "content": {
-              "type": "SYMBOL",
-              "name": "_expression"
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "declaration_expression"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "_expression"
+                }
+              ]
             }
           }
         ]
@@ -4514,5 +4499,125 @@
   ],
   "inline": [],
   "supertypes": [],
-  "reserved": {}
+  "reserved": {
+    "global": [],
+    "pattern": [
+      {
+        "type": "STRING",
+        "value": "module"
+      },
+      {
+        "type": "STRING",
+        "value": "const"
+      },
+      {
+        "type": "STRING",
+        "value": "var"
+      },
+      {
+        "type": "STRING",
+        "value": "assume"
+      },
+      {
+        "type": "STRING",
+        "value": "val"
+      },
+      {
+        "type": "STRING",
+        "value": "pure"
+      },
+      {
+        "type": "STRING",
+        "value": "def"
+      },
+      {
+        "type": "STRING",
+        "value": "action"
+      },
+      {
+        "type": "STRING",
+        "value": "run"
+      },
+      {
+        "type": "STRING",
+        "value": "temporal"
+      },
+      {
+        "type": "STRING",
+        "value": "nondet"
+      },
+      {
+        "type": "STRING",
+        "value": "type"
+      },
+      {
+        "type": "STRING",
+        "value": "import"
+      },
+      {
+        "type": "STRING",
+        "value": "export"
+      },
+      {
+        "type": "STRING",
+        "value": "bool"
+      },
+      {
+        "type": "STRING",
+        "value": "int"
+      },
+      {
+        "type": "STRING",
+        "value": "str"
+      },
+      {
+        "type": "STRING",
+        "value": "if"
+      },
+      {
+        "type": "STRING",
+        "value": "else"
+      },
+      {
+        "type": "STRING",
+        "value": "match"
+      },
+      {
+        "type": "STRING",
+        "value": "and"
+      },
+      {
+        "type": "STRING",
+        "value": "or"
+      },
+      {
+        "type": "STRING",
+        "value": "iff"
+      },
+      {
+        "type": "STRING",
+        "value": "implies"
+      },
+      {
+        "type": "STRING",
+        "value": "leadsTo"
+      },
+      {
+        "type": "STRING",
+        "value": "all"
+      },
+      {
+        "type": "STRING",
+        "value": "any"
+      },
+      {
+        "type": "STRING",
+        "value": "true"
+      },
+      {
+        "type": "STRING",
+        "value": "false"
+      }
+    ]
+  }
 }
