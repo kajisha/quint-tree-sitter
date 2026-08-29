@@ -296,3 +296,25 @@ module Boundaries {
               body: (integer))
             body: (identifier)))
         value: (identifier)))))
+
+==================
+precedence pair associativity
+==================
+
+module PairAssociativity {
+  val pair = a -> b -> c
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (pair_expression
+        key: (pair_expression
+          key: (identifier)
+          value: (identifier))
+        value: (identifier)))))

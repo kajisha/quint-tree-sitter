@@ -213,7 +213,7 @@ module Control {
       name: (identifier)
       body: (lambda_expression
         parameter: (parameter
-          name: (wildcard))
+          name: (hole))
         body: (integer)))
     body: (operator_definition
       qualifier: (operator_qualifier)
@@ -352,3 +352,137 @@ module Trailing {
       body: (action_block
         body: (identifier)
         element: (identifier)))))
+
+==================
+expressions lambda parameter forms and tuple continuation
+==================
+
+module LambdaParameters {
+  val parenthesized = (x) => x
+  val parenthesizedHole = (_) => 0
+  val multipleHoles = (x, _) => x
+  val qualifiedSingle = Math::x => Math::x
+  val qualifiedKeyword = Math::and => 0
+  val qualifiedList = (Math::x, Util::y) => Math::x
+  val qualifiedTupleSugar = ((Math::x, _)) => Math::x
+  val groupedTuple = ((x, y))
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (lambda_expression
+        parameters: (parameter_list
+          (parameter
+            name: (identifier)))
+        body: (identifier)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (lambda_expression
+        parameters: (parameter_list
+          (parameter
+            name: (hole)))
+        body: (integer)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (lambda_expression
+        parameters: (parameter_list
+          (parameter
+            name: (identifier))
+          (parameter
+            name: (hole)))
+        body: (identifier)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (lambda_expression
+        parameter: (parameter
+          name: (qualified_name
+            (type_identifier)
+            (identifier)))
+        body: (qualified_name
+          (type_identifier)
+          (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (lambda_expression
+        parameter: (parameter
+          name: (qualified_name
+            (type_identifier)
+            (identifier)))
+        body: (integer)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (lambda_expression
+        parameters: (parameter_list
+          (parameter
+            name: (qualified_name
+              (type_identifier)
+              (identifier)))
+          (parameter
+            name: (qualified_name
+              (type_identifier)
+              (identifier))))
+        body: (qualified_name
+          (type_identifier)
+          (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (lambda_expression
+        parameters: (tuple_parameter
+          (parameter
+            name: (qualified_name
+              (type_identifier)
+              (identifier)))
+          (parameter
+            name: (hole)))
+        body: (qualified_name
+          (type_identifier)
+          (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (parenthesized_expression
+        (tuple_expression
+          element: (identifier)
+          element: (identifier))))))
+
+==================
+expressions reject wildcard hole cross contamination
+==================
+
+module InvalidImport {
+  import Math._
+}
+
+module InvalidLambda {
+  val invalid = * => value
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (import_declaration
+      module: (qualified_name
+        (type_identifier)))
+    (ERROR
+      (hole)))
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      (ERROR)
+      body: (identifier))))

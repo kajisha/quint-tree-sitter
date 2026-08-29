@@ -27,7 +27,9 @@ module.exports = grammar({
   conflicts: $ => [
     [$.tuple_type, $.operator_type],
     // `(x, y)` is a tuple until a following `=>` makes it a lambda parameter list.
-    [$._expression_name, $._lambda_parameter],
+    [$._expression_name, $._lambda_name_component],
+    // `Math::x` remains an expression unless a following `=>` makes it a parameter.
+    [$._qualified_expression_name, $._lambda_name_component],
     // `((x, y)) =>` is Quint's tuple-parameter sugar, not a grouped tuple value.
     [$.tuple_parameter],
   ],
@@ -201,7 +203,8 @@ module.exports = grammar({
       '=',
       field('value', $._expression),
     ),
-    wildcard: _ => choice('*', '_'),
+    wildcard: _ => '*',
+    hole: _ => '_',
     _type: $ => choice(
       $.operator_type,
       $.function_type,
@@ -423,7 +426,21 @@ module.exports = grammar({
         field('body', $._expression),
       ),
     ),
-    _lambda_parameter: $ => field('name', choice($.identifier, $.type_identifier, $.wildcard)),
+    _lambda_parameter: $ => field('name', choice(
+      $._lambda_name_component,
+      alias($._lambda_qualified_name, $.qualified_name),
+      $.hole,
+    )),
+    _lambda_name_component: $ => choice(
+      $.identifier,
+      $.type_identifier,
+      alias(choice('and', 'or', 'iff', 'implies', 'leadsTo', 'import', 'export', 'from', 'as'), $.identifier),
+      alias(choice('Set', 'List'), $.type_identifier),
+    ),
+    _lambda_qualified_name: $ => seq(
+      $._lambda_name_component,
+      repeat1(seq('::', $._lambda_name_component)),
+    ),
     _lambda_parameter_list: $ => seq(
       '(',
       alias($._lambda_parameter, $.parameter),

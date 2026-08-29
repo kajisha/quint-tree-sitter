@@ -3103,15 +3103,19 @@
         "required": true,
         "types": [
           {
+            "type": "hole",
+            "named": true
+          },
+          {
             "type": "identifier",
             "named": true
           },
           {
-            "type": "type_identifier",
+            "type": "qualified_name",
             "named": true
           },
           {
-            "type": "wildcard",
+            "type": "type_identifier",
             "named": true
           }
         ]
@@ -4362,10 +4366,6 @@
     "named": false
   },
   {
-    "type": "_",
-    "named": false
-  },
-  {
     "type": "action",
     "named": false
   },
@@ -4424,6 +4424,10 @@
   },
   {
     "type": "hash_bang_line",
+    "named": true
+  },
+  {
+    "type": "hole",
     "named": true
   },
   {

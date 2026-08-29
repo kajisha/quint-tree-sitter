@@ -140,6 +140,7 @@ module Lexical {
     name: (type_identifier)
     (ERROR
       (operator_qualifier)
+      (hole)
       (integer))))
 
 ==================

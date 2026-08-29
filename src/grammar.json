@@ -1160,17 +1160,12 @@
       ]
     },
     "wildcard": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "STRING",
-          "value": "*"
-        },
-        {
-          "type": "STRING",
-          "value": "_"
-        }
-      ]
+      "type": "STRING",
+      "value": "*"
+    },
+    "hole": {
+      "type": "STRING",
+      "value": "_"
     },
     "_type": {
       "type": "CHOICE",
@@ -2527,18 +2522,125 @@
         "members": [
           {
             "type": "SYMBOL",
-            "name": "identifier"
+            "name": "_lambda_name_component"
+          },
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_lambda_qualified_name"
+            },
+            "named": true,
+            "value": "qualified_name"
           },
           {
             "type": "SYMBOL",
-            "name": "type_identifier"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "wildcard"
+            "name": "hole"
           }
         ]
       }
+    },
+    "_lambda_name_component": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "identifier"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "type_identifier"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "and"
+              },
+              {
+                "type": "STRING",
+                "value": "or"
+              },
+              {
+                "type": "STRING",
+                "value": "iff"
+              },
+              {
+                "type": "STRING",
+                "value": "implies"
+              },
+              {
+                "type": "STRING",
+                "value": "leadsTo"
+              },
+              {
+                "type": "STRING",
+                "value": "import"
+              },
+              {
+                "type": "STRING",
+                "value": "export"
+              },
+              {
+                "type": "STRING",
+                "value": "from"
+              },
+              {
+                "type": "STRING",
+                "value": "as"
+              }
+            ]
+          },
+          "named": true,
+          "value": "identifier"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "Set"
+              },
+              {
+                "type": "STRING",
+                "value": "List"
+              }
+            ]
+          },
+          "named": true,
+          "value": "type_identifier"
+        }
+      ]
+    },
+    "_lambda_qualified_name": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_lambda_name_component"
+        },
+        {
+          "type": "REPEAT1",
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "::"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_lambda_name_component"
+              }
+            ]
+          }
+        }
+      ]
     },
     "_lambda_parameter_list": {
       "type": "SEQ",
@@ -3855,7 +3957,11 @@
     ],
     [
       "_expression_name",
-      "_lambda_parameter"
+      "_lambda_name_component"
+    ],
+    [
+      "_qualified_expression_name",
+      "_lambda_name_component"
     ],
     [
       "tuple_parameter"
