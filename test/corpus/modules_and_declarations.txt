@@ -172,3 +172,51 @@ module Nested {
           body: (binary_expression
             left: (identifier)
             right: (integer)))))))
+
+==================
+declaration rejects typed parameters without a return type
+==================
+
+module InvalidTyped {
+  def f(a: int) = a
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      (ERROR
+        (parameter_list
+          (parameter
+            name: (identifier)
+            type: (primitive_type))))
+      body: (identifier))))
+
+==================
+declaration rejects mixed typed and untyped parameters
+==================
+
+module InvalidMixed {
+  def f(a: int, b): int = a
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      parameters: (parameter_list
+        (parameter
+          name: (identifier)
+          type: (primitive_type))
+        (ERROR
+          (identifier)))
+      type: (primitive_type)
+      body: (identifier))))

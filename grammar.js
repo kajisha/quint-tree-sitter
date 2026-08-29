@@ -51,13 +51,24 @@ module.exports = grammar({
       field('value', $._expression),
       optional(';'),
     ),
-    operator_definition: $ => seq(
-      field('qualifier', $.operator_qualifier),
-      field('name', $.identifier),
-      optional(field('parameters', $.parameter_list)),
-      optional(seq(':', field('type', $._type))),
-      optional(seq('=', field('body', $._expression))),
-      optional(';'),
+    operator_definition: $ => choice(
+      seq(
+        field('qualifier', $.operator_qualifier),
+        field('name', $.identifier),
+        field('parameters', alias($._annotated_parameter_list, $.parameter_list)),
+        ':',
+        field('type', $._type),
+        optional(seq('=', field('body', $._expression))),
+        optional(';'),
+      ),
+      seq(
+        field('qualifier', $.operator_qualifier),
+        field('name', $.identifier),
+        optional(field('parameters', alias($._untyped_parameter_list, $.parameter_list))),
+        optional(seq(':', field('type', $._type))),
+        optional(seq('=', field('body', $._expression))),
+        optional(';'),
+      ),
     ),
     operator_qualifier: _ => choice(
       'val',
@@ -69,19 +80,36 @@ module.exports = grammar({
       'temporal',
       'nondet',
     ),
-    parameter_list: $ => seq(
+    parameter_list: $ => choice(
+      $._annotated_parameter_list,
+      $._untyped_parameter_list,
+    ),
+    _annotated_parameter_list: $ => seq(
+      '(',
+      alias($._annotated_parameter, $.parameter),
+      repeat(seq(',', alias($._annotated_parameter, $.parameter))),
+      optional(','),
+      ')',
+    ),
+    _untyped_parameter_list: $ => seq(
       '(',
       optional(seq(
-        $.parameter,
-        repeat(seq(',', $.parameter)),
+        alias($._untyped_parameter, $.parameter),
+        repeat(seq(',', alias($._untyped_parameter, $.parameter))),
         optional(','),
       )),
       ')',
     ),
-    parameter: $ => seq(
-      field('name', $.identifier),
-      optional(seq(':', field('type', $._type))),
+    parameter: $ => choice(
+      $._annotated_parameter,
+      $._untyped_parameter,
     ),
+    _annotated_parameter: $ => seq(
+      field('name', $.identifier),
+      ':',
+      field('type', $._type),
+    ),
+    _untyped_parameter: $ => field('name', $.identifier),
     _type: $ => $.primitive_type,
     primitive_type: _ => 'int',
     _expression: $ => choice(
