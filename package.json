@@ -9,6 +9,7 @@
   "scripts": {
     "generate": "tree-sitter generate",
     "test:corpus": "tree-sitter test",
+    "test:highlight": "tree-sitter test --file-name basic.qnt",
     "test:fixtures": "node --test test/tree-sitter-command.test.mjs && node test/scripts/check-fixtures.mjs",
     "test:node-types": "node test/node-types.test.js",
     "test": "npm run test:corpus && npm run test:node-types",
