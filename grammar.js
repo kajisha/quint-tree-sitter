@@ -123,11 +123,11 @@ module.exports = grammar({
     type_declaration: $ => choice(
       seq(
         'type',
-        field('name', choice($.type_identifier, $.qualified_type_identifier)),
+        field('name', $.qualified_name),
       ),
       seq(
         'type',
-        field('name', choice($.type_identifier, $.qualified_type_identifier)),
+        field('name', $.qualified_name),
         optional(seq(
           '[',
           field('type_parameter', $.identifier),
@@ -141,38 +141,38 @@ module.exports = grammar({
     import_declaration: $ => choice(
       seq(
         'import',
-        field('module', choice($.identifier, $.type_identifier)),
+        field('module', $.qualified_name),
         '.',
-        field('member', choice($.identifier, $.type_identifier, $.wildcard)),
+        field('member', choice($.qualified_name, $.wildcard)),
         optional(seq('from', field('source', $.string))),
       ),
       seq(
         'import',
-        field('module', choice($.identifier, $.type_identifier)),
-        optional(seq('as', field('alias', choice($.identifier, $.type_identifier)))),
+        field('module', $.qualified_name),
+        optional(seq('as', field('alias', $.qualified_name))),
         optional(seq('from', field('source', $.string))),
       ),
     ),
     export_declaration: $ => choice(
       seq(
         'export',
-        field('module', choice($.identifier, $.type_identifier)),
+        field('module', $.qualified_name),
         '.',
-        field('member', choice($.identifier, $.type_identifier, $.wildcard)),
+        field('member', choice($.qualified_name, $.wildcard)),
       ),
       seq(
         'export',
-        field('module', choice($.identifier, $.type_identifier)),
-        optional(seq('as', field('alias', choice($.identifier, $.type_identifier)))),
+        field('module', $.qualified_name),
+        optional(seq('as', field('alias', $.qualified_name))),
       ),
     ),
     instance_declaration: $ => seq(
       'import',
-      field('module', choice($.identifier, $.type_identifier)),
+      field('module', $.qualified_name),
       field('overrides', $.instance_overrides),
       choice(
         seq('.', field('member', $.wildcard)),
-        seq('as', field('alias', choice($.identifier, $.type_identifier))),
+        seq('as', field('alias', $.qualified_name)),
       ),
       optional(seq('from', field('source', $.string))),
     ),
@@ -184,7 +184,7 @@ module.exports = grammar({
       ')',
     ),
     instance_override: $ => seq(
-      field('name', choice($.identifier, $.type_identifier)),
+      field('name', $.qualified_name),
       '=',
       field('value', $._expression),
     ),
@@ -200,7 +200,7 @@ module.exports = grammar({
       $.type_application,
       $.tuple_type,
       $.record_type,
-      $._parenthesized_type,
+      $.parenthesized_type,
     ),
     primitive_type: _ => choice('bool', 'int', 'str'),
     named_type: $ => seq(
@@ -248,10 +248,10 @@ module.exports = grammar({
           repeat(seq(',', $.record_field)),
           optional(choice(
             ',',
-            seq('|', field('tail', $.named_type)),
+            seq('|', field('tail', $.identifier)),
           )),
         ),
-        seq('|', field('tail', $.named_type)),
+        seq('|', field('tail', $.identifier)),
       )),
       '}',
     ),
@@ -289,7 +289,11 @@ module.exports = grammar({
         field('result', $._type),
       ),
     )),
-    _parenthesized_type: $ => seq('(', $._type, ')'),
+    parenthesized_type: $ => seq(
+      '(',
+      field('type', $._type),
+      ')',
+    ),
     sum_type: $ => choice(
       seq(
         optional('|'),
@@ -372,9 +376,7 @@ module.exports = grammar({
     )),
     identifier: _ => /[a-z][A-Za-z0-9_]*|_[A-Za-z0-9_]+/,
     type_identifier: _ => /[A-Z][A-Za-z0-9_]*/,
-    qualified_type_identifier: $ => seq(
-      choice($.identifier, $.type_identifier),
-      '::',
+    qualified_name: $ => seq(
       choice($.identifier, $.type_identifier),
       repeat(seq('::', choice($.identifier, $.type_identifier))),
     ),

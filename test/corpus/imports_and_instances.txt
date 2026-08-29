@@ -16,18 +16,25 @@ module Imports {
   (module
     name: (type_identifier)
     body: (import_declaration
-      module: (type_identifier))
+      module: (qualified_name
+        (type_identifier)))
     body: (import_declaration
-      module: (type_identifier)
-      member: (identifier))
+      module: (qualified_name
+        (type_identifier))
+      member: (qualified_name
+        (identifier)))
     body: (import_declaration
-      module: (type_identifier)
+      module: (qualified_name
+        (type_identifier))
       member: (wildcard))
     body: (import_declaration
-      module: (type_identifier)
-      alias: (type_identifier))
+      module: (qualified_name
+        (type_identifier))
+      alias: (qualified_name
+        (type_identifier)))
     body: (import_declaration
-      module: (type_identifier)
+      module: (qualified_name
+        (type_identifier))
       member: (wildcard)
       source: (string))))
 
@@ -45,8 +52,64 @@ module Exports {
   (module
     name: (type_identifier)
     body: (export_declaration
-      module: (type_identifier)
+      module: (qualified_name
+        (type_identifier))
       member: (wildcard))))
+
+==================
+qualified import export and instance names
+==================
+
+module QualifiedNames {
+  import Root::Math.member::pow
+  import Root::Math as Alias::M
+  export Root::Math.member::pow
+  import Root::Voting(Config::Value = Set(0, 1)) as Alias::V
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (import_declaration
+      module: (qualified_name
+        (type_identifier)
+        (type_identifier))
+      member: (qualified_name
+        (identifier)
+        (identifier)))
+    body: (import_declaration
+      module: (qualified_name
+        (type_identifier)
+        (type_identifier))
+      alias: (qualified_name
+        (type_identifier)
+        (type_identifier)))
+    body: (export_declaration
+      module: (qualified_name
+        (type_identifier)
+        (type_identifier))
+      member: (qualified_name
+        (identifier)
+        (identifier)))
+    body: (instance_declaration
+      module: (qualified_name
+        (type_identifier)
+        (type_identifier))
+      overrides: (instance_overrides
+        (instance_override
+          name: (qualified_name
+            (type_identifier)
+            (type_identifier))
+          value: (call_expression
+            function: (type_identifier)
+            arguments: (argument_list
+              (integer)
+              (integer)))))
+      alias: (qualified_name
+        (type_identifier)
+        (type_identifier)))))
 
 ==================
 instance with alias
@@ -62,16 +125,19 @@ module Instances {
   (module
     name: (type_identifier)
     body: (instance_declaration
-      module: (type_identifier)
+      module: (qualified_name
+        (type_identifier))
       overrides: (instance_overrides
         (instance_override
-          name: (type_identifier)
+          name: (qualified_name
+            (type_identifier))
           value: (call_expression
             function: (type_identifier)
             arguments: (argument_list
               (integer)
               (integer)))))
-      alias: (type_identifier))))
+      alias: (qualified_name
+        (type_identifier)))))
 
 ==================
 instance with wildcard and trailing override comma
@@ -87,10 +153,12 @@ module Instances {
   (module
     name: (type_identifier)
     body: (instance_declaration
-      module: (type_identifier)
+      module: (qualified_name
+        (type_identifier))
       overrides: (instance_overrides
         (instance_override
-          name: (type_identifier)
+          name: (qualified_name
+            (type_identifier))
           value: (call_expression
             function: (type_identifier)
             arguments: (argument_list

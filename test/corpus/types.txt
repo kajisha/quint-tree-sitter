@@ -14,12 +14,15 @@ module Types {
   (module
     name: (type_identifier)
     body: (type_declaration
-      name: (type_identifier))
+      name: (qualified_name
+        (type_identifier)))
     body: (type_declaration
-      name: (type_identifier)
+      name: (qualified_name
+        (type_identifier))
       value: (primitive_type))
     body: (type_declaration
-      name: (type_identifier)
+      name: (qualified_name
+        (type_identifier))
       type_parameter: (identifier)
       type_parameter: (identifier)
       value: (tuple_type
@@ -42,7 +45,8 @@ module Types {
   (module
     name: (type_identifier)
     body: (type_declaration
-      name: (type_identifier)
+      name: (qualified_name
+        (type_identifier))
       type_parameter: (identifier)
       value: (sum_type
         (sum_variant
@@ -67,7 +71,8 @@ module Types {
   (module
     name: (type_identifier)
     body: (type_declaration
-      name: (type_identifier)
+      name: (qualified_name
+        (type_identifier))
       value: (record_type
         (record_field
           name: (identifier)
@@ -76,14 +81,14 @@ module Types {
           name: (identifier)
           type: (primitive_type))))
     body: (type_declaration
-      name: (type_identifier)
+      name: (qualified_name
+        (type_identifier))
       type_parameter: (identifier)
       value: (record_type
         (record_field
           name: (identifier)
           type: (primitive_type))
-        tail: (named_type
-          (identifier))))))
+        tail: (identifier)))))
 
 ==================
 applications and nested applications
@@ -101,17 +106,20 @@ module Types {
   (module
     name: (type_identifier)
     body: (type_declaration
-      name: (type_identifier)
+      name: (qualified_name
+        (type_identifier))
       value: (type_application
         name: (named_type)
         argument: (primitive_type)))
     body: (type_declaration
-      name: (type_identifier)
+      name: (qualified_name
+        (type_identifier))
       value: (type_application
         name: (named_type)
         argument: (primitive_type)))
     body: (type_declaration
-      name: (type_identifier)
+      name: (qualified_name
+        (type_identifier))
       value: (type_application
         name: (named_type
           (type_identifier))
@@ -145,43 +153,50 @@ module Types {
   (module
     name: (type_identifier)
     body: (type_declaration
-      name: (type_identifier)
+      name: (qualified_name
+        (type_identifier))
       value: (function_type
         parameter: (primitive_type)
         result: (primitive_type)))
     body: (type_declaration
-      name: (type_identifier)
+      name: (qualified_name
+        (type_identifier))
       value: (function_type
         parameter: (primitive_type)
         result: (function_type
           parameter: (primitive_type)
           result: (primitive_type))))
     body: (type_declaration
-      name: (type_identifier)
+      name: (qualified_name
+        (type_identifier))
       value: (operator_type
         parameter: (primitive_type)
         parameter: (primitive_type)
         result: (primitive_type)))
     body: (type_declaration
-      name: (type_identifier)
+      name: (qualified_name
+        (type_identifier))
       value: (operator_type
         result: (primitive_type)))
     body: (type_declaration
-      name: (type_identifier)
+      name: (qualified_name
+        (type_identifier))
       value: (operator_type
         parameter: (primitive_type)
         result: (operator_type
           parameter: (primitive_type)
           result: (primitive_type))))
     body: (type_declaration
-      name: (type_identifier)
+      name: (qualified_name
+        (type_identifier))
       value: (operator_type
         parameter: (function_type
           parameter: (primitive_type)
           result: (primitive_type))
         result: (primitive_type)))
     body: (type_declaration
-      name: (type_identifier)
+      name: (qualified_name
+        (type_identifier))
       value: (operator_type
         parameter: (primitive_type)
         result: (function_type
@@ -196,7 +211,9 @@ module Types {
   type Unit = ()
   type Triple = (int, str, bool,)
   type lib::Qualified = int
+  type lowercase = str
   const qualified: lib::Domain
+  const parenthesized: ((int -> str))
 }
 
 ---
@@ -205,24 +222,37 @@ module Types {
   (module
     name: (type_identifier)
     body: (type_declaration
-      name: (type_identifier)
+      name: (qualified_name
+        (type_identifier))
       value: (tuple_type))
     body: (type_declaration
-      name: (type_identifier)
+      name: (qualified_name
+        (type_identifier))
       value: (tuple_type
         element: (primitive_type)
         element: (primitive_type)
         element: (primitive_type)))
     body: (type_declaration
-      name: (qualified_type_identifier
+      name: (qualified_name
         (identifier)
         (type_identifier))
+      value: (primitive_type))
+    body: (type_declaration
+      name: (qualified_name
+        (identifier))
       value: (primitive_type))
     body: (const_declaration
       name: (identifier)
       type: (named_type
         (identifier)
-        (type_identifier)))))
+        (type_identifier)))
+    body: (const_declaration
+      name: (identifier)
+      type: (parenthesized_type
+        type: (parenthesized_type
+          type: (function_type
+            parameter: (primitive_type)
+            result: (primitive_type)))))))
 
 ==================
 type rejects parameters on an abstract declaration
@@ -238,6 +268,32 @@ module InvalidTypes {
   (module
     name: (type_identifier)
     body: (type_declaration
-      name: (type_identifier))
+      name: (qualified_name
+        (type_identifier)))
     (ERROR
       (identifier))))
+
+==================
+record row rejects a qualified tail
+==================
+
+module InvalidRows {
+  type Invalid[r] = { name: str | scope::r }
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (type_declaration
+      name: (qualified_name
+        (type_identifier))
+      type_parameter: (identifier)
+      value: (record_type
+        (record_field
+          name: (identifier)
+          type: (primitive_type))
+        tail: (identifier)
+        (ERROR
+          (identifier))))))
