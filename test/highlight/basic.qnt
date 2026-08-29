@@ -30,6 +30,10 @@ type Maybe[a] = | None | Some(a)
 //                ^^^^ constructor
 //                       ^^^^ constructor
 
+val records = Set({ primary: Ready, secondary: Waiting })
+//                          ^^^^^ constructor
+//                                           ^^^^^^^ constructor
+
 const optional: Maybe[int]
 //              ^^^^^ type
 

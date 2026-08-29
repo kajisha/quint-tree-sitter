@@ -27,6 +27,9 @@
 (variant_pattern
   name: (_) @constructor)
 
+(record_element
+  value: (type_identifier) @constructor)
+
 (const_declaration
   name: (_) @constant)
 
