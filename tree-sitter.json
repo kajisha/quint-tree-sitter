@@ -1,0 +1,17 @@
+{
+  "grammars": [{
+    "name": "quint",
+    "camelcase": "Quint",
+    "scope": "source.quint",
+    "path": ".",
+    "file-types": ["qnt"],
+    "highlights": "queries/highlights.scm"
+  }],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "Apache-2.0",
+    "description": "Quint grammar for Tree-sitter",
+    "authors": [{ "name": "kajisha" }]
+  },
+  "bindings": { "c": true, "node": true }
+}

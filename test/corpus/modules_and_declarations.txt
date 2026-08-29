@@ -1,0 +1,11 @@
+==================
+empty module
+==================
+
+module Example {}
+
+---
+
+(source_file
+  (module
+    name: (identifier)))

@@ -1,0 +1,19 @@
+{
+  "name": "tree-sitter-quint",
+  "version": "0.1.0",
+  "description": "Quint grammar for Tree-sitter",
+  "license": "Apache-2.0",
+  "main": "bindings/node",
+  "types": "bindings/node/index.d.ts",
+  "files": ["grammar.js", "tree-sitter.json", "bindings/node", "queries", "src"],
+  "scripts": {
+    "generate": "tree-sitter generate",
+    "test:corpus": "tree-sitter test",
+    "test": "npm run test:corpus",
+    "check:generated": "npm run generate && git diff --exit-code -- src"
+  },
+  "devDependencies": {
+    "tree-sitter-cli": "0.26.13"
+  },
+  "tree-sitter": [{ "scope": "source.quint", "file-types": ["qnt"] }]
+}
