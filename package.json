@@ -9,6 +9,7 @@
   "scripts": {
     "generate": "tree-sitter generate",
     "test:corpus": "tree-sitter test",
+    "test:fixtures": "node test/scripts/check-fixtures.mjs",
     "test:node-types": "node test/node-types.test.js",
     "test": "npm run test:corpus && npm run test:node-types",
     "check:generated": "npm run generate && git diff --exit-code -- src"
