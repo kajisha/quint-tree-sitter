@@ -1,35 +1,18 @@
 import fs from 'node:fs'
-import os from 'node:os'
-import path from 'node:path'
-import { spawnSync } from 'node:child_process'
-import { fileURLToPath } from 'node:url'
 
-import { resolveTreeSitterCommand } from './tree-sitter-command.mjs'
+import Parser from 'tree-sitter'
+import Quint from '../../bindings/node/index.js'
 
+const parser = new Parser()
+parser.setLanguage(Quint)
 const root = new URL('../fixtures/quint-0.32.0/', import.meta.url)
 const files = fs.readdirSync(root).filter(name => name.endsWith('.qnt')).sort()
 
 if (files.length === 0) throw new Error('no Quint compatibility fixtures found')
-
-const grammar = fileURLToPath(new URL('../../', import.meta.url))
-const treeSitter = resolveTreeSitterCommand(grammar)
-const cache = fs.mkdtempSync(path.join(os.tmpdir(), 'tree-sitter-quint-fixtures-'))
-
-try {
-  for (const name of files) {
-    const fixture = fileURLToPath(new URL(name, root))
-    const args = [...treeSitter.args, 'parse', '--grammar-path', grammar, '--quiet', fixture]
-    const result = spawnSync(treeSitter.command, args, {
-      encoding: 'utf8',
-      env: { ...process.env, XDG_CACHE_HOME: cache },
-    })
-
-    if (result.error) throw result.error
-    if (result.status !== 0) {
-      const detail = `${result.stdout}${result.stderr}`.trim()
-      throw new Error(`${name}: ${detail || `tree-sitter parse exited ${result.status}`}`)
-    }
+for (const name of files) {
+  const source = fs.readFileSync(new URL(name, root), 'utf8')
+  const tree = parser.parse(source)
+  if (tree.rootNode.hasError) {
+    throw new Error(`${name}: ${tree.rootNode.toString()}`)
   }
-} finally {
-  fs.rmSync(cache, { recursive: true, force: true })
 }
