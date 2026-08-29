@@ -1,0 +1,298 @@
+==================
+precedence arithmetic and associativity
+==================
+
+module Arithmetic {
+  val multiply = a + b * c
+  val power = a ^ b ^ c
+  val unary = -a * b
+  val subtract = a - b - c
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (binary_expression
+        left: (identifier)
+        right: (binary_expression
+          left: (identifier)
+          right: (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (binary_expression
+        left: (identifier)
+        right: (binary_expression
+          left: (identifier)
+          right: (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (binary_expression
+        left: (unary_expression
+          operand: (identifier))
+        right: (identifier)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (binary_expression
+        left: (binary_expression
+          left: (identifier)
+          right: (identifier))
+        right: (identifier)))))
+
+==================
+precedence comparison assignment and logic
+==================
+
+module Logic {
+  val compare = a + b == c * d
+  val conjunction = a == b and c == d
+  action assignment = x' = a + b
+  action qualifiedAssignment = State::x' = a + b
+  val logic = a and b or c
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (binary_expression
+        left: (binary_expression
+          left: (identifier)
+          right: (identifier))
+        right: (binary_expression
+          left: (identifier)
+          right: (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (binary_expression
+        left: (binary_expression
+          left: (identifier)
+          right: (identifier))
+        right: (binary_expression
+          left: (identifier)
+          right: (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (delayed_assignment
+        name: (identifier)
+        value: (binary_expression
+          left: (identifier)
+          right: (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (delayed_assignment
+        name: (qualified_name
+          (type_identifier)
+          (identifier))
+        value: (binary_expression
+          left: (identifier)
+          right: (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (binary_expression
+        left: (binary_expression
+          left: (identifier)
+          right: (identifier))
+        right: (identifier)))))
+
+==================
+precedence temporal logic pair and postfix
+==================
+
+module Temporal {
+  val implication = a implies b iff c
+  temporal progress = a implies b leadsTo c iff d
+  val pair = key -> value implies valid
+  val postfix = -xs[0].size() ^ 2
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (binary_expression
+        left: (identifier)
+        right: (binary_expression
+          left: (identifier)
+          right: (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (binary_expression
+        left: (identifier)
+        right: (binary_expression
+          left: (identifier)
+          right: (binary_expression
+            left: (identifier)
+            right: (identifier)))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (pair_expression
+        key: (identifier)
+        value: (binary_expression
+          left: (identifier)
+          right: (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (unary_expression
+        operand: (binary_expression
+          left: (ufcs_expression
+            receiver: (index_expression
+              collection: (identifier)
+              index: (integer))
+            function: (identifier)
+            arguments: (argument_list))
+          right: (integer))))))
+
+==================
+precedence all infix operators
+==================
+
+module Operators {
+  val arithmetic = a ^ b * c / d % e + f - g
+  val comparisons = a > b and c < d and e >= f and g <= h and i != j and k == l
+  val booleans = a and b or c iff d leadsTo e implies f
+  val pair = a -> b
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (binary_expression
+        left: (binary_expression
+          left: (binary_expression
+            left: (binary_expression
+              left: (binary_expression
+                left: (binary_expression
+                  left: (identifier)
+                  right: (identifier))
+                right: (identifier))
+              right: (identifier))
+            right: (identifier))
+          right: (identifier))
+        right: (identifier)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (binary_expression
+        left: (binary_expression
+          left: (binary_expression
+            left: (binary_expression
+              left: (binary_expression
+                left: (binary_expression
+                  left: (identifier)
+                  right: (identifier))
+                right: (binary_expression
+                  left: (identifier)
+                  right: (identifier)))
+              right: (binary_expression
+                left: (identifier)
+                right: (identifier)))
+            right: (binary_expression
+              left: (identifier)
+              right: (identifier)))
+          right: (binary_expression
+            left: (identifier)
+            right: (identifier)))
+        right: (binary_expression
+          left: (identifier)
+          right: (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (binary_expression
+        left: (binary_expression
+          left: (binary_expression
+            left: (binary_expression
+              left: (binary_expression
+                left: (identifier)
+                right: (identifier))
+              right: (identifier))
+            right: (identifier))
+          right: (identifier))
+        right: (identifier)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (pair_expression
+        key: (identifier)
+        value: (identifier)))))
+
+==================
+precedence assignment and block boundaries
+==================
+
+module Boundaries {
+  action nestedAssignment = x' = y' = 0
+  action comparisonAssignment = x' = a == b
+  action assignmentLogic = x' = a and b
+  val blockPair = { val local = 1 local } -> value
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (delayed_assignment
+        name: (identifier)
+        value: (delayed_assignment
+          name: (identifier)
+          value: (integer))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (delayed_assignment
+        name: (identifier)
+        value: (binary_expression
+          left: (identifier)
+          right: (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (binary_expression
+        left: (delayed_assignment
+          name: (identifier)
+          value: (identifier))
+        right: (identifier)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (pair_expression
+        key: (block_expression
+          body: (declaration_expression
+            declaration: (operator_definition
+              qualifier: (operator_qualifier)
+              name: (identifier)
+              body: (integer))
+            body: (identifier)))
+        value: (identifier)))))

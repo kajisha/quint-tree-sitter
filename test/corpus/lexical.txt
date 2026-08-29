@@ -62,9 +62,7 @@ module Lexical {
     (ERROR
       (UNEXPECTED '#')
       (identifier)
-      (UNEXPECTED 'b')
       (identifier)
-      (UNEXPECTED 'e')
       (identifier)
       (identifier)
       (operator_qualifier))))
@@ -82,9 +80,7 @@ module Lexical {}
   (ERROR
     (UNEXPECTED '#')
     (identifier)
-    (UNEXPECTED 'b')
     (identifier)
-    (UNEXPECTED 'e')
     (identifier)
     (identifier))
   (module
@@ -104,9 +100,7 @@ module Lexical {}
   (ERROR
     (UNEXPECTED '#')
     (identifier)
-    (UNEXPECTED 'b')
     (identifier)
-    (UNEXPECTED 'e')
     (identifier)
     (identifier))
   (module
@@ -146,7 +140,6 @@ module Lexical {
     name: (type_identifier)
     (ERROR
       (operator_qualifier)
-      (UNEXPECTED ' ')
       (integer))))
 
 ==================
@@ -172,9 +165,9 @@ module Lexical {
     body: (operator_definition
       qualifier: (operator_qualifier)
       name: (identifier)
-      body: (integer))
-    (ERROR
-      (type_identifier))))
+      (ERROR
+        (integer))
+      body: (type_identifier))))
 
 ==================
 lexical strings do not interpret escapes

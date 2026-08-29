@@ -1,0 +1,354 @@
+==================
+expressions primary and collection forms
+==================
+
+module Expressions {
+  val qualified = Math::pow
+  val unit = ()
+  val grouped = (1)
+  val tuple = (1, "a")
+  val emptyList = []
+  val list = [1, 2, 3]
+  val record = { name: "q", count: 1 }
+  val spread = { ...record, count: 2 }
+  val set = Set(1, 2)
+  val builtin = and(true, false)
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (qualified_name
+        (type_identifier)
+        (identifier)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (unit_expression))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (parenthesized_expression
+        (integer)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (tuple_expression
+        element: (integer)
+        element: (string)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (list_expression))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (list_expression
+        element: (integer)
+        element: (integer)
+        element: (integer)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (record_expression
+        (record_element
+          name: (identifier)
+          value: (string))
+        (record_element
+          name: (identifier)
+          value: (integer))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (record_expression
+        (record_element
+          value: (identifier))
+        (record_element
+          name: (identifier)
+          value: (integer))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (call_expression
+        function: (type_identifier)
+        arguments: (argument_list
+          (integer)
+          (integer))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (boolean)
+          (boolean))))))
+
+==================
+expressions calls and access
+==================
+
+module Postfix {
+  val call = f(1, 2)
+  val qualifiedCall = Math::pow(2, 3)
+  val ufcs = value.f(1)
+  val field = record.name
+  val element = tuple._1
+  val indexed = list[0]
+  val chained = list[0].field.f()
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (integer)
+          (integer))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (call_expression
+        function: (qualified_name
+          (type_identifier)
+          (identifier))
+        arguments: (argument_list
+          (integer)
+          (integer))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (ufcs_expression
+        receiver: (identifier)
+        function: (identifier)
+        arguments: (argument_list
+          (integer))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (field_access_expression
+        receiver: (identifier)
+        field: (identifier)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (field_access_expression
+        receiver: (identifier)
+        field: (identifier)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (index_expression
+        collection: (identifier)
+        index: (integer)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (ufcs_expression
+        receiver: (field_access_expression
+          receiver: (index_expression
+            collection: (identifier)
+            index: (integer))
+          field: (identifier))
+        function: (identifier)
+        arguments: (argument_list)))))
+
+==================
+expressions conditionals and lambdas
+==================
+
+module Control {
+  val conditional = if (ready) yes else no
+  val single = x => x + 1
+  val parameters = (x, y) => x + y
+  val hole = _ => 0
+  val tupleSugar = ((x, y)) => x + y
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (conditional_expression
+        condition: (identifier)
+        consequence: (identifier)
+        alternative: (identifier)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (lambda_expression
+        parameter: (parameter
+          name: (identifier))
+        body: (binary_expression
+          left: (identifier)
+          right: (integer))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (lambda_expression
+        parameters: (parameter_list
+          (parameter
+            name: (identifier))
+          (parameter
+            name: (identifier)))
+        body: (binary_expression
+          left: (identifier)
+          right: (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (lambda_expression
+        parameter: (parameter
+          name: (wildcard))
+        body: (integer)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (lambda_expression
+        parameters: (tuple_parameter
+          (parameter
+            name: (identifier))
+          (parameter
+            name: (identifier)))
+        body: (binary_expression
+          left: (identifier)
+          right: (identifier))))))
+
+==================
+expressions logical action and ordinary blocks
+==================
+
+module Blocks {
+  val conjunction = and { a, b, }
+  val disjunction = or { a, b }
+  action both = all { a, b, }
+  action either = any { a, b }
+  val grouped = { a + b }
+  val local = {
+    val increment(x) = x + 1
+    increment(1)
+  }
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (logical_block
+        body: (identifier)
+        element: (identifier)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (logical_block
+        body: (identifier)
+        element: (identifier)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (action_block
+        body: (identifier)
+        element: (identifier)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (action_block
+        body: (identifier)
+        element: (identifier)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (block_expression
+        body: (binary_expression
+          left: (identifier)
+          right: (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (block_expression
+        body: (declaration_expression
+          declaration: (operator_definition
+            qualifier: (operator_qualifier)
+            name: (identifier)
+            parameters: (parameter_list
+              (parameter
+                name: (identifier)))
+            body: (binary_expression
+              left: (identifier)
+              right: (integer)))
+          body: (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (integer))))))))
+
+==================
+expressions trailing commas
+==================
+
+module Trailing {
+  val tuple = (1, 2,)
+  val list = [1, 2,]
+  val record = { first: 1, second: 2, }
+  val call = f(1, 2,)
+  val blocks = all { a, b, }
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (tuple_expression
+        element: (integer)
+        element: (integer)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (list_expression
+        element: (integer)
+        element: (integer)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (record_expression
+        (record_element
+          name: (identifier)
+          value: (integer))
+        (record_element
+          name: (identifier)
+          value: (integer))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (integer)
+          (integer))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (action_block
+        body: (identifier)
+        element: (identifier)))))
