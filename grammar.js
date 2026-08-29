@@ -74,14 +74,14 @@ module.exports = grammar({
     ),
     var_declaration: $ => seq(
       'var',
-      field('name', $.identifier),
+      field('name', choice($.identifier, $.type_identifier)),
       ':',
       field('type', $._type),
       optional(';'),
     ),
     assume_declaration: $ => seq(
       'assume',
-      field('name', $.identifier),
+      field('name', choice($.identifier, $.hole)),
       '=',
       field('value', $._expression),
       optional(';'),
@@ -96,7 +96,7 @@ module.exports = grammar({
       ),
       seq(
         field('qualifier', $.operator_qualifier),
-        field('name', $.identifier),
+        field('name', choice($.identifier, $.type_identifier)),
         field('parameters', alias($._annotated_parameter_list, $.parameter_list)),
         ':',
         field('type', $._type),
@@ -105,7 +105,7 @@ module.exports = grammar({
       ),
       seq(
         field('qualifier', $.operator_qualifier),
-        field('name', $.identifier),
+        field('name', choice($.identifier, $.type_identifier)),
         optional(field('parameters', alias($._untyped_parameter_list, $.parameter_list))),
         optional(seq(':', field('type', $._type))),
         optional(seq('=', field('body', $._expression))),
@@ -377,6 +377,7 @@ module.exports = grammar({
       $.logical_block,
       $.action_block,
       $.block_expression,
+      $.declaration_expression,
     ),
     _expression_name: $ => choice(
       $.identifier,
@@ -649,7 +650,7 @@ module.exports = grammar({
     ),
     block_expression: $ => seq(
       '{',
-      field('body', choice($.declaration_expression, $._expression)),
+      field('body', $._expression),
       '}',
     ),
     declaration_expression: $ => prec.right(PREC.BLOCK, seq(

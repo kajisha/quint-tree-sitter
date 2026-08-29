@@ -300,6 +300,36 @@ module Blocks {
               (integer))))))))
 
 ==================
+expressions allow unbraced local declarations
+==================
+
+module Locals {
+  val field =
+    val record = { a: 1 }
+    record.a
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (declaration_expression
+        declaration: (operator_definition
+          qualifier: (operator_qualifier)
+          name: (identifier)
+          body: (record_expression
+            (record_element
+              name: (identifier)
+              value: (integer))))
+        body: (field_access_expression
+          receiver: (identifier)
+          field: (identifier))))))
+
+==================
 expressions trailing commas
 ==================
 
