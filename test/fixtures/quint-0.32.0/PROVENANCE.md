@@ -4,6 +4,8 @@ Except for `upstream-SuperSpec.qnt`, these fixtures are original, repository-loc
 
 The copied fixture is unmodified. Quint attribution and the exact pinned Apache-2.0 terms are preserved locally in [`LICENSE.Quint-Apache-2.0`](./LICENSE.Quint-Apache-2.0), copied verbatim from the pinned root [`LICENSE`](https://github.com/quint-co/quint/blob/fd772606588b40def9978d8c82da69c2db7a0e3b/LICENSE) (Git blob `9778fd7248cd93f3cede8e807e652a6075808f8e`, 11490 bytes). The pinned root tree contains no `NOTICE` file, so there is no upstream NOTICE to copy.
 
+The `tree-sitter-quint` project and its original equivalent fixtures are licensed under Apache-2.0; see the repository-root [`LICENSE`](../../../LICENSE). The separate `LICENSE.Quint-Apache-2.0` file is retained specifically to preserve attribution and the pinned license text for the unmodified upstream fixture rather than replacing it with the project's copy.
+
 - Quint tag: [`v0.32.0`](https://github.com/quint-co/quint/releases/tag/v0.32.0)
 - Quint commit: [`fd772606588b40def9978d8c82da69c2db7a0e3b`](https://github.com/quint-co/quint/commit/fd772606588b40def9978d8c82da69c2db7a0e3b)
 - Upstream grammar: [`quint/src/generated/Quint.g4`](https://github.com/quint-co/quint/blob/fd772606588b40def9978d8c82da69c2db7a0e3b/quint/src/generated/Quint.g4)

@@ -2,7 +2,7 @@
   "name": "tree-sitter-quint",
   "version": "0.1.0",
   "description": "Quint grammar for Tree-sitter",
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "main": "bindings/node",
   "types": "bindings/node/index.d.ts",
   "files": [
@@ -29,8 +29,8 @@
     "test:node": "node --test bindings/node/binding_test.js",
     "test:node-types": "node test/node-types.test.js",
     "test:types": "tsc --noEmit --strict --module node16 --moduleResolution node16 bindings/node/index_test.ts",
-    "test": "npm run test:corpus && npm run test:node-types && npm run test:node && npm run test:types && npm run test:fixtures",
-    "check:generated": "npm run generate && git diff --exit-code -- src"
+    "test": "npm run test:corpus && npm run test:highlight && npm run test:node-types && npm run test:node && npm run test:types && npm run test:fixtures && npm run check:generated",
+    "check:generated": "npm run generate && git diff --exit-code -- src/grammar.json src/node-types.json src/parser.c src/scanner.c src/tree_sitter"
   },
   "dependencies": {
     "node-addon-api": "8.3.1",
