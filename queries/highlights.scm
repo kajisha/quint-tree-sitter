@@ -6,6 +6,11 @@
 (boolean) @boolean
 (primitive_type) @type.builtin
 
+; Identifiers are value references by default. More specific structural
+; contexts below override this capture for declarations and call sites.
+
+(identifier) @variable
+
 ; Structurally known declarations and call sites
 
 (module

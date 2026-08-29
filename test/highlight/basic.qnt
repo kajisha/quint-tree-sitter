@@ -49,6 +49,11 @@ var enabled: bool
 //  ^^^^^^^ variable
 //           ^^^^ type.builtin
 
+var counter: int
+// <- keyword
+//  ^^^^^^^ variable
+//           ^^^ type.builtin
+
 assume ready = true
 // <- keyword
 //           ^ operator
@@ -160,6 +165,15 @@ action update = enabled' = false
 // <- keyword
 //                     ^ operator
 //                       ^ operator
+
+action increment = counter' = counter + 1
+// <- keyword
+//                 ^^^^^^^ variable
+//                        ^ operator
+//                          ^ operator
+//                            ^^^^^^^ variable
+//                                    ^ operator
+//                                      ^ number
 
 val matched = match constructorLikeReference { | Some(x) => x | None => 0 }
 //            ^^^^^ keyword
