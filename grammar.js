@@ -78,6 +78,13 @@ module.exports = grammar({
     ),
     operator_definition: $ => choice(
       seq(
+        field('qualifier', alias($._destructuring_qualifier, $.operator_qualifier)),
+        field('pattern', choice($.tuple_pattern, $.record_pattern)),
+        '=',
+        field('body', $._expression),
+        optional(';'),
+      ),
+      seq(
         field('qualifier', $.operator_qualifier),
         field('name', $.identifier),
         field('parameters', alias($._annotated_parameter_list, $.parameter_list)),
@@ -94,6 +101,10 @@ module.exports = grammar({
         optional(seq('=', field('body', $._expression))),
         optional(';'),
       ),
+    ),
+    _destructuring_qualifier: _ => choice(
+      'val',
+      seq('pure', 'val'),
     ),
     operator_qualifier: _ => choice(
       'val',
@@ -343,6 +354,7 @@ module.exports = grammar({
       $.list_expression,
       $.record_expression,
       $.conditional_expression,
+      $.match_expression,
       $.lambda_expression,
       $.unary_expression,
       $.binary_expression,
@@ -409,6 +421,57 @@ module.exports = grammar({
       'else',
       field('alternative', $._expression),
     ),
+    match_expression: $ => seq(
+      'match',
+      field('value', $._expression),
+      '{',
+      optional('|'),
+      $.match_arm,
+      repeat(seq('|', $.match_arm)),
+      '}',
+    ),
+    match_arm: $ => seq(
+      field('pattern', choice($.variant_pattern, $._wildcard_pattern)),
+      '=>',
+      field('body', $._expression),
+    ),
+    _pattern: $ => choice(
+      $.identifier_pattern,
+      $._wildcard_pattern,
+      $.tuple_pattern,
+      $.record_pattern,
+      $.variant_pattern,
+    ),
+    identifier_pattern: $ => field('name', $._pattern_identifier),
+    _wildcard_pattern: $ => alias($.hole, $.wildcard_pattern),
+    tuple_pattern: $ => seq(
+      '(',
+      field('element', choice($.identifier_pattern, $._wildcard_pattern)),
+      ',',
+      field('element', choice($.identifier_pattern, $._wildcard_pattern)),
+      repeat(seq(',', field('element', choice($.identifier_pattern, $._wildcard_pattern)))),
+      ')',
+    ),
+    record_pattern: $ => seq(
+      '{',
+      field('field', $.identifier_pattern),
+      repeat(seq(',', field('field', $.identifier_pattern))),
+      '}',
+    ),
+    variant_pattern: $ => seq(
+      field('name', $._pattern_identifier),
+      optional(seq(
+        '(',
+        field('argument', choice($.identifier_pattern, $._wildcard_pattern)),
+        ')',
+      )),
+    ),
+    _pattern_identifier: $ => choice(
+      $.identifier,
+      $.type_identifier,
+      alias(choice('and', 'or', 'iff', 'implies', 'leadsTo', 'match', 'import', 'export', 'from', 'as'), $.identifier),
+      alias(choice('Set', 'List'), $.type_identifier),
+    ),
     lambda_expression: $ => choice(
       seq(
         field('parameter', alias($._lambda_parameter, $.parameter)),
@@ -434,7 +497,7 @@ module.exports = grammar({
     _lambda_name_component: $ => choice(
       $.identifier,
       $.type_identifier,
-      alias(choice('and', 'or', 'iff', 'implies', 'leadsTo', 'import', 'export', 'from', 'as'), $.identifier),
+      alias(choice('and', 'or', 'iff', 'implies', 'leadsTo', 'match', 'import', 'export', 'from', 'as'), $.identifier),
       alias(choice('Set', 'List'), $.type_identifier),
     ),
     _lambda_qualified_name: $ => seq(
@@ -584,6 +647,13 @@ module.exports = grammar({
       field('body', $._expression),
     )),
     _local_operator_definition: $ => choice(
+      seq(
+        field('qualifier', alias($._destructuring_qualifier, $.operator_qualifier)),
+        field('pattern', choice($.tuple_pattern, $.record_pattern)),
+        '=',
+        field('body', $._expression),
+        optional(';'),
+      ),
       seq(
         field('qualifier', $.operator_qualifier),
         field('name', $.identifier),

@@ -1,0 +1,167 @@
+==================
+error recovery preserves later declaration siblings
+==================
+
+module Recovery {
+  val broken @
+  val good = 1
+  const Missing: ;
+  val afterType = 2
+  val badCall = f(1,,)
+  val afterCall = 3
+  val badRecord = { name: , }
+  val afterRecord = 4
+  val badMatch = match value { | Some(x => x | None => 0 }
+  val afterMatch = 5
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier))
+    (ERROR
+      (UNEXPECTED '@'))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (integer))
+    body: (const_declaration
+      name: (type_identifier)
+      type: (named_type
+        (MISSING identifier)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (integer))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (integer)
+          (ERROR))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (integer))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (record_expression
+        (record_element
+          name: (identifier)
+          value: (MISSING identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (integer))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (match_expression
+        value: (identifier)
+        (match_arm
+          pattern: (variant_pattern
+            name: (type_identifier)
+            argument: (identifier_pattern
+              name: (identifier))
+            (MISSING ")"))
+          body: (identifier))
+        (match_arm
+          pattern: (variant_pattern
+            name: (type_identifier))
+          body: (integer))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (integer))))
+
+==================
+error incomplete names declarations and closing braces
+==================
+
+module {}
+
+module Declarations {
+  val
+}
+
+module Unclosed {
+  val kept = 1
+
+---
+
+(source_file
+  (ERROR)
+  (module
+    name: (type_identifier)
+    (ERROR
+      (operator_qualifier)))
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (integer))
+    (MISSING "}")))
+
+==================
+error unsupported trailing pattern separators recover locally
+==================
+
+module PatternSeparators {
+  val (left, right,) = pair
+  val { name, count, } = record
+  val result = match value { | Some(x) => x | None => 0 | }
+  val kept = 1
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      pattern: (tuple_pattern
+        element: (identifier_pattern
+          name: (identifier))
+        element: (identifier_pattern
+          name: (identifier))
+        (ERROR))
+      body: (identifier))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      pattern: (record_pattern
+        field: (identifier_pattern
+          name: (identifier))
+        field: (identifier_pattern
+          name: (identifier))
+        field: (identifier_pattern
+          name: (MISSING identifier)))
+      body: (identifier))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (match_expression
+        value: (identifier)
+        (match_arm
+          pattern: (variant_pattern
+            name: (type_identifier)
+            argument: (identifier_pattern
+              name: (identifier)))
+          body: (identifier))
+        (match_arm
+          pattern: (variant_pattern
+            name: (type_identifier))
+          body: (integer))
+        (ERROR)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (integer))))

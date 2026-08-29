@@ -1,0 +1,205 @@
+==================
+match variant identifier and wildcard patterns
+==================
+
+module Matching {
+  type Option[a] = | Some(a) | None
+  def unwrap(value) = match value {
+    | Some(x) => x
+    | None => 0
+    | _ => -1
+  }
+  val lower = match value { present(item) => item | absent => 0 }
+  val ignored = match value { Some(_) => 1 | _ => 0 }
+  val incremented = match value { Some(x) => x | None => 0 } + 1
+  val argument = f(match value { Some(x) => x | None => 0 }, 2)
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (type_declaration
+      name: (qualified_name
+        (type_identifier))
+      type_parameter: (identifier)
+      value: (sum_type
+        (sum_variant
+          name: (type_identifier)
+          type: (named_type
+            (identifier)))
+        (sum_variant
+          name: (type_identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      parameters: (parameter_list
+        (parameter
+          name: (identifier)))
+      body: (match_expression
+        value: (identifier)
+        (match_arm
+          pattern: (variant_pattern
+            name: (type_identifier)
+            argument: (identifier_pattern
+              name: (identifier)))
+          body: (identifier))
+        (match_arm
+          pattern: (variant_pattern
+            name: (type_identifier))
+          body: (integer))
+        (match_arm
+          pattern: (wildcard_pattern)
+          body: (unary_expression
+            operand: (integer)))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (match_expression
+        value: (identifier)
+        (match_arm
+          pattern: (variant_pattern
+            name: (identifier)
+            argument: (identifier_pattern
+              name: (identifier)))
+          body: (identifier))
+        (match_arm
+          pattern: (variant_pattern
+            name: (identifier))
+          body: (integer))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (match_expression
+        value: (identifier)
+        (match_arm
+          pattern: (variant_pattern
+            name: (type_identifier)
+            argument: (wildcard_pattern))
+          body: (integer))
+        (match_arm
+          pattern: (wildcard_pattern)
+          body: (integer))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (binary_expression
+        left: (match_expression
+          value: (identifier)
+          (match_arm
+            pattern: (variant_pattern
+              name: (type_identifier)
+              argument: (identifier_pattern
+                name: (identifier)))
+            body: (identifier))
+          (match_arm
+            pattern: (variant_pattern
+              name: (type_identifier))
+            body: (integer)))
+        right: (integer)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (match_expression
+            value: (identifier)
+            (match_arm
+              pattern: (variant_pattern
+                name: (type_identifier)
+                argument: (identifier_pattern
+                  name: (identifier)))
+              body: (identifier))
+            (match_arm
+              pattern: (variant_pattern
+                name: (type_identifier))
+              body: (integer)))
+          (integer))))))
+
+==================
+tuple and record destructuring patterns
+==================
+
+module Destructuring {
+  val pair = (1, 2)
+  val (left, right) = pair
+  val (first, _, third) = (1, 2, 3)
+  val { name, count } = { name: "q", count: 1 }
+  pure val { width, height } = rectangle
+  pure def sumPair(pair) = { pure val (x, y) = pair x + y }
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (tuple_expression
+        element: (integer)
+        element: (integer)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      pattern: (tuple_pattern
+        element: (identifier_pattern
+          name: (identifier))
+        element: (identifier_pattern
+          name: (identifier)))
+      body: (identifier))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      pattern: (tuple_pattern
+        element: (identifier_pattern
+          name: (identifier))
+        element: (wildcard_pattern)
+        element: (identifier_pattern
+          name: (identifier)))
+      body: (tuple_expression
+        element: (integer)
+        element: (integer)
+        element: (integer)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      pattern: (record_pattern
+        field: (identifier_pattern
+          name: (identifier))
+        field: (identifier_pattern
+          name: (identifier)))
+      body: (record_expression
+        (record_element
+          name: (identifier)
+          value: (string))
+        (record_element
+          name: (identifier)
+          value: (integer))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      pattern: (record_pattern
+        field: (identifier_pattern
+          name: (identifier))
+        field: (identifier_pattern
+          name: (identifier)))
+      body: (identifier))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      parameters: (parameter_list
+        (parameter
+          name: (identifier)))
+      body: (block_expression
+        body: (declaration_expression
+          declaration: (operator_definition
+            qualifier: (operator_qualifier)
+            pattern: (tuple_pattern
+              element: (identifier_pattern
+                name: (identifier))
+              element: (identifier_pattern
+                name: (identifier)))
+            body: (identifier))
+          body: (binary_expression
+            left: (identifier)
+            right: (identifier)))))))
