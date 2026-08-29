@@ -9,3 +9,166 @@ module Example {}
 (source_file
   (module
     name: (type_identifier)))
+
+==================
+core declarations
+==================
+
+module Declarations {
+  const N: int
+  var x: int
+  assume positive = N > 0
+  pure def increment(a: int): int = a + 1
+  pure val initial = 0
+  val current = x
+  def next(a) = a + 1
+  action init = x' = 0
+  run simulate = all { init }
+  temporal invariant = always(x >= 0)
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (const_declaration
+      name: (type_identifier)
+      type: (primitive_type))
+    body: (var_declaration
+      name: (identifier)
+      type: (primitive_type))
+    body: (assume_declaration
+      name: (identifier)
+      value: (binary_expression
+        left: (type_identifier)
+        right: (integer)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      parameters: (parameter_list
+        (parameter
+          name: (identifier)
+          type: (primitive_type)))
+      type: (primitive_type)
+      body: (binary_expression
+        left: (identifier)
+        right: (integer)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (integer))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (identifier))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      parameters: (parameter_list
+        (parameter
+          name: (identifier)))
+      body: (binary_expression
+        left: (identifier)
+        right: (integer)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (delayed_assignment
+        name: (identifier)
+        value: (integer)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (action_block
+        body: (identifier)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (binary_expression
+            left: (identifier)
+            right: (integer)))))))
+
+==================
+declaration parameters and semicolons
+==================
+
+module Signatures {
+  pure def empty(): int = 0;
+  pure def typed(a: int, b: int,): int = a + b;
+  def untyped(a, b,) = a + b;
+  val inferred = 0;
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      parameters: (parameter_list)
+      type: (primitive_type)
+      body: (integer))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      parameters: (parameter_list
+        (parameter
+          name: (identifier)
+          type: (primitive_type))
+        (parameter
+          name: (identifier)
+          type: (primitive_type)))
+      type: (primitive_type)
+      body: (binary_expression
+        left: (identifier)
+        right: (identifier)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      parameters: (parameter_list
+        (parameter
+          name: (identifier))
+        (parameter
+          name: (identifier)))
+      body: (binary_expression
+        left: (identifier)
+        right: (identifier)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (integer))))
+
+==================
+nondet nested declaration expression
+==================
+
+module Nested {
+  action choose = {
+    nondet picked = 1
+    picked > 0
+  }
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (block_expression
+        body: (declaration_expression
+          declaration: (operator_definition
+            qualifier: (operator_qualifier)
+            name: (identifier)
+            body: (integer))
+          body: (binary_expression
+            left: (identifier)
+            right: (integer)))))))

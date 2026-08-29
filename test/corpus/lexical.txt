@@ -20,27 +20,28 @@ module Lexical {
   (hash_bang_line)
   (module
     name: (type_identifier)
-    (ERROR
-      (identifier)
-      (identifier)
-      (UNEXPECTED ':')
-      (identifier)
-      (identifier)
-      (type_identifier)
-      (UNEXPECTED ':')
-      (identifier))
-    body: (operator_definition
+    body: (const_declaration
       name: (identifier)
-      value: (integer))
+      type: (primitive_type))
+    body: (const_declaration
+      name: (type_identifier)
+      type: (primitive_type))
     body: (operator_definition
+      qualifier: (operator_qualifier)
       name: (identifier)
-      value: (integer))
+      body: (integer))
     body: (operator_definition
+      qualifier: (operator_qualifier)
       name: (identifier)
-      value: (string))
+      body: (integer))
     body: (operator_definition
+      qualifier: (operator_qualifier)
       name: (identifier)
-      value: (boolean))
+      body: (string))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (boolean))
     (comment)
     (comment)
     (comment)))
@@ -66,7 +67,7 @@ module Lexical {
       (UNEXPECTED 'e')
       (identifier)
       (identifier)
-      (identifier))))
+      (operator_qualifier))))
 
 ==================
 lexical hashbang rejects a leading newline
@@ -84,7 +85,6 @@ module Lexical {}
     (UNEXPECTED 'b')
     (identifier)
     (UNEXPECTED 'e')
-    (identifier)
     (identifier)
     (identifier))
   (module
@@ -108,7 +108,6 @@ module Lexical {}
     (identifier)
     (UNEXPECTED 'e')
     (identifier)
-    (identifier)
     (identifier))
   (module
     name: (type_identifier)))
@@ -126,8 +125,10 @@ module Lexical {
 (source_file
   (module
     name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier))
     (ERROR
-      (identifier)
       (UNEXPECTED '\n'))))
 
 ==================
@@ -144,6 +145,7 @@ module Lexical {
   (module
     name: (type_identifier)
     (ERROR
+      (operator_qualifier)
       (UNEXPECTED ' ')
       (integer))))
 
@@ -162,13 +164,15 @@ module Lexical {
   (module
     name: (type_identifier)
     body: (operator_definition
+      qualifier: (operator_qualifier)
       name: (identifier)
-      value: (integer))
+      body: (integer))
     (ERROR
       (integer))
     body: (operator_definition
+      qualifier: (operator_qualifier)
       name: (identifier)
-      value: (integer))
+      body: (integer))
     (ERROR
       (type_identifier))))
 
@@ -186,8 +190,9 @@ module Lexical {
   (module
     name: (type_identifier)
     body: (operator_definition
+      qualifier: (operator_qualifier)
       name: (identifier)
-      value: (string))
+      body: (string))
     (ERROR
       (identifier)
       (UNEXPECTED '\n'))))
