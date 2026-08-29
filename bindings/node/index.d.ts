@@ -9,14 +9,11 @@ type ChildNode = {
   types: BaseNode[]
 }
 
-type NodeInfo =
-  | (BaseNode & {
-      subtypes: BaseNode[]
-    })
-  | (BaseNode & {
-      fields: { [name: string]: ChildNode }
-      children: ChildNode[]
-    })
+type NodeInfo = BaseNode & {
+  subtypes?: BaseNode[]
+  fields?: { [name: string]: ChildNode }
+  children?: ChildNode
+}
 
 /** The tree-sitter language object for this grammar. */
 declare const binding: {
@@ -27,7 +24,7 @@ declare const binding: {
   nodeTypeInfo: NodeInfo[]
 
   /** The syntax highlighting query for this grammar. */
-  HIGHLIGHTS_QUERY?: string
+  HIGHLIGHTS_QUERY: string
 
   /** The language injection query for this grammar. */
   INJECTIONS_QUERY?: string

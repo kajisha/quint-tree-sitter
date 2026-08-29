@@ -5,7 +5,21 @@
   "license": "UNLICENSED",
   "main": "bindings/node",
   "types": "bindings/node/index.d.ts",
-  "files": ["grammar.js", "tree-sitter.json", "binding.gyp", "bindings/node", "queries", "src"],
+  "files": [
+    "grammar.js",
+    "tree-sitter.json",
+    "binding.gyp",
+    "bindings/node/binding.cc",
+    "bindings/node/index.js",
+    "bindings/node/index.d.ts",
+    "queries/highlights.scm",
+    "src/parser.c",
+    "src/scanner.c",
+    "src/node-types.json",
+    "src/tree_sitter/alloc.h",
+    "src/tree_sitter/array.h",
+    "src/tree_sitter/parser.h"
+  ],
   "scripts": {
     "generate": "tree-sitter generate",
     "install": "node-gyp-build",
@@ -14,7 +28,8 @@
     "test:fixtures": "node test/scripts/check-fixtures.mjs",
     "test:node": "node --test bindings/node/binding_test.js",
     "test:node-types": "node test/node-types.test.js",
-    "test": "npm run test:corpus && npm run test:node-types && npm run test:node && npm run test:fixtures",
+    "test:types": "tsc --noEmit --strict --module node16 --moduleResolution node16 bindings/node/index_test.ts",
+    "test": "npm run test:corpus && npm run test:node-types && npm run test:node && npm run test:types && npm run test:fixtures",
     "check:generated": "npm run generate && git diff --exit-code -- src"
   },
   "dependencies": {
@@ -23,7 +38,8 @@
   },
   "devDependencies": {
     "tree-sitter": "0.25.0",
-    "tree-sitter-cli": "0.26.13"
+    "tree-sitter-cli": "0.26.13",
+    "typescript": "5.9.3"
   },
   "peerDependencies": {
     "tree-sitter": "0.25.0"

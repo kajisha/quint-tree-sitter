@@ -4,12 +4,10 @@ const path = require('node:path')
 const root = path.join(__dirname, '../..')
 const binding = require('node-gyp-build')(root)
 
-try {
-  binding.nodeTypeInfo = require('../../src/node-types.json')
-} catch {}
+binding.nodeTypeInfo = JSON.parse(readFileSync(path.join(root, 'src/node-types.json'), 'utf8'))
+binding.HIGHLIGHTS_QUERY = readFileSync(path.join(root, 'queries/highlights.scm'), 'utf8')
 
 const queries = [
-  ['HIGHLIGHTS_QUERY', path.join(root, 'queries/highlights.scm')],
   ['INJECTIONS_QUERY', path.join(root, 'queries/injections.scm')],
   ['LOCALS_QUERY', path.join(root, 'queries/locals.scm')],
   ['TAGS_QUERY', path.join(root, 'queries/tags.scm')],
@@ -23,7 +21,9 @@ for (const [property, queryPath] of queries) {
       delete binding[property]
       try {
         binding[property] = readFileSync(queryPath, 'utf8')
-      } catch {}
+      } catch (error) {
+        if (error?.code !== 'ENOENT') throw error
+      }
       return binding[property]
     },
   })
