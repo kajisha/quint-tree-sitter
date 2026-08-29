@@ -7,12 +7,26 @@ import Math.* from "./math"
 //            ^^^^ keyword
 //                 ^^^^^^^^ string
 
-export Math.*
+import Math as M from "./math"
 // <- keyword
+//          ^^ keyword
+//               ^^^^ keyword
+
+export Math as M
+// <- keyword
+//          ^^ keyword
+
+import Voting(Value = 1) as V from "./voting"
+// <- keyword
+//                  ^ operator
+//                       ^^ keyword
+//                            ^^^^ keyword
 
 type Maybe[a] = | None | Some(a)
 // <- keyword
 //   ^^^^^ type
+//            ^ operator
+//              ^ operator
 //                ^^^^ constructor
 //                       ^^^^ constructor
 
@@ -51,6 +65,19 @@ def add(x: int, y: int): int = x + y
 //                           ^ operator
 //                               ^ operator
 
+pure val pureValue = 0
+// <- keyword
+//   ^^^ keyword
+
+run runner = true
+// <- keyword
+
+temporal progress = true
+// <- keyword
+
+nondet selected = true
+// <- keyword
+
 val result = add(42, true)
 // <- keyword
 //  ^^^^^^ function
@@ -72,6 +99,12 @@ val choices = all { ready, enabled }
 val conjunctions = and { ready, enabled }
 //                 ^^^ operator
 
+val alternatives = or { ready, enabled }
+//                 ^^ operator
+
+val possibilities = any { ready, enabled }
+//                  ^^^ keyword
+
 val lambda = x => -x
 //             ^^ operator
 //                ^ operator
@@ -80,6 +113,45 @@ val comparison = result == limit and ready implies enabled
 //                      ^^ operator
 //                               ^^^ operator
 //                                         ^^^^^^^ operator
+
+val power = a ^ b
+//            ^ operator
+
+val multiply = a * b
+//               ^ operator
+
+val divide = a / b
+//             ^ operator
+
+val remainder = a % b
+//                ^ operator
+
+val subtract = a - b
+//               ^ operator
+
+val greater = a > b
+//              ^ operator
+
+val less = a < b
+//           ^ operator
+
+val greaterEqual = a >= b
+//                   ^^ operator
+
+val lessEqual = a <= b
+//                ^^ operator
+
+val unequal = a != b
+//              ^^ operator
+
+val disjunction = a or b
+//                  ^^ operator
+
+val equivalence = a iff b
+//                  ^^^ operator
+
+val leads = a leadsTo b
+//            ^^^^^^^ operator
 
 val pair = "key" -> result
 //               ^^ operator
