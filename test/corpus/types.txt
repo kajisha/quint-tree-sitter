@@ -297,3 +297,38 @@ module InvalidRows {
         tail: (identifier)
         (ERROR
           (identifier))))))
+
+==================
+single sum variants retain sum type shape
+==================
+
+module Types {
+  type Bare = None
+  type Leading = | None
+  type Payload = Some(int)
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (type_declaration
+      name: (qualified_name
+        (type_identifier))
+      value: (sum_type
+        (sum_variant
+          name: (type_identifier))))
+    body: (type_declaration
+      name: (qualified_name
+        (type_identifier))
+      value: (sum_type
+        (sum_variant
+          name: (type_identifier))))
+    body: (type_declaration
+      name: (qualified_name
+        (type_identifier))
+      value: (sum_type
+        (sum_variant
+          name: (type_identifier)
+          type: (primitive_type))))))

@@ -1,27 +1,9 @@
-type BaseNode = {
-  type: string
-  named: boolean
-}
-
-type ChildNode = {
-  multiple: boolean
-  required: boolean
-  types: BaseNode[]
-}
-
-type NodeInfo = BaseNode & {
-  subtypes?: BaseNode[]
-  fields?: { [name: string]: ChildNode }
-  children?: ChildNode
-}
+import Parser = require('tree-sitter')
 
 /** The tree-sitter language object for this grammar. */
-declare const binding: {
-  /** The inner language object. */
-  language: unknown
-
-  /** The content of the `node-types.json` file for this grammar. */
-  nodeTypeInfo: NodeInfo[]
+declare const binding: Parser.Language & {
+  /** The Tree-sitter grammar name. */
+  name: 'quint'
 
   /** The syntax highlighting query for this grammar. */
   HIGHLIGHTS_QUERY: string

@@ -1,10 +1,17 @@
+import Parser = require('tree-sitter')
 import Quint = require('./')
+
+const parser = new Parser()
+parser.setLanguage(Quint)
+
+const languageName: 'quint' = Quint.name
 
 type NodeInfo = (typeof Quint.nodeTypeInfo)[number]
 
 const child: NodeInfo = {
   type: 'identifier',
   named: true,
+  subtypes: [],
 }
 
 const withFields: NodeInfo = {
@@ -17,16 +24,18 @@ const withFields: NodeInfo = {
       types: [{ type: 'identifier', named: true }],
     },
   },
+  children: [],
 }
 
 const withChildren: NodeInfo = {
   type: 'source_file',
   named: true,
-  children: {
+  fields: {},
+  children: [{
     multiple: true,
     required: false,
     types: [{ type: 'module', named: true }],
-  },
+  }],
 }
 
 const withSubtypes: NodeInfo = {
@@ -35,4 +44,4 @@ const withSubtypes: NodeInfo = {
   subtypes: [{ type: 'identifier', named: true }],
 }
 
-void [child, withFields, withChildren, withSubtypes]
+void [parser, languageName, child, withFields, withChildren, withSubtypes]

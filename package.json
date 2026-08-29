@@ -15,6 +15,7 @@
     "queries/highlights.scm",
     "src/parser.c",
     "src/scanner.c",
+    "src/grammar.json",
     "src/node-types.json",
     "src/tree_sitter/alloc.h",
     "src/tree_sitter/array.h",
@@ -29,7 +30,9 @@
     "test:node": "node --test bindings/node/binding_test.js",
     "test:node-types": "node test/node-types.test.js",
     "test:types": "tsc --noEmit --strict --module node16 --moduleResolution node16 bindings/node/index_test.ts",
-    "test": "npm run test:corpus && npm run test:highlight && npm run test:node-types && npm run test:node && npm run test:types && npm run test:fixtures && npm run check:generated",
+    "test:coverage": "node test/scripts/check-upstream-coverage.mjs",
+    "test:package": "node test/scripts/check-package.mjs",
+    "test": "npm run test:corpus && npm run test:highlight && npm run test:node-types && npm run test:node && npm run test:types && npm run test:fixtures && npm run test:coverage && npm run check:generated && npm run test:package",
     "check:generated": "npm run generate && git diff --exit-code -- src/grammar.json src/node-types.json src/parser.c src/scanner.c src/tree_sitter"
   },
   "dependencies": {
@@ -37,6 +40,7 @@
     "node-gyp-build": "4.8.4"
   },
   "devDependencies": {
+    "@types/node": "22.15.3",
     "tree-sitter": "0.25.0",
     "tree-sitter-cli": "0.26.13",
     "typescript": "5.9.3"

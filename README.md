@@ -22,12 +22,17 @@ console.log(tree.rootNode.toString())
 ```
 
 The package also exposes `Quint.nodeTypeInfo` and `Quint.HIGHLIGHTS_QUERY`.
+Its CommonJS declaration is a `Parser.Language`, so the same import and
+`parser.setLanguage(Quint)` usage compile under strict TypeScript settings.
 
 ## Compatibility and scope
 
 Syntax compatibility is checked against the immutable Quint 0.32.0 commit [`fd772606588b40def9978d8c82da69c2db7a0e3b`](https://github.com/quint-co/quint/commit/fd772606588b40def9978d8c82da69c2db7a0e3b), its generated `Quint.g4`, and provenance-recorded fixtures. Corpus tests define the Tree-sitter concrete syntax tree (CST); the CST is not intended to match Quint's ANTLR parse tree or semantic intermediate representation.
 
 This parser is syntax-only. It does not perform module or import resolution, name resolution, declaration ordering, effect or mode checking, type checking, or other Quint semantic validation. Tree-sitter error recovery can also produce a tree for incomplete or invalid Quint input.
+An empty source file intentionally remains a clean editor-recovery state. A
+hashbang, however, is accepted only at byte zero and only when terminated by a
+newline, matching the pinned `HASHBANG_LINE` token.
 
 The initial distribution includes the generated C parser, Node/npm binding, and syntax-highlighting query. Rust, Python, Go, Java, Swift, Zig, Wasm, and editor-specific packages are intentionally unsupported in this release.
 
@@ -49,18 +54,27 @@ npm run test:node-types
 npm run test:node
 npm run test:types
 npm run test:fixtures
+npm run test:coverage
 npm run check:generated
+npm run test:package
 ```
 
-`npm test` runs those checks in release order. `npm pack --dry-run` shows the public package contents. Corpus tests cover CST and recovery behavior, highlight tests cover `queries/highlights.scm`, Node and type tests cover the npm binding, and fixture tests reject unexpected parse errors in the pinned Quint 0.32.0 inputs.
+`npm test` runs those checks in release order. The coverage gate validates the
+checked-in mapping for every pinned `Quint.g4` parser/lexer rule against
+`src/grammar.json` and its cited corpus or fixture evidence. The package gate
+creates a real tarball in a temporary directory, checks required/excluded paths,
+installs it offline under Node 22, and smoke-tests `Parser#setLanguage` and
+representative parsing. Corpus tests cover CST and recovery behavior, highlight
+tests cover `queries/highlights.scm`, Node and type tests cover the npm binding,
+and fixture tests reject unexpected parse errors in the pinned Quint 0.32.0 inputs.
 
 ## Updating for a Quint release
 
 1. Select a released Quint version and record its immutable tag and full commit SHA; do not use moving `main` references in release verification.
-2. Compare that commit's `Quint.g4`, parser tests, and relevant fixtures with the current pinned sources.
+2. Compare that commit's `Quint.g4`, parser tests, and relevant fixtures with the current pinned sources and update `test/upstream/quint-0.32.0/coverage.json` (including the source SHA-256).
 3. Classify changes as lexical, syntactic, semantic-only, or documentation-only. Add failing corpus or fixture tests for syntax changes.
 4. Update `grammar.js` and highlighting queries, regenerate committed artifacts with the pinned CLI, and review CST changes as compatibility changes.
-5. Run `npm ci`, `npm test`, fixture parsing, and `npm pack --dry-run`; then update the compatibility statement and fixture provenance.
+5. Run `npm ci` and `npm test`; then update the compatibility statement and fixture provenance.
 
 ## License
 

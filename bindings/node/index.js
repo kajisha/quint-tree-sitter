@@ -4,6 +4,7 @@ const path = require('node:path')
 const root = path.join(__dirname, '../..')
 const binding = require('node-gyp-build')(root)
 
+binding.name = 'quint'
 binding.nodeTypeInfo = JSON.parse(readFileSync(path.join(root, 'src/node-types.json'), 'utf8'))
 binding.HIGHLIGHTS_QUERY = readFileSync(path.join(root, 'queries/highlights.scm'), 'utf8')
 

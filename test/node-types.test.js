@@ -1,7 +1,7 @@
 const assert = require('node:assert/strict')
 const nodeTypes = require('../src/node-types.json')
 
-const nodesByType = new Map(nodeTypes.map(node => [node.type, node]))
+const nodesByType = new Map(nodeTypes.filter(node => node.named).map(node => [node.type, node]))
 
 function assertSingleNamedField(nodeType, fieldName) {
   const field = nodesByType.get(nodeType)?.fields?.[fieldName]
@@ -102,6 +102,36 @@ assertField('operator_definition', 'pattern', {
   required: false,
   multiple: false,
   types: ['record_pattern', 'tuple_pattern'],
+})
+assertField('module', 'name', {
+  required: true,
+  multiple: false,
+  types: ['identifier', 'qualified_name', 'type_identifier'],
+})
+for (const declaration of ['const_declaration', 'var_declaration']) {
+  assertField(declaration, 'name', {
+    required: true,
+    multiple: false,
+    types: ['identifier', 'qualified_name', 'type_identifier'],
+  })
+}
+for (const nodeType of ['assume_declaration', 'parameter']) {
+  assertField(nodeType, 'name', {
+    required: true,
+    multiple: false,
+    types: ['hole', 'identifier', 'qualified_name', 'type_identifier'],
+  })
+}
+assertField('operator_definition', 'name', {
+  required: false,
+  multiple: false,
+  types: ['identifier', 'qualified_name', 'type_identifier'],
+})
+
+assert.deepEqual(nodesByType.get('sum_type').children, {
+  multiple: true,
+  required: true,
+  types: [{ type: 'sum_variant', named: true }],
 })
 
 console.log('node-types field cardinality: ok')

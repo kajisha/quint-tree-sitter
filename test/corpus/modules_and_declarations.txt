@@ -278,3 +278,109 @@ module InvalidMixed {
           (identifier)))
       type: (primitive_type)
       body: (identifier))))
+
+==================
+qualified declaration names and parameter holes
+==================
+
+module Foo::Bar {
+  const Foo::x: int
+  var Foo::state: int
+  assume Foo::ok = true
+  def Foo::op(x) = x
+  def f(_: int): int = 0
+  def g(Foo::x) = Foo::x
+}
+
+---
+
+(source_file
+  (module
+    name: (qualified_name
+      (type_identifier)
+      (type_identifier))
+    body: (const_declaration
+      name: (qualified_name
+        (type_identifier)
+        (identifier))
+      type: (primitive_type))
+    body: (var_declaration
+      name: (qualified_name
+        (type_identifier)
+        (identifier))
+      type: (primitive_type))
+    body: (assume_declaration
+      name: (qualified_name
+        (type_identifier)
+        (identifier))
+      value: (boolean))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (qualified_name
+        (type_identifier)
+        (identifier))
+      parameters: (parameter_list
+        (parameter
+          name: (identifier)))
+      body: (identifier))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      parameters: (parameter_list
+        (parameter
+          name: (hole)
+          type: (primitive_type)))
+      type: (primitive_type)
+      body: (integer))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      parameters: (parameter_list
+        (parameter
+          name: (qualified_name
+            (type_identifier)
+            (identifier))))
+      body: (qualified_name
+        (type_identifier)
+        (identifier)))))
+
+==================
+upstream keyword identifier alternatives
+==================
+
+module from::Set {
+  const as::List: int
+  def and(x) = x
+  def from(as::Set) = as::Set
+}
+
+---
+
+(source_file
+  (module
+    name: (qualified_name
+      (identifier)
+      (type_identifier))
+    body: (const_declaration
+      name: (qualified_name
+        (identifier)
+        (type_identifier))
+      type: (primitive_type))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      parameters: (parameter_list
+        (parameter
+          name: (identifier)))
+      body: (identifier))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      parameters: (parameter_list
+        (parameter
+          name: (qualified_name
+            (identifier)
+            (type_identifier))))
+      body: (qualified_name
+        (identifier)
+        (type_identifier)))))

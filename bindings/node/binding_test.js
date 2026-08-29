@@ -54,6 +54,69 @@ test('loads and parses a Quint module', () => {
   assert.equal(tree.rootNode.namedChild(0).type, 'module')
   assert.ok(Quint.nodeTypeInfo.length > 0)
   assert.doesNotThrow(() => new Parser.Query(Quint, Quint.HIGHLIGHTS_QUERY))
+  assert.equal(Quint.name, 'quint')
+})
+
+test('hashbang requires a terminating newline', () => {
+  const parser = new Parser()
+  parser.setLanguage(Quint)
+
+  const withNewline = parser.parse('#! /usr/bin/env quint run\nmodule Example {}')
+  const atEof = parser.parse('#! /usr/bin/env quint run')
+
+  assert.equal(withNewline.rootNode.hasError, false)
+  assert.equal(withNewline.rootNode.namedChild(0).type, 'hash_bang_line')
+  assert.equal(atEof.rootNode.hasError, true)
+})
+
+test('hashbang scanner handles incremental insertion and removal', () => {
+  const parser = new Parser()
+  parser.setLanguage(Quint)
+  const originalSource = 'module Example {}\n'
+  const hashbang = '#! quint\n'
+  const insertedSource = hashbang + originalSource
+  const originalTree = parser.parse(originalSource)
+
+  originalTree.edit({
+    startIndex: 0,
+    oldEndIndex: 0,
+    newEndIndex: hashbang.length,
+    startPosition: { row: 0, column: 0 },
+    oldEndPosition: { row: 0, column: 0 },
+    newEndPosition: { row: 1, column: 0 },
+  })
+  const insertedTree = parser.parse(insertedSource, originalTree)
+  assert.equal(insertedTree.rootNode.hasError, false)
+  assert.equal(insertedTree.rootNode.namedChild(0).type, 'hash_bang_line')
+
+  insertedTree.edit({
+    startIndex: 0,
+    oldEndIndex: hashbang.length,
+    newEndIndex: 0,
+    startPosition: { row: 0, column: 0 },
+    oldEndPosition: { row: 1, column: 0 },
+    newEndPosition: { row: 0, column: 0 },
+  })
+  const removedTree = parser.parse(originalSource, insertedTree)
+  assert.equal(removedTree.rootNode.hasError, false)
+  assert.equal(removedTree.rootNode.namedChild(0).type, 'module')
+})
+
+test('hashbang is rejected after leading extras', () => {
+  const parser = new Parser()
+  parser.setLanguage(Quint)
+
+  assert.equal(parser.parse('\n#! quint\nmodule Example {}').rootNode.hasError, true)
+  assert.equal(parser.parse('// before\n#! quint\nmodule Example {}').rootNode.hasError, true)
+})
+
+test('reserved words remain invalid qualId and identOrHole components', () => {
+  const parser = new Parser()
+  parser.setLanguage(Quint)
+
+  assert.equal(parser.parse('module import {}').rootNode.hasError, true)
+  assert.equal(parser.parse('module M { def f(import) = 0 }').rootNode.hasError, true)
+  assert.equal(parser.parse('module M { val x = Math::and => 0 }').rootNode.hasError, true)
 })
 
 test('fails when required node type metadata is missing', t => {

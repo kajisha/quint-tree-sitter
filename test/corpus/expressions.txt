@@ -392,7 +392,6 @@ module LambdaParameters {
   val parenthesizedHole = (_) => 0
   val multipleHoles = (x, _) => x
   val qualifiedSingle = Math::x => Math::x
-  val qualifiedKeyword = Math::and => 0
   val qualifiedList = (Math::x, Util::y) => Math::x
   val qualifiedTupleSugar = ((Math::x, _)) => Math::x
   val groupedTuple = ((x, y))
@@ -440,15 +439,6 @@ module LambdaParameters {
         body: (qualified_name
           (type_identifier)
           (identifier))))
-    body: (operator_definition
-      qualifier: (operator_qualifier)
-      name: (identifier)
-      body: (lambda_expression
-        parameter: (parameter
-          name: (qualified_name
-            (type_identifier)
-            (identifier)))
-        body: (integer)))
     body: (operator_definition
       qualifier: (operator_qualifier)
       name: (identifier)

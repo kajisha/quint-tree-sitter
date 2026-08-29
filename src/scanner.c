@@ -59,6 +59,12 @@ bool tree_sitter_quint_external_scanner_scan(
       lexer->advance(lexer, false);
     } while (lexer->lookahead != '\n' && !lexer->eof(lexer));
 
+    if (lexer->eof(lexer)) {
+      return false;
+    }
+
+    lexer->advance(lexer, false);
+
     scanner->at_start = false;
     lexer->result_symbol = HASH_BANG_LINE;
     return true;

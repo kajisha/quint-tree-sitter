@@ -37,7 +37,12 @@ module.exports = grammar({
   word: $ => $.identifier,
 
   reserved: {
-    global: _ => [],
+    global: _ => [
+      'module', 'const', 'var', 'assume', 'val', 'pure', 'def', 'action', 'run',
+      'temporal', 'nondet', 'type', 'import', 'export', 'bool', 'int', 'str',
+      'if', 'else', 'match', 'and', 'or', 'iff', 'implies', 'leadsTo', 'all',
+      'any', 'true', 'false',
+    ],
     pattern: _ => [
       'module', 'const', 'var', 'assume', 'val', 'pure', 'def', 'action', 'run',
       'temporal', 'nondet', 'type', 'import', 'export', 'bool', 'int', 'str',
@@ -50,7 +55,13 @@ module.exports = grammar({
     source_file: $ => seq(choice($.hash_bang_line, $._file_start), repeat($.module)),
     module: $ => seq(
       'module',
-      field('name', choice($.identifier, $.type_identifier)),
+      field('name', choice(
+        $.identifier,
+        $.type_identifier,
+        alias(choice('from', 'as'), $.identifier),
+        alias(choice('Set', 'List'), $.type_identifier),
+        alias($._strict_qualified_name, $.qualified_name),
+      )),
       '{',
       field('body', repeat($._declaration)),
       '}',
@@ -67,21 +78,21 @@ module.exports = grammar({
     ),
     const_declaration: $ => seq(
       'const',
-      field('name', choice($.identifier, $.type_identifier)),
+      field('name', $._qual_id),
       ':',
       field('type', $._type),
       optional(';'),
     ),
     var_declaration: $ => seq(
       'var',
-      field('name', choice($.identifier, $.type_identifier)),
+      field('name', $._qual_id),
       ':',
       field('type', $._type),
       optional(';'),
     ),
     assume_declaration: $ => seq(
       'assume',
-      field('name', choice($.identifier, $.hole)),
+      field('name', $._ident_or_hole),
       '=',
       field('value', $._expression),
       optional(';'),
@@ -96,7 +107,7 @@ module.exports = grammar({
       ),
       seq(
         field('qualifier', $.operator_qualifier),
-        field('name', choice($.identifier, $.type_identifier)),
+        field('name', $._normal_call_name),
         field('parameters', alias($._annotated_parameter_list, $.parameter_list)),
         ':',
         field('type', $._type),
@@ -105,7 +116,7 @@ module.exports = grammar({
       ),
       seq(
         field('qualifier', $.operator_qualifier),
-        field('name', choice($.identifier, $.type_identifier)),
+        field('name', $._normal_call_name),
         optional(field('parameters', alias($._untyped_parameter_list, $.parameter_list))),
         optional(seq(':', field('type', $._type))),
         optional(seq('=', field('body', $._expression))),
@@ -151,11 +162,11 @@ module.exports = grammar({
       $._untyped_parameter,
     ),
     _annotated_parameter: $ => seq(
-      field('name', $.identifier),
+      field('name', $._ident_or_hole),
       ':',
       field('type', $._type),
     ),
-    _untyped_parameter: $ => field('name', $.identifier),
+    _untyped_parameter: $ => field('name', $._ident_or_hole),
     type_declaration: $ => choice(
       seq(
         'type',
@@ -331,28 +342,15 @@ module.exports = grammar({
       field('type', $._type),
       ')',
     ),
-    sum_type: $ => choice(
-      seq(
-        optional('|'),
-        $.sum_variant,
-        repeat1(seq('|', $.sum_variant)),
-      ),
-      seq(
-        '|',
-        $.sum_variant,
-      ),
-      alias($._sum_variant_with_payload, $.sum_variant),
-    ),
-    sum_variant: $ => seq(
+    sum_type: $ => prec.dynamic(1, seq(
+      optional('|'),
+      $.sum_variant,
+      repeat(seq('|', $.sum_variant)),
+    )),
+    sum_variant: $ => prec(1, seq(
       field('name', choice($.identifier, $.type_identifier)),
       optional(seq('(', field('type', $._type), ')')),
-    ),
-    _sum_variant_with_payload: $ => seq(
-      field('name', choice($.identifier, $.type_identifier)),
-      '(',
-      field('type', $._type),
-      ')',
-    ),
+    )),
     _expression: $ => choice(
       $._expression_name,
       $.integer,
@@ -380,13 +378,12 @@ module.exports = grammar({
       $.declaration_expression,
     ),
     _expression_name: $ => choice(
-      $.identifier,
-      $.type_identifier,
+      $._identifier_component,
       alias($._qualified_expression_name, $.qualified_name),
     ),
     _qualified_expression_name: $ => seq(
-      choice($.identifier, $.type_identifier),
-      repeat1(seq('::', choice($.identifier, $.type_identifier))),
+      $._identifier_component,
+      repeat1(seq('::', $._identifier_component)),
     ),
     unit_expression: _ => seq('(', ')'),
     parenthesized_expression: $ => seq('(', $._expression, ')'),
@@ -506,10 +503,7 @@ module.exports = grammar({
       $.hole,
     )),
     _lambda_name_component: $ => choice(
-      $.identifier,
-      $.type_identifier,
-      alias(choice('and', 'or', 'iff', 'implies', 'leadsTo', 'import', 'export', 'from', 'as'), $.identifier),
-      alias(choice('Set', 'List'), $.type_identifier),
+      $._identifier_component,
     ),
     _lambda_qualified_name: $ => seq(
       $._lambda_name_component,
@@ -667,7 +661,7 @@ module.exports = grammar({
       ),
       seq(
         field('qualifier', $.operator_qualifier),
-        field('name', $.identifier),
+        field('name', $._normal_call_name),
         field('parameters', alias($._annotated_parameter_list, $.parameter_list)),
         ':',
         field('type', $._type),
@@ -677,7 +671,7 @@ module.exports = grammar({
       ),
       seq(
         field('qualifier', $.operator_qualifier),
-        field('name', $.identifier),
+        field('name', $._normal_call_name),
         optional(field('parameters', alias($._untyped_parameter_list, $.parameter_list))),
         optional(seq(':', field('type', $._type))),
         '=',
@@ -687,9 +681,28 @@ module.exports = grammar({
     ),
     identifier: _ => /[a-z][A-Za-z0-9_]*|_[A-Za-z0-9_]+/,
     type_identifier: _ => /[A-Z][A-Za-z0-9_]*/,
+    _identifier_component: $ => choice(
+      $.identifier,
+      $.type_identifier,
+      alias(choice('from', 'as'), $.identifier),
+      alias(choice('Set', 'List'), $.type_identifier),
+    ),
+    _qual_id: $ => choice(
+      $._identifier_component,
+      alias($._strict_qualified_name, $.qualified_name),
+    ),
+    _strict_qualified_name: $ => seq(
+      $._identifier_component,
+      repeat1(seq('::', $._identifier_component)),
+    ),
+    _ident_or_hole: $ => choice($.hole, $._qual_id),
+    _normal_call_name: $ => choice(
+      $._qual_id,
+      alias(choice('and', 'or', 'iff', 'implies', 'leadsTo'), $.identifier),
+    ),
     qualified_name: $ => seq(
-      choice($.identifier, $.type_identifier),
-      repeat(seq('::', choice($.identifier, $.type_identifier))),
+      $._identifier_component,
+      repeat(seq('::', $._identifier_component)),
     ),
     integer: _ => token(choice(
       /0x[0-9A-Fa-f](?:_?[0-9A-Fa-f])*/,
