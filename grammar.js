@@ -1,4 +1,6 @@
 const PREC = {
+  TYPE_OPERATOR: 1,
+  TYPE_FUNCTION: 2,
   BLOCK: 2,
   ASSIGN: 8,
   COMPARE: 9,
@@ -12,6 +14,10 @@ module.exports = grammar({
   extras: $ => [/\s/, $.comment],
 
   externals: $ => [$.hash_bang_line, $._file_start],
+
+  conflicts: $ => [
+    [$.tuple_type, $.operator_type],
+  ],
 
   word: $ => $.identifier,
 
@@ -29,6 +35,10 @@ module.exports = grammar({
       $.var_declaration,
       $.assume_declaration,
       $.operator_definition,
+      $.type_declaration,
+      $.import_declaration,
+      $.export_declaration,
+      $.instance_declaration,
     ),
     const_declaration: $ => seq(
       'const',
@@ -110,8 +120,198 @@ module.exports = grammar({
       field('type', $._type),
     ),
     _untyped_parameter: $ => field('name', $.identifier),
-    _type: $ => $.primitive_type,
-    primitive_type: _ => 'int',
+    type_declaration: $ => choice(
+      seq(
+        'type',
+        field('name', choice($.type_identifier, $.qualified_type_identifier)),
+      ),
+      seq(
+        'type',
+        field('name', choice($.type_identifier, $.qualified_type_identifier)),
+        optional(seq(
+          '[',
+          field('type_parameter', $.identifier),
+          repeat(seq(',', field('type_parameter', $.identifier))),
+          ']',
+        )),
+        '=',
+        field('value', choice($.sum_type, $._type)),
+      ),
+    ),
+    import_declaration: $ => choice(
+      seq(
+        'import',
+        field('module', choice($.identifier, $.type_identifier)),
+        '.',
+        field('member', choice($.identifier, $.type_identifier, $.wildcard)),
+        optional(seq('from', field('source', $.string))),
+      ),
+      seq(
+        'import',
+        field('module', choice($.identifier, $.type_identifier)),
+        optional(seq('as', field('alias', choice($.identifier, $.type_identifier)))),
+        optional(seq('from', field('source', $.string))),
+      ),
+    ),
+    export_declaration: $ => choice(
+      seq(
+        'export',
+        field('module', choice($.identifier, $.type_identifier)),
+        '.',
+        field('member', choice($.identifier, $.type_identifier, $.wildcard)),
+      ),
+      seq(
+        'export',
+        field('module', choice($.identifier, $.type_identifier)),
+        optional(seq('as', field('alias', choice($.identifier, $.type_identifier)))),
+      ),
+    ),
+    instance_declaration: $ => seq(
+      'import',
+      field('module', choice($.identifier, $.type_identifier)),
+      field('overrides', $.instance_overrides),
+      choice(
+        seq('.', field('member', $.wildcard)),
+        seq('as', field('alias', choice($.identifier, $.type_identifier))),
+      ),
+      optional(seq('from', field('source', $.string))),
+    ),
+    instance_overrides: $ => seq(
+      '(',
+      $.instance_override,
+      repeat(seq(',', $.instance_override)),
+      optional(','),
+      ')',
+    ),
+    instance_override: $ => seq(
+      field('name', choice($.identifier, $.type_identifier)),
+      '=',
+      field('value', $._expression),
+    ),
+    wildcard: _ => '*',
+    _type: $ => choice(
+      $.operator_type,
+      $.function_type,
+      $._type_atom,
+    ),
+    _type_atom: $ => choice(
+      $.primitive_type,
+      $.named_type,
+      $.type_application,
+      $.tuple_type,
+      $.record_type,
+      $._parenthesized_type,
+    ),
+    primitive_type: _ => choice('bool', 'int', 'str'),
+    named_type: $ => seq(
+      choice($.identifier, $.type_identifier),
+      repeat(seq('::', choice($.identifier, $.type_identifier))),
+    ),
+    type_application: $ => choice(
+      seq(
+        field('name', alias('Set', $.named_type)),
+        '[',
+        field('argument', $._type),
+        ']',
+      ),
+      seq(
+        field('name', alias('List', $.named_type)),
+        '[',
+        field('argument', $._type),
+        ']',
+      ),
+      seq(
+        field('name', $.named_type),
+        '[',
+        field('argument', $._type),
+        repeat(seq(',', field('argument', $._type))),
+        ']',
+      ),
+    ),
+    tuple_type: $ => choice(
+      seq('(', ')'),
+      seq(
+        '(',
+        field('element', $._type),
+        ',',
+        field('element', $._type),
+        repeat(seq(',', field('element', $._type))),
+        optional(','),
+        ')',
+      ),
+    ),
+    record_type: $ => seq(
+      '{',
+      optional(choice(
+        seq(
+          $.record_field,
+          repeat(seq(',', $.record_field)),
+          optional(choice(
+            ',',
+            seq('|', field('tail', $.named_type)),
+          )),
+        ),
+        seq('|', field('tail', $.named_type)),
+      )),
+      '}',
+    ),
+    record_field: $ => seq(
+      field('name', choice($.identifier, $.type_identifier)),
+      ':',
+      field('type', $._type),
+    ),
+    function_type: $ => prec.right(PREC.TYPE_FUNCTION, seq(
+      field('parameter', $._type_atom),
+      '->',
+      field('result', choice($.function_type, $._type_atom)),
+    )),
+    operator_type: $ => prec.right(PREC.TYPE_OPERATOR, choice(
+      seq(
+        '(',
+        optional(seq(
+          field('parameter', $._type),
+          repeat(seq(',', field('parameter', $._type))),
+          optional(','),
+        )),
+        ')',
+        '=>',
+        field('result', $._type),
+      ),
+      seq(
+        field('parameter', choice(
+          $.function_type,
+          $.primitive_type,
+          $.named_type,
+          $.type_application,
+          $.record_type,
+        )),
+        '=>',
+        field('result', $._type),
+      ),
+    )),
+    _parenthesized_type: $ => seq('(', $._type, ')'),
+    sum_type: $ => choice(
+      seq(
+        optional('|'),
+        $.sum_variant,
+        repeat1(seq('|', $.sum_variant)),
+      ),
+      seq(
+        '|',
+        $.sum_variant,
+      ),
+      alias($._sum_variant_with_payload, $.sum_variant),
+    ),
+    sum_variant: $ => seq(
+      field('name', choice($.identifier, $.type_identifier)),
+      optional(seq('(', field('type', $._type), ')')),
+    ),
+    _sum_variant_with_payload: $ => seq(
+      field('name', choice($.identifier, $.type_identifier)),
+      '(',
+      field('type', $._type),
+      ')',
+    ),
     _expression: $ => choice(
       $.identifier,
       $.type_identifier,
@@ -172,6 +372,12 @@ module.exports = grammar({
     )),
     identifier: _ => /[a-z][A-Za-z0-9_]*|_[A-Za-z0-9_]+/,
     type_identifier: _ => /[A-Z][A-Za-z0-9_]*/,
+    qualified_type_identifier: $ => seq(
+      choice($.identifier, $.type_identifier),
+      '::',
+      choice($.identifier, $.type_identifier),
+      repeat(seq('::', choice($.identifier, $.type_identifier))),
+    ),
     integer: _ => token(choice(
       /0x[0-9A-Fa-f](?:_?[0-9A-Fa-f])*/,
       /0|[1-9](?:_?[0-9])*/,

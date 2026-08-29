@@ -1,0 +1,243 @@
+==================
+abstract alias and polymorphic types
+==================
+
+module Types {
+  type Abstract
+  type Temperature = int
+  type Pair[a, b] = (a, b)
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (type_declaration
+      name: (type_identifier))
+    body: (type_declaration
+      name: (type_identifier)
+      value: (primitive_type))
+    body: (type_declaration
+      name: (type_identifier)
+      type_parameter: (identifier)
+      type_parameter: (identifier)
+      value: (tuple_type
+        element: (named_type
+          (identifier))
+        element: (named_type
+          (identifier))))))
+
+==================
+sum type with optional leading separator
+==================
+
+module Types {
+  type Option[a] = | Some(a) | None
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (type_declaration
+      name: (type_identifier)
+      type_parameter: (identifier)
+      value: (sum_type
+        (sum_variant
+          name: (type_identifier)
+          type: (named_type
+            (identifier)))
+        (sum_variant
+          name: (type_identifier))))))
+
+==================
+record types and rows
+==================
+
+module Types {
+  type Row = { name: str, count: int, }
+  type OpenRow[r] = { name: str | r }
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (type_declaration
+      name: (type_identifier)
+      value: (record_type
+        (record_field
+          name: (identifier)
+          type: (primitive_type))
+        (record_field
+          name: (identifier)
+          type: (primitive_type))))
+    body: (type_declaration
+      name: (type_identifier)
+      type_parameter: (identifier)
+      value: (record_type
+        (record_field
+          name: (identifier)
+          type: (primitive_type))
+        tail: (named_type
+          (identifier))))))
+
+==================
+applications and nested applications
+==================
+
+module Types {
+  type Sets = Set[int]
+  type Lists = List[str]
+  type Nested = Result[List[int], Set[Option[str]]]
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (type_declaration
+      name: (type_identifier)
+      value: (type_application
+        name: (named_type)
+        argument: (primitive_type)))
+    body: (type_declaration
+      name: (type_identifier)
+      value: (type_application
+        name: (named_type)
+        argument: (primitive_type)))
+    body: (type_declaration
+      name: (type_identifier)
+      value: (type_application
+        name: (named_type
+          (type_identifier))
+        argument: (type_application
+          name: (named_type)
+          argument: (primitive_type))
+        argument: (type_application
+          name: (named_type)
+          argument: (type_application
+            name: (named_type
+              (type_identifier))
+            argument: (primitive_type)))))))
+
+==================
+function and operator types
+==================
+
+module Types {
+  type Function = int -> str
+  type Curried = int -> str -> bool
+  type Operator = (int, str,) => bool
+  type NullaryOperator = () => bool
+  type CurriedOperator = int => str => bool
+  type FunctionToOperator = int -> str => bool
+  type OperatorToFunction = int => str -> bool
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (type_declaration
+      name: (type_identifier)
+      value: (function_type
+        parameter: (primitive_type)
+        result: (primitive_type)))
+    body: (type_declaration
+      name: (type_identifier)
+      value: (function_type
+        parameter: (primitive_type)
+        result: (function_type
+          parameter: (primitive_type)
+          result: (primitive_type))))
+    body: (type_declaration
+      name: (type_identifier)
+      value: (operator_type
+        parameter: (primitive_type)
+        parameter: (primitive_type)
+        result: (primitive_type)))
+    body: (type_declaration
+      name: (type_identifier)
+      value: (operator_type
+        result: (primitive_type)))
+    body: (type_declaration
+      name: (type_identifier)
+      value: (operator_type
+        parameter: (primitive_type)
+        result: (operator_type
+          parameter: (primitive_type)
+          result: (primitive_type))))
+    body: (type_declaration
+      name: (type_identifier)
+      value: (operator_type
+        parameter: (function_type
+          parameter: (primitive_type)
+          result: (primitive_type))
+        result: (primitive_type)))
+    body: (type_declaration
+      name: (type_identifier)
+      value: (operator_type
+        parameter: (primitive_type)
+        result: (function_type
+          parameter: (primitive_type)
+          result: (primitive_type))))))
+
+==================
+unit tuple and qualified named types
+==================
+
+module Types {
+  type Unit = ()
+  type Triple = (int, str, bool,)
+  type lib::Qualified = int
+  const qualified: lib::Domain
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (type_declaration
+      name: (type_identifier)
+      value: (tuple_type))
+    body: (type_declaration
+      name: (type_identifier)
+      value: (tuple_type
+        element: (primitive_type)
+        element: (primitive_type)
+        element: (primitive_type)))
+    body: (type_declaration
+      name: (qualified_type_identifier
+        (identifier)
+        (type_identifier))
+      value: (primitive_type))
+    body: (const_declaration
+      name: (identifier)
+      type: (named_type
+        (identifier)
+        (type_identifier)))))
+
+==================
+type rejects parameters on an abstract declaration
+==================
+
+module InvalidTypes {
+  type Abstract[a]
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (type_declaration
+      name: (type_identifier))
+    (ERROR
+      (identifier))))

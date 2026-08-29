@@ -1,0 +1,99 @@
+==================
+import modules and members
+==================
+
+module Imports {
+  import Math
+  import Math.pow
+  import Math.*
+  import Math as M
+  import Math.* from "./math"
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (import_declaration
+      module: (type_identifier))
+    body: (import_declaration
+      module: (type_identifier)
+      member: (identifier))
+    body: (import_declaration
+      module: (type_identifier)
+      member: (wildcard))
+    body: (import_declaration
+      module: (type_identifier)
+      alias: (type_identifier))
+    body: (import_declaration
+      module: (type_identifier)
+      member: (wildcard)
+      source: (string))))
+
+==================
+export module members
+==================
+
+module Exports {
+  export Math.*
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (export_declaration
+      module: (type_identifier)
+      member: (wildcard))))
+
+==================
+instance with alias
+==================
+
+module Instances {
+  import Voting(Value = Set(0, 1)) as V
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (instance_declaration
+      module: (type_identifier)
+      overrides: (instance_overrides
+        (instance_override
+          name: (type_identifier)
+          value: (call_expression
+            function: (type_identifier)
+            arguments: (argument_list
+              (integer)
+              (integer)))))
+      alias: (type_identifier))))
+
+==================
+instance with wildcard and trailing override comma
+==================
+
+module Instances {
+  import Voting(Value = Set(0, 1),).*
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (instance_declaration
+      module: (type_identifier)
+      overrides: (instance_overrides
+        (instance_override
+          name: (type_identifier)
+          value: (call_expression
+            function: (type_identifier)
+            arguments: (argument_list
+              (integer)
+              (integer)))))
+      member: (wildcard))))
