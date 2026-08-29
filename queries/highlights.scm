@@ -35,10 +35,10 @@
   name: (_) @variable.parameter)
 
 (call_expression
-  function: (_) @function.call)
+  function: (_) @function)
 
 (ufcs_expression
-  function: (_) @function.call)
+  function: (_) @function)
 
 ; Keywords, scoped to the CST forms in which they are syntax.
 
@@ -101,6 +101,9 @@
     "leadsTo"
     "implies"
   ] @operator)
+
+(logical_block
+  ["and" "or"] @operator)
 
 (pair_expression "->" @operator)
 (function_type "->" @operator)
