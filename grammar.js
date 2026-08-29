@@ -3,10 +3,12 @@ module.exports = grammar({
 
   extras: $ => [/\s/, $.comment],
 
+  externals: $ => [$.hash_bang_line, $._file_start],
+
   word: $ => $.identifier,
 
   rules: {
-    source_file: $ => seq(optional($.hash_bang_line), repeat($.module)),
+    source_file: $ => seq(choice($.hash_bang_line, $._file_start), repeat($.module)),
     module: $ => seq(
       'module',
       field('name', choice($.identifier, $.type_identifier)),
@@ -30,7 +32,6 @@ module.exports = grammar({
     )),
     string: _ => token(seq('"', repeat(/[^"\n]/), '"')),
     boolean: _ => choice('true', 'false'),
-    hash_bang_line: _ => token(seq('#!', /[^\n]*/)),
     comment: _ => token(choice(
       seq('///', /[^\n]*/),
       seq('//', /[^\n]*/),

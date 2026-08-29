@@ -1,7 +1,6 @@
 ==================
 lexical forms
 ==================
-
 #! /usr/bin/env quint run
 module Lexical {
   const lower_name: int
@@ -60,7 +59,59 @@ module Lexical {
   (module
     name: (type_identifier)
     (ERROR
-      (hash_bang_line))))
+      (UNEXPECTED '#')
+      (identifier)
+      (UNEXPECTED 'b')
+      (identifier)
+      (UNEXPECTED 'e')
+      (identifier)
+      (identifier)
+      (identifier))))
+
+==================
+lexical hashbang rejects a leading newline
+==================
+
+#! /usr/bin/env quint run
+module Lexical {}
+
+---
+
+(source_file
+  (ERROR
+    (UNEXPECTED '#')
+    (identifier)
+    (UNEXPECTED 'b')
+    (identifier)
+    (UNEXPECTED 'e')
+    (identifier)
+    (identifier)
+    (identifier))
+  (module
+    name: (type_identifier)))
+
+==================
+lexical hashbang rejects a leading comment
+==================
+// before hashbang
+#! /usr/bin/env quint run
+module Lexical {}
+
+---
+
+(source_file
+  (comment)
+  (ERROR
+    (UNEXPECTED '#')
+    (identifier)
+    (UNEXPECTED 'b')
+    (identifier)
+    (UNEXPECTED 'e')
+    (identifier)
+    (identifier)
+    (identifier))
+  (module
+    name: (type_identifier)))
 
 ==================
 lexical unterminated string is an error
