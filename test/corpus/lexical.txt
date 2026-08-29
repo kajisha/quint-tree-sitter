@@ -1,0 +1,142 @@
+==================
+lexical forms
+==================
+
+#! /usr/bin/env quint run
+module Lexical {
+  const lower_name: int
+  const UpperName: int
+  val decimal = 1_000_000
+  val hexadecimal = 0xCA_FE
+  val text = "Quint"
+  val truth = true
+  /// documentation
+  // line
+  /* block */
+}
+
+---
+
+(source_file
+  (hash_bang_line)
+  (module
+    name: (type_identifier)
+    (ERROR
+      (identifier)
+      (identifier)
+      (UNEXPECTED ':')
+      (identifier)
+      (identifier)
+      (type_identifier)
+      (UNEXPECTED ':')
+      (identifier))
+    body: (operator_definition
+      name: (identifier)
+      value: (integer))
+    body: (operator_definition
+      name: (identifier)
+      value: (integer))
+    body: (operator_definition
+      name: (identifier)
+      value: (string))
+    body: (operator_definition
+      name: (identifier)
+      value: (boolean))
+    (comment)
+    (comment)
+    (comment)))
+
+==================
+lexical hashbang is source-leading only
+==================
+
+module Lexical {
+  #! /usr/bin/env quint run
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    (ERROR
+      (hash_bang_line))))
+
+==================
+lexical unterminated string is an error
+==================
+
+module Lexical {
+  val text = "Quint
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    (ERROR
+      (identifier)
+      (UNEXPECTED '\n'))))
+
+==================
+lexical bare underscore is not an identifier
+==================
+
+module Lexical {
+  val _ = 0
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    (ERROR
+      (UNEXPECTED ' ')
+      (integer))))
+
+==================
+lexical integers follow upstream prefixes and leading-zero rules
+==================
+
+module Lexical {
+  val leading_zero = 01
+  val uppercase_hex = 0XCA
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      name: (identifier)
+      value: (integer))
+    (ERROR
+      (integer))
+    body: (operator_definition
+      name: (identifier)
+      value: (integer))
+    (ERROR
+      (type_identifier))))
+
+==================
+lexical strings do not interpret escapes
+==================
+
+module Lexical {
+  val text = "a\"b"
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      name: (identifier)
+      value: (string))
+    (ERROR
+      (identifier)
+      (UNEXPECTED '\n'))))

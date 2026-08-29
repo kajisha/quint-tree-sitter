@@ -8,4 +8,4 @@ module Example {}
 
 (source_file
   (module
-    name: (identifier)))
+    name: (type_identifier)))

@@ -1,5 +1,10 @@
 [
   {
+    "type": "boolean",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "module",
     "named": true,
     "fields": {
@@ -8,7 +13,7 @@
         "required": false,
         "types": [
           {
-            "type": "comment",
+            "type": "operator_definition",
             "named": true
           }
         ]
@@ -19,6 +24,44 @@
         "types": [
           {
             "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "type_identifier",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "operator_definition",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "integer",
+            "named": true
+          },
+          {
+            "type": "string",
             "named": true
           }
         ]
@@ -35,6 +78,10 @@
       "required": false,
       "types": [
         {
+          "type": "hash_bang_line",
+          "named": true
+        },
+        {
           "type": "module",
           "named": true
         }
@@ -42,16 +89,52 @@
     }
   },
   {
+    "type": ";",
+    "named": false
+  },
+  {
+    "type": "=",
+    "named": false
+  },
+  {
     "type": "comment",
     "named": true,
     "extra": true
+  },
+  {
+    "type": "false",
+    "named": false
+  },
+  {
+    "type": "hash_bang_line",
+    "named": true
   },
   {
     "type": "identifier",
     "named": true
   },
   {
+    "type": "integer",
+    "named": true
+  },
+  {
     "type": "module",
+    "named": false
+  },
+  {
+    "type": "string",
+    "named": true
+  },
+  {
+    "type": "true",
+    "named": false
+  },
+  {
+    "type": "type_identifier",
+    "named": true
+  },
+  {
+    "type": "val",
     "named": false
   },
   {
