@@ -11,7 +11,15 @@ const fixtureDirectory = 'test/fixtures/quint-0.32.0'
 const expectedSha = 'fd772606588b40def9978d8c82da69c2db7a0e3b'
 const expectedSourceSha256 = '4a7129cfd2e75f115a80cf4c1bb07273d7c3f2728b1f4421ec4112aace07bf36'
 const expectedAlternativeCount = 197
-const expectedAlternativeNamesSha256 = '3787527312966ceed5cbda972b5f253c7ac3e27121c449e1445973a4549f0425'
+const expectedReachableAlternativeCount = 196
+const expectedUnreachableAlternativeCount = 1
+const expectedAlternativeInventorySha256 = '433c37a208eecb8841f1319d965d60a920eac0b287af9b07a902d73646527620'
+const expectedUnreachableAlternatives = [{
+  rule: 'CAP_ID',
+  index: 1,
+  name: 'underscore-prefixed overlap',
+  disposition: 'Upstream-unreachable: LOW_ID precedes CAP_ID with the same underscore-prefixed branch, so ANTLR assigns these tokens to LOW_ID.',
+}]
 const expectedRules = [
   'modules', 'module', 'documentedDeclaration', 'declaration', 'operDef', 'typeDef',
   'typeDefHead', 'sumTypeDefinition', 'typeSumVariant', 'qualifier', 'importMod',
@@ -86,7 +94,7 @@ function parseCorpusAttributes(testNameAndMarkers) {
   }
   return {
     executed: !skip && (platform ?? true),
-    name: name.replaceAll('\r\n', '\n').trimEnd(),
+    name: name.trimEnd(),
   }
 }
 
@@ -128,7 +136,7 @@ function corpusEntries(corpusPath) {
 function assertCorpusEntryParserConformance() {
   assert.deepEqual(corpusEntriesFromContents(
     '===suffix\r\nmultiline\r\nname   \r\n:error\r\n=====suffix\r\ninput\r\n---suffix\r\n(source_file)\r\n',
-  ), ['multiline\nname'])
+  ), ['multiline\r\nname'])
   assert.deepEqual(corpusEntriesFromContents(
     '===\nduplicate\n===\ninput\n---\n(source_file)\n===\nduplicate   \n=====\ninput\n-----\n(source_file)\n',
   ), ['duplicate', 'duplicate'])
@@ -192,15 +200,41 @@ assert.deepEqual(Object.keys(inventory.rules).sort(), expectedRules.sort())
 const alternativeCount = Object.values(inventory.rules)
   .reduce((count, mapping) => count + mapping.alternatives.length, 0)
 assert.equal(alternativeCount, expectedAlternativeCount, 'reviewed alternative count changed')
-const alternativeNames = Object.fromEntries(
-  Object.entries(inventory.rules)
-    .sort(([left], [right]) => left.localeCompare(right))
-    .map(([rule, mapping]) => [rule, mapping.alternatives.map(alternative => alternative.name)]),
+const unreachableAlternatives = Object.entries(inventory.rules).flatMap(([rule, mapping]) =>
+  mapping.alternatives.flatMap((alternative, index) =>
+    alternative.upstreamReachability === 'unreachable'
+      ? [{ rule, index, name: alternative.name, disposition: alternative.disposition }]
+      : [],
+  ),
+)
+assert.deepEqual(
+  unreachableAlternatives,
+  expectedUnreachableAlternatives,
+  'reviewed upstream-unreachable alternative set changed',
 )
 assert.equal(
-  crypto.createHash('sha256').update(JSON.stringify(alternativeNames)).digest('hex'),
-  expectedAlternativeNamesSha256,
-  'reviewed alternative names or order changed',
+  alternativeCount - unreachableAlternatives.length,
+  expectedReachableAlternativeCount,
+  'reviewed reachable alternative count changed',
+)
+assert.equal(
+  unreachableAlternatives.length,
+  expectedUnreachableAlternativeCount,
+  'reviewed upstream-unreachable alternative count changed',
+)
+const alternativeInventory = Object.fromEntries(
+  Object.entries(inventory.rules)
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([rule, mapping]) => [rule, mapping.alternatives.map(alternative => ({
+      name: alternative.name,
+      reachability: alternative.upstreamReachability ?? 'reachable',
+      disposition: alternative.disposition ?? null,
+    }))]),
+)
+assert.equal(
+  crypto.createHash('sha256').update(JSON.stringify(alternativeInventory)).digest('hex'),
+  expectedAlternativeInventorySha256,
+  'reviewed alternative inventory, reachability, or disposition changed',
 )
 
 for (const [upstreamRule, mapping] of Object.entries(inventory.rules)) {
