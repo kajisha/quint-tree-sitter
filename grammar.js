@@ -730,10 +730,17 @@ module.exports = grammar({
       field('body', $._expression),
       optional(';'),
     ),
-    _complete_local_operator_definition: $ => seq(
-      $._local_named_operator_definition_header,
-      field('body', $._complete_expression),
-      optional(';'),
+    _complete_local_operator_definition: $ => choice(
+      seq(
+        $._local_named_operator_definition_header,
+        field('body', $._complete_expression),
+        optional(';'),
+      ),
+      seq(
+        $._local_destructuring_operator_definition_header,
+        field('body', $._complete_expression),
+        optional(';'),
+      ),
     ),
     _complete_expression: $ => prec.right(choice(
       $._complete_pair_level,

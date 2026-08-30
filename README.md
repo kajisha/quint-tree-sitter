@@ -40,8 +40,13 @@ Visible CST node names and field names are a versioned compatibility surface. Br
 
 The Quint 0.32.0 conformance grammar keeps those public node and field names
 while factoring internal expression precedence. Recovery preserves an unclosed
-module and its declarations with a missing `}` node, and an incomplete local
-declaration does not consume later module-level declarations. Generated
+module and its declarations with a missing `}` node. Official-valid complete
+local RHS syntax before `all` and `any` action bodies takes precedence over the
+historical recovery tree for an incomplete local declaration. For example, in
+`def broken = { val (x, y) = pair } val later = 1`, recovery skips the inner
+closing `}`, leaves `later` under an `ERROR`, and does not recover it as a
+module-level `operator_definition`; consumers must not rely on later declarations
+being independently highlighted after this invalid shape. Generated
 `nodeTypeInfo` child unions are narrower only where the precedence grammar makes
 a direct child impossible; because `nodeTypeInfo` is exported, consumers that
 depend on those theoretical unions must treat that metadata narrowing as a

@@ -1050,3 +1050,58 @@ module ActionBoundarySingleLine { action f = { val x: bool = a or b; any { true 
               (identifier)))
           (action_block
             (boolean)))))))
+
+==================
+destructuring local rhs leaves action block body
+==================
+
+module DestructuringTupleSingleLine { action f = { val (x, y) = a and b all { true } } }
+
+module DestructuringRecordMultiline {
+  action f = {
+    pure val {x, y} = a or b
+    any { true }
+  }
+}
+
+---
+
+(source_file
+  (module
+    (type_identifier)
+    (operator_definition
+      (operator_qualifier)
+      (identifier)
+      (block_expression
+        (declaration_expression
+          (operator_definition
+            (operator_qualifier)
+            (tuple_pattern
+              (identifier_pattern
+                (identifier))
+              (identifier_pattern
+                (identifier)))
+            (binary_expression
+              (identifier)
+              (identifier)))
+          (action_block
+            (boolean))))))
+  (module
+    (type_identifier)
+    (operator_definition
+      (operator_qualifier)
+      (identifier)
+      (block_expression
+        (declaration_expression
+          (operator_definition
+            (operator_qualifier)
+            (record_pattern
+              (identifier_pattern
+                (identifier))
+              (identifier_pattern
+                (identifier)))
+            (binary_expression
+              (identifier)
+              (identifier)))
+          (action_block
+            (boolean)))))))

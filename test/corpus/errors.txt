@@ -215,7 +215,7 @@ module ReservedDestructuring {
         name: (identifier)))))
 
 ==================
-error incomplete local declaration preserves later sibling
+error incomplete local declaration skips the block boundary
 ==================
 
 module M {
@@ -232,19 +232,17 @@ module M {
     name: (type_identifier)
     body: (operator_definition
       qualifier: (operator_qualifier)
-      name: (identifier)
-      body: (block_expression
-        body: (declaration_expression
-          declaration: (operator_definition
-            qualifier: (operator_qualifier)
-            pattern: (tuple_pattern
-              element: (identifier_pattern
-                name: (identifier))
-              element: (identifier_pattern
-                name: (identifier)))
-            body: (identifier))
-          body: (MISSING identifier))))
-    body: (operator_definition
+      name: (identifier))
+    (ERROR
+      (operator_definition
+        qualifier: (operator_qualifier)
+        pattern: (tuple_pattern
+          element: (identifier_pattern
+            name: (identifier))
+          element: (identifier_pattern
+            name: (identifier)))
+        body: (identifier))
+      (ERROR)
       qualifier: (operator_qualifier)
       name: (identifier)
-      body: (integer))))
+      (integer))))
