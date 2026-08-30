@@ -134,4 +134,38 @@ assert.deepEqual(nodesByType.get('sum_type').children, {
   types: [{ type: 'sum_variant', named: true }],
 })
 
+assert.equal(
+  nodesByType.get('unary_expression').fields.operand.types.some(type => (
+    type.type === 'unary_expression' && type.named
+  )),
+  true,
+  'unary_expression.operand remains recursively unary',
+)
+assert.equal(
+  nodesByType.get('parenthesized_expression').children.required,
+  true,
+  'parenthesized_expression keeps its required expression child',
+)
+
+for (const [nodeType, fieldName, excludedTypes] of [
+  ['binary_expression', 'left', ['declaration_expression', 'lambda_expression', 'pair_expression']],
+  ['binary_expression', 'right', ['pair_expression']],
+  ['delayed_assignment', 'value', ['declaration_expression', 'lambda_expression', 'pair_expression']],
+  ['field_access_expression', 'receiver', ['binary_expression', 'delayed_assignment', 'pair_expression', 'unary_expression']],
+  ['index_expression', 'collection', ['binary_expression', 'delayed_assignment', 'pair_expression', 'unary_expression']],
+  ['pair_expression', 'key', ['declaration_expression', 'lambda_expression']],
+  ['pair_expression', 'value', ['declaration_expression', 'lambda_expression', 'pair_expression']],
+  ['ufcs_expression', 'receiver', ['binary_expression', 'delayed_assignment', 'pair_expression', 'unary_expression']],
+  ['unary_expression', 'operand', ['declaration_expression', 'delayed_assignment', 'lambda_expression', 'pair_expression']],
+]) {
+  const actualTypes = nodesByType.get(nodeType).fields[fieldName].types.map(type => type.type)
+  for (const excludedType of excludedTypes) {
+    assert.equal(
+      actualTypes.includes(excludedType),
+      false,
+      `${nodeType}.${fieldName} excludes precedence-incompatible ${excludedType}`,
+    )
+  }
+}
+
 console.log('node-types field cardinality: ok')

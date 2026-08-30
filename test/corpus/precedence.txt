@@ -307,6 +307,93 @@ module Boundaries {
         value: (identifier)))))
 
 ==================
+precedence recursive unary and unified postfix chain
+==================
+
+module ReviewProbes {
+  val doubleUnary = --a
+  val negativePower = a ^ -b
+  val negUfcs = -a.b(1)
+  val powerUfcs = a ^ b.c(1)
+  val addUfcs = a + b.c(1)
+  val multUfcs = a * b.c(1)
+  val mixed = -a.b[0]^c.d(1)
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (unary_expression
+        operand: (unary_expression
+          operand: (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (binary_expression
+        left: (identifier)
+        right: (unary_expression
+          operand: (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (unary_expression
+        operand: (ufcs_expression
+          receiver: (identifier)
+          function: (identifier)
+          arguments: (argument_list
+            (integer)))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (binary_expression
+        left: (identifier)
+        right: (ufcs_expression
+          receiver: (identifier)
+          function: (identifier)
+          arguments: (argument_list
+            (integer)))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (binary_expression
+        left: (identifier)
+        right: (ufcs_expression
+          receiver: (identifier)
+          function: (identifier)
+          arguments: (argument_list
+            (integer)))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (binary_expression
+        left: (identifier)
+        right: (ufcs_expression
+          receiver: (identifier)
+          function: (identifier)
+          arguments: (argument_list
+            (integer)))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (unary_expression
+        operand: (binary_expression
+          left: (index_expression
+            collection: (field_access_expression
+              receiver: (identifier)
+              field: (identifier))
+            index: (integer))
+          right: (ufcs_expression
+            receiver: (identifier)
+            function: (identifier)
+            arguments: (argument_list
+              (integer))))))))
+
+==================
 precedence pair associativity
 ==================
 

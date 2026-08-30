@@ -39,10 +39,13 @@ The initial distribution includes the generated C parser, Node/npm binding, and 
 Visible CST node names and field names are a versioned compatibility surface. Breaking changes require a major package release; additive syntax support that preserves the CST may use a minor release, and parser fixes without an intentional CST change may use a patch release.
 
 The Quint 0.32.0 conformance grammar keeps those public node and field names
-while factoring internal expression precedence. Generated child-type unions are
-therefore narrower where the precedence grammar makes a child impossible. On
-incomplete modules or local declarations, recovery may group a larger region
-under `ERROR`; later declaration tokens remain available in the recovered tree.
+while factoring internal expression precedence. Recovery preserves an unclosed
+module and its declarations with a missing `}` node, and an incomplete local
+declaration does not consume later module-level declarations. Generated
+`nodeTypeInfo` child unions are narrower only where the precedence grammar makes
+a direct child impossible; because `nodeTypeInfo` is exported, consumers that
+depend on those theoretical unions must treat that metadata narrowing as a
+breaking compatibility change.
 
 ## Generated artifacts
 

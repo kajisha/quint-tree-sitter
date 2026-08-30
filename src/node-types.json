@@ -511,10 +511,6 @@
             "named": true
           },
           {
-            "type": "declaration_expression",
-            "named": true
-          },
-          {
             "type": "delayed_assignment",
             "named": true
           },
@@ -532,10 +528,6 @@
           },
           {
             "type": "integer",
-            "named": true
-          },
-          {
-            "type": "lambda_expression",
             "named": true
           },
           {
@@ -1426,10 +1418,6 @@
             "named": true
           },
           {
-            "type": "declaration_expression",
-            "named": true
-          },
-          {
             "type": "delayed_assignment",
             "named": true
           },
@@ -1450,10 +1438,6 @@
             "named": true
           },
           {
-            "type": "lambda_expression",
-            "named": true
-          },
-          {
             "type": "list_expression",
             "named": true
           },
@@ -1463,10 +1447,6 @@
           },
           {
             "type": "match_expression",
-            "named": true
-          },
-          {
-            "type": "pair_expression",
             "named": true
           },
           {
@@ -1580,10 +1560,6 @@
             "named": true
           },
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
             "type": "block_expression",
             "named": true
           },
@@ -1601,10 +1577,6 @@
           },
           {
             "type": "declaration_expression",
-            "named": true
-          },
-          {
-            "type": "delayed_assignment",
             "named": true
           },
           {
@@ -1640,10 +1612,6 @@
             "named": true
           },
           {
-            "type": "pair_expression",
-            "named": true
-          },
-          {
             "type": "parenthesized_expression",
             "named": true
           },
@@ -1669,10 +1637,6 @@
           },
           {
             "type": "ufcs_expression",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
             "named": true
           },
           {
@@ -1836,10 +1800,6 @@
             "named": true
           },
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
             "type": "block_expression",
             "named": true
           },
@@ -1857,10 +1817,6 @@
           },
           {
             "type": "declaration_expression",
-            "named": true
-          },
-          {
-            "type": "delayed_assignment",
             "named": true
           },
           {
@@ -1896,10 +1852,6 @@
             "named": true
           },
           {
-            "type": "pair_expression",
-            "named": true
-          },
-          {
             "type": "parenthesized_expression",
             "named": true
           },
@@ -1925,10 +1877,6 @@
           },
           {
             "type": "ufcs_expression",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
             "named": true
           },
           {
@@ -3391,10 +3339,6 @@
             "named": true
           },
           {
-            "type": "declaration_expression",
-            "named": true
-          },
-          {
             "type": "delayed_assignment",
             "named": true
           },
@@ -3412,10 +3356,6 @@
           },
           {
             "type": "integer",
-            "named": true
-          },
-          {
-            "type": "lambda_expression",
             "named": true
           },
           {
@@ -3501,10 +3441,6 @@
             "named": true
           },
           {
-            "type": "declaration_expression",
-            "named": true
-          },
-          {
             "type": "delayed_assignment",
             "named": true
           },
@@ -3522,10 +3458,6 @@
           },
           {
             "type": "integer",
-            "named": true
-          },
-          {
-            "type": "lambda_expression",
             "named": true
           },
           {
@@ -3667,7 +3599,7 @@
     "fields": {},
     "children": {
       "multiple": false,
-      "required": false,
+      "required": true,
       "types": [
         {
           "type": "action_block",
@@ -4540,10 +4472,6 @@
             "named": true
           },
           {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
             "type": "block_expression",
             "named": true
           },
@@ -4561,10 +4489,6 @@
           },
           {
             "type": "declaration_expression",
-            "named": true
-          },
-          {
-            "type": "delayed_assignment",
             "named": true
           },
           {
@@ -4600,10 +4524,6 @@
             "named": true
           },
           {
-            "type": "pair_expression",
-            "named": true
-          },
-          {
             "type": "parenthesized_expression",
             "named": true
           },
@@ -4629,10 +4549,6 @@
           },
           {
             "type": "ufcs_expression",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
             "named": true
           },
           {
@@ -4676,14 +4592,6 @@
             "named": true
           },
           {
-            "type": "declaration_expression",
-            "named": true
-          },
-          {
-            "type": "delayed_assignment",
-            "named": true
-          },
-          {
             "type": "field_access_expression",
             "named": true
           },
@@ -4697,10 +4605,6 @@
           },
           {
             "type": "integer",
-            "named": true
-          },
-          {
-            "type": "lambda_expression",
             "named": true
           },
           {
@@ -4741,6 +4645,10 @@
           },
           {
             "type": "ufcs_expression",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
             "named": true
           },
           {

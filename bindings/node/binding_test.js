@@ -9,6 +9,20 @@ const Quint = require('./')
 
 const projectRoot = path.join(__dirname, '../..')
 
+function namedNodesOfType(node, type, result = []) {
+  if (node.type === type) result.push(node)
+  for (const child of node.namedChildren) namedNodesOfType(child, type, result)
+  return result
+}
+
+function alternatingLogicalModule(operatorCount) {
+  let expression = 'a0'
+  for (let i = 1; i <= operatorCount; i += 1) {
+    expression += ` ${i % 2 === 1 ? 'or' : 'and'} a${i}`
+  }
+  return `module LogicalChain { val result = ${expression} }`
+}
+
 function createTestPackage({ nodeTypes, highlights, injectionDirectory = false }) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'tree-sitter-quint-binding-'))
   fs.mkdirSync(path.join(root, 'bindings/node'), { recursive: true })
@@ -117,6 +131,60 @@ test('reserved words remain invalid qualId and identOrHole components', () => {
   assert.equal(parser.parse('module import {}').rootNode.hasError, true)
   assert.equal(parser.parse('module M { def f(import) = 0 }').rootNode.hasError, true)
   assert.equal(parser.parse('module M { val x = Math::and => 0 }').rootNode.hasError, true)
+})
+
+test('alternating logical chains parse fully and incrementally', () => {
+  const parser = new Parser()
+  parser.setLanguage(Quint)
+  const source = alternatingLogicalModule(33)
+  const tree = parser.parse(source)
+
+  assert.equal(tree.rootNode.hasError, false)
+
+  const editIndex = source.indexOf(' or ', Math.floor(source.length / 2)) + 1
+  const editedSource = `${source.slice(0, editIndex)}and${source.slice(editIndex + 2)}`
+  tree.edit({
+    startIndex: editIndex,
+    oldEndIndex: editIndex + 2,
+    newEndIndex: editIndex + 3,
+    startPosition: { row: 0, column: editIndex },
+    oldEndPosition: { row: 0, column: editIndex + 2 },
+    newEndPosition: { row: 0, column: editIndex + 3 },
+  })
+
+  assert.equal(parser.parse(editedSource, tree).rootNode.hasError, false)
+})
+
+test('incomplete declarations preserve later named declaration siblings', () => {
+  const parser = new Parser()
+  parser.setLanguage(Quint)
+  const source = `module M {
+  def broken = {
+    val (x, y) = pair
+  }
+  val later = 1
+}`
+  const tree = parser.parse(source)
+  const definitions = namedNodesOfType(tree.rootNode, 'operator_definition')
+  const later = definitions.find(node => node.childForFieldName('name')?.text === 'later')
+
+  assert.ok(later, 'later must remain an independently named operator_definition')
+  assert.equal(later.parent.type, 'module')
+})
+
+test('unclosed modules preserve the module, operator, and missing brace', () => {
+  const parser = new Parser()
+  parser.setLanguage(Quint)
+  const tree = parser.parse('module Unclosed {\n  val kept = 1')
+  const moduleNode = tree.rootNode.namedChildren.find(node => node.type === 'module')
+
+  assert.ok(moduleNode, 'the unclosed module must remain a module node')
+  const kept = namedNodesOfType(moduleNode, 'operator_definition')
+    .find(node => node.childForFieldName('name')?.text === 'kept')
+  const missingBrace = moduleNode.children.find(node => node.type === '}' && node.isMissing)
+
+  assert.ok(kept, 'the kept declaration must remain an operator_definition')
+  assert.ok(missingBrace, 'the module must expose a missing closing brace')
 })
 
 test('fails when required node type metadata is missing', t => {
