@@ -27,16 +27,43 @@ Its CommonJS declaration is a `Parser.Language`, so the same import and
 
 ## Compatibility and scope
 
-Syntax compatibility is checked against the immutable Quint 0.32.0 commit [`fd772606588b40def9978d8c82da69c2db7a0e3b`](https://github.com/quint-co/quint/commit/fd772606588b40def9978d8c82da69c2db7a0e3b), its generated `Quint.g4`, and provenance-recorded fixtures. Corpus tests define the Tree-sitter concrete syntax tree (CST); the CST is not intended to match Quint's ANTLR parse tree or semantic intermediate representation.
+This grammar targets ordinary `.qnt` source files accepted through the Quint
+0.32.0 `modules` grammar entry point. Syntax compatibility is pinned to the
+immutable Quint commit
+[`fd772606588b40def9978d8c82da69c2db7a0e3b`](https://github.com/quint-co/quint/commit/fd772606588b40def9978d8c82da69c2db7a0e3b)
+and its generated `quint/src/generated/Quint.g4` SHA-256
+`4a7129cfd2e75f115a80cf4c1bb07273d7c3f2728b1f4421ec4112aace07bf36`.
+The checked-in manifest classifies 179 phase-one-valid sources among the 184
+`.qnt` files at that commit using a transient official
+`@informalsystems/quint` 0.32.0 package; that package is not a project
+dependency. The hosted conformance gate verifies the pinned commit, grammar
+hash, manifest counts, and every accepted source hash, then requires all 179
+sources to parse with zero `ERROR` nodes and zero missing nodes.
 
-This parser is syntax-only. It does not perform module or import resolution, name resolution, declaration ordering, effect or mode checking, type checking, or other Quint semantic validation. Tree-sitter error recovery can also produce a tree for incomplete or invalid Quint input.
+This is a syntax-only compatibility claim for those accepted Quint 0.32.0
+source files, not a guarantee for future Quint versions. It excludes the Quint
+REPL's `declarationOrExpr` entry point, parity with QNT diagnostic codes or
+messages, and semantic equivalence. The parser does not perform module or
+import resolution, name resolution, declaration ordering, effect or mode
+checking, type checking, or other Quint semantic validation. Corpus tests
+define the Tree-sitter concrete syntax tree (CST); the CST is not intended to
+match Quint's ANTLR parse tree or semantic intermediate representation.
+
+Tree-sitter intentionally recovers from incomplete or invalid input and may
+produce a usable tree where Quint reports a syntax diagnostic. Recovery trees
+are therefore not covered by the 179-source equivalence claim and may differ
+from Quint's recovery or diagnostic behavior.
 An empty source file intentionally remains a clean editor-recovery state. A
 hashbang, however, is accepted only at byte zero and only when terminated by a
 newline, matching the pinned `HASHBANG_LINE` token.
 
 The initial distribution includes the generated C parser, Node/npm binding, and syntax-highlighting query. Rust, Python, Go, Java, Swift, Zig, Wasm, and editor-specific packages are intentionally unsupported in this release.
 
-Visible CST node names and field names are a versioned compatibility surface. Breaking changes require a major package release; additive syntax support that preserves the CST may use a minor release, and parser fixes without an intentional CST change may use a patch release.
+Visible CST node names, field names, and exported `nodeTypeInfo` metadata are a
+versioned compatibility surface. Breaking changes to any of them require a
+major package release; additive syntax support that preserves them may use a
+minor release, and parser fixes without an intentional compatibility change may
+use a patch release.
 
 The Quint 0.32.0 conformance grammar keeps those public node and field names
 while factoring internal expression precedence. Recovery preserves an unclosed
@@ -48,9 +75,8 @@ closing `}`, leaves `later` under an `ERROR`, and does not recover it as a
 module-level `operator_definition`; consumers must not rely on later declarations
 being independently highlighted after this invalid shape. Generated
 `nodeTypeInfo` child unions are narrower only where the precedence grammar makes
-a direct child impossible; because `nodeTypeInfo` is exported, consumers that
-depend on those theoretical unions must treat that metadata narrowing as a
-breaking compatibility change.
+a direct child impossible; consumers must treat any further metadata narrowing
+as a breaking compatibility change.
 
 ## Generated artifacts
 
@@ -81,6 +107,27 @@ installs it offline under Node 22, and smoke-tests `Parser#setLanguage` and
 representative parsing. Corpus tests cover CST and recovery behavior, highlight
 tests cover `queries/highlights.scm`, Node and type tests cover the npm binding,
 and fixture tests reject unexpected parse errors in the pinned Quint 0.32.0 inputs.
+
+The normal verification lane is fully offline after `npm ci`:
+
+```sh
+npm test
+```
+
+The external conformance lane uses a disposable read-only checkout and does not
+execute upstream package scripts:
+
+```sh
+QUINT_UPSTREAM_CHECKOUT="$(mktemp -d)/quint-upstream"
+git clone --filter=blob:none --no-checkout https://github.com/quint-co/quint \
+  "$QUINT_UPSTREAM_CHECKOUT"
+git -C "$QUINT_UPSTREAM_CHECKOUT" checkout --detach \
+  fd772606588b40def9978d8c82da69c2db7a0e3b
+npm run test:upstream-sources -- "$QUINT_UPSTREAM_CHECKOUT"
+```
+
+The final command accepts only that exact commit and the 179 paths and hashes
+recorded in `test/upstream/quint-0.32.0/valid-sources.json`.
 
 ## Updating for a Quint release
 
