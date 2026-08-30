@@ -1,0 +1,746 @@
+{
+  "version": "0.32.0",
+  "commit": "fd772606588b40def9978d8c82da69c2db7a0e3b",
+  "grammarSha256": "4a7129cfd2e75f115a80cf4c1bb07273d7c3f2728b1f4421ec4112aace07bf36",
+  "totalSources": 184,
+  "validSources": [
+    {
+      "path": "docs/codetour/lesson0-helloworld/hello.qnt",
+      "sha256": "62bb05d8aa93ecc4f958052f6c04b38401520cee113b59cb8335368117ab92e6"
+    },
+    {
+      "path": "docs/codetour/lesson0-helloworld/hello.template.qnt",
+      "sha256": "82a6b5063ba241de98fa8b1fd24b105957cdbe374d7f77bed0f189d0c64d26e8"
+    },
+    {
+      "path": "docs/codetour/lesson1-booleans/booleans.qnt",
+      "sha256": "2916074acf98facd7846d6708e16068fdb289cc8995ccea893b5ae720028e5d4"
+    },
+    {
+      "path": "docs/codetour/lesson1-booleans/booleans.template.qnt",
+      "sha256": "594f99a2c9b3517937b206cea181c4519e40275e09fd936bc24f5a0dd2622f96"
+    },
+    {
+      "path": "docs/codetour/lesson2-integers/integers.qnt",
+      "sha256": "82b91e24895396f10117e50d63deca60766d341735f82c116aacb76099722cfc"
+    },
+    {
+      "path": "docs/codetour/lesson2-integers/integers.template.qnt",
+      "sha256": "c47df4c7144e7c48b5d6599c8154e0a683a9f0519af3ed62546a6430e4fe00d3"
+    },
+    {
+      "path": "docs/codetour/lesson3-anatomy/coin.qnt",
+      "sha256": "3fe4b496f45cc717ab93d3fd383f557895b8d87988a282224aaff0d26cc07d73"
+    },
+    {
+      "path": "docs/codetour/lesson3-anatomy/coin.template.qnt",
+      "sha256": "75c174b77bc124c8d490d54ff7ac1c7160d3a9d63c62bcfc1f9add4ff6e08116"
+    },
+    {
+      "path": "docs/codetour/lesson4-sets/sets.qnt",
+      "sha256": "3a8b11ff1470a4d306c3148ff36afb077266afac98c8c0385d5cf46202f6553b"
+    },
+    {
+      "path": "docs/codetour/lesson4-sets/sets.template.qnt",
+      "sha256": "0cf38c4091ec7cd51b1e662ca37a6e18ce582dd964ff4441b11b94706c76ce73"
+    },
+    {
+      "path": "evaluator/fixtures/instances.qnt",
+      "sha256": "33ad1da09e24739f66874ab5b98a5430d0ee3d6513184197a45afafcc6fd5e39"
+    },
+    {
+      "path": "evaluator/fixtures/jmt/apply_fancy.qnt",
+      "sha256": "18cd822d7f7c29aafde70626628fb13182703ffaddcc7ec1fece1b9769849f8f"
+    },
+    {
+      "path": "evaluator/fixtures/jmt/apply_simple.qnt",
+      "sha256": "a7dfaf3632b0387ea52f3e941929fea07c980c35032af7db5f6352c4a18e676f"
+    },
+    {
+      "path": "evaluator/fixtures/jmt/apply_state_machine.qnt",
+      "sha256": "b4fc95f66dc1c7c79340498bdc3e2b04faa2274cc33ff931e56b79a3c07acea6"
+    },
+    {
+      "path": "evaluator/fixtures/jmt/completeness.qnt",
+      "sha256": "a220ecc9d5640a42c06ee6017e73c591c2c01754da28fa2e0a57170e01b6920a"
+    },
+    {
+      "path": "evaluator/fixtures/jmt/grug_ics23.qnt",
+      "sha256": "4e1bf7e7fc88ff1851368ced4a2abf772b1d80bc0a3f9fc8d5bf007097945608"
+    },
+    {
+      "path": "evaluator/fixtures/jmt/hashes.qnt",
+      "sha256": "de24d6d6458818fcac02a426c5d515928412598b96219d352ad4ef696024da44"
+    },
+    {
+      "path": "evaluator/fixtures/jmt/node.qnt",
+      "sha256": "2eb666524c5b0e2adda0a614b35342cf231703906233625b877d0009446bdf42"
+    },
+    {
+      "path": "evaluator/fixtures/jmt/proof_types.qnt",
+      "sha256": "333fab5dbf62355e9e059f9fb05b825c7099784e3dac2870b8f02318b32ca068"
+    },
+    {
+      "path": "evaluator/fixtures/jmt/proofs.qnt",
+      "sha256": "d33406a18433765b5fb05a0ac9c60a2532e56d20995f95bb363dfdb0253bb5c8"
+    },
+    {
+      "path": "evaluator/fixtures/jmt/pruning_state_machine.qnt",
+      "sha256": "5ad96ed872584d1649dbddd6b012c08b896223934b7afea88717944a663c4bec"
+    },
+    {
+      "path": "evaluator/fixtures/jmt/soundness.qnt",
+      "sha256": "2070a31c17fab59dbf85ec53e490af74cc60da4db8748833a199d0a5ebc2a07b"
+    },
+    {
+      "path": "evaluator/fixtures/jmt/spells/basicSpells.qnt",
+      "sha256": "cf1199b92ff1dd49729d79de81f5c71572c0cc2af8d46a0a24e2a97e9b2efced"
+    },
+    {
+      "path": "evaluator/fixtures/jmt/spells/commonSpells.qnt",
+      "sha256": "927b19ee3136d96a77b5dd6c7ef9bc915c76e22a8963056619ed0c795b89f65f"
+    },
+    {
+      "path": "evaluator/fixtures/jmt/spells/rareSpells.qnt",
+      "sha256": "3583dcf1d6e03ba834f93715f42ad50b8d258111ce2d738a5cfce5e2db7bfe00"
+    },
+    {
+      "path": "evaluator/fixtures/jmt/test/apply_fancy_test.qnt",
+      "sha256": "dfef8d3baff044364b6f57592f93382f7dc6c3813617f04e482f2e262411b6c3"
+    },
+    {
+      "path": "evaluator/fixtures/jmt/test/apply_simple_test.qnt",
+      "sha256": "8aff6d4d9fc8d1e52b9c8f38c739351fc3dd366f0a2ae54e2c4d731204166259"
+    },
+    {
+      "path": "evaluator/fixtures/jmt/test/instantiatable_tree.qnt",
+      "sha256": "ee4100b59dbda04d03e68632cb58f650ad91f115b235d36b9d6694e0ded38cfe"
+    },
+    {
+      "path": "evaluator/fixtures/jmt/test/node_test.qnt",
+      "sha256": "fb7c60e01148d22528c995dacf7e20da76c2d0ccb6e5ece917393a37c3df6ad5"
+    },
+    {
+      "path": "evaluator/fixtures/jmt/test/proofs_test.qnt",
+      "sha256": "a07027e09c48cdcf137c129ccf14714716ad00d042047e26ec70034f0efb628c"
+    },
+    {
+      "path": "evaluator/fixtures/jmt/test/test_all.qnt",
+      "sha256": "1bf5c4b3800b523e62368184f7af2c37e0ee75966f8a3135fcf9f964722d6320"
+    },
+    {
+      "path": "evaluator/fixtures/jmt/test/tree_test.qnt",
+      "sha256": "df356a951852fd8546e1d23f0a5315878f2095d1f8d97bb7673eb7b352434e7b"
+    },
+    {
+      "path": "evaluator/fixtures/jmt/tree.qnt",
+      "sha256": "07fdd47a436e4fb0e1d0a762c002e1796378325c37157f35138bc10ea04f2aba"
+    },
+    {
+      "path": "evaluator/fixtures/jmt/utils.qnt",
+      "sha256": "5647c40b3f4d37f481de55e73631182500dce0e110456fc9cab3522d784d0e6b"
+    },
+    {
+      "path": "evaluator/fixtures/oneOf_empty_test.qnt",
+      "sha256": "de9e1eca60aad40965ed5a2a65ff964906bde701b501b0af497c4f9e6ce2de91"
+    },
+    {
+      "path": "evaluator/fixtures/runs.qnt",
+      "sha256": "62d7779bc06960281cc8ce256a140df561e50b3f254d377519ff9f77706dbe8e"
+    },
+    {
+      "path": "evaluator/fixtures/tictactoe.qnt",
+      "sha256": "464b6c5c37592905a49460b3a10c533098111c841b945fc05e6047d281a2df46"
+    },
+    {
+      "path": "examples/classic/distributed/Bakery/bakery.qnt",
+      "sha256": "11ec5d507853151c34f134faaa557ab3359ce493129adda0fc18b6f67d46e0e7"
+    },
+    {
+      "path": "examples/classic/distributed/ClockSync/clockSync6.qnt",
+      "sha256": "e1cd915d6ec61e4b8b421d83e083e3bd34e34ce74f3d0d8896bc13e6b98a9c91"
+    },
+    {
+      "path": "examples/classic/distributed/ConsensusAlgorithm/ConsensusAlg.qnt",
+      "sha256": "e9f4fc2979b99d89cc547cb4d7bb2c1ae0a55acc5c4d0c29e3bfcec0b4de536d"
+    },
+    {
+      "path": "examples/classic/distributed/ConsensusAlgorithm/KSetAgreementConsensus.qnt",
+      "sha256": "43920872dd5569bc3f10dc5bd9702c6ba56f08c5de53b563899587c4e0462d93"
+    },
+    {
+      "path": "examples/classic/distributed/DiningPhilosophers/DiningPhilosophers5.qnt",
+      "sha256": "6f87d74defca06124a01f621d8d9c32197d5bef443cd23a93c80c0ed1dab00ab"
+    },
+    {
+      "path": "examples/classic/distributed/LamportMutex/LamportMutex.qnt",
+      "sha256": "fb6133b8edf2231a384e91f3e8fe4ff6c0c0f18f012ffe7a723418001f8b1569"
+    },
+    {
+      "path": "examples/classic/distributed/Paxos/Paxos.qnt",
+      "sha256": "601b54fdfb49847d1b08b420b25d459dcfa5fb0498b7f861ee20c4b740cfce3c"
+    },
+    {
+      "path": "examples/classic/distributed/Paxos/Voting.qnt",
+      "sha256": "f0ffd493ffc3144e459b1caef9df5a067120986634f4c8fecb379e453eb7e661"
+    },
+    {
+      "path": "examples/classic/distributed/ReadersWriters/ReadersWriters.qnt",
+      "sha256": "cb64e542c23623aed0b3c78a5fab7d819cdeda2b33846a7ec0f39abadc27613a"
+    },
+    {
+      "path": "examples/classic/distributed/ReliableBroadcast/reliablebc.qnt",
+      "sha256": "28d37999b63156575030f58170bd2b940205f96c8e901c349c1586c42073e984"
+    },
+    {
+      "path": "examples/classic/distributed/TeachingConcurrency/mutex.qnt",
+      "sha256": "fcc4d608b4e27d38873cf932a0397531d28290ff2de8b66615e63caa969b7319"
+    },
+    {
+      "path": "examples/classic/distributed/TeachingConcurrency/teaching.qnt",
+      "sha256": "7837a9e5a03f94f2670f3db2c05c1cc38c7e7adea0349a34317f83c7c8f1a214"
+    },
+    {
+      "path": "examples/classic/distributed/TwoLayeredCache/two_layered_cache.qnt",
+      "sha256": "1e5cbc9ad0d959ded8f415ba2d555278351863eb135b22bbe8ba8d1a3c0b45ba"
+    },
+    {
+      "path": "examples/classic/distributed/TwoPhaseCommit/two_phase_commit.qnt",
+      "sha256": "35e90f6e9478a1ecee11b227cc76c3d362883dbf78cbcbca59f5a1bf5773b169"
+    },
+    {
+      "path": "examples/classic/distributed/TwoPhaseCommit/two_phase_commit_modules.qnt",
+      "sha256": "d5fac04b1b5e4e1d7ac939832d6f83549ffeb70741a59fcb0d2e4d8ab79bf8bc"
+    },
+    {
+      "path": "examples/classic/distributed/ewd426/ewd426.qnt",
+      "sha256": "21519a36e0f921192ae41ba07b2508ebc86b3b868c3ba85a82e69b8879d19a99"
+    },
+    {
+      "path": "examples/classic/distributed/ewd426/ewd426_3.qnt",
+      "sha256": "6dae5c6c9a699486042dde522603b9faeb6782171873798d75f2db4c4694813b"
+    },
+    {
+      "path": "examples/classic/distributed/ewd426/ewd426_4.qnt",
+      "sha256": "98b57cfe0d886dde8d8242684eb7cbe3269512105cfc9aa8265a6a7c2c9332d4"
+    },
+    {
+      "path": "examples/classic/distributed/ewd840/ewd840.qnt",
+      "sha256": "dacf12a1536e086b7f95dd3b11e284064c6bb3d746809de313e65c77bb684c4f"
+    },
+    {
+      "path": "examples/classic/sequential/BinSearch/BinSearch.qnt",
+      "sha256": "f75e4c736eedb0e3df35b668dd517ffaa58cf22a7ce3065b87659290f2bee701"
+    },
+    {
+      "path": "examples/cosmos/bank/bank.qnt",
+      "sha256": "b3b26ecfbdb23b3550216488934d576a5277feac3fb5efcdc41ae58c0a25aa00"
+    },
+    {
+      "path": "examples/cosmos/bank/bankTest.qnt",
+      "sha256": "e8fba5ca37b48b55485d346859a262da3178eb746bdb3f6870d2b5807416d54e"
+    },
+    {
+      "path": "examples/cosmos/ics20/bank.qnt",
+      "sha256": "7aa38d878e191626a2024791861842c0961ad91afda64dadcc4d524f6709713e"
+    },
+    {
+      "path": "examples/cosmos/ics20/base.qnt",
+      "sha256": "2d7ff4cc64f79873401e06ecb8c6f2307d18571540c637b39f9aff1019ea1a51"
+    },
+    {
+      "path": "examples/cosmos/ics20/denomTrace.qnt",
+      "sha256": "8af9a1896d066fdbe72b8d2ee4911d0233050fff586167fb75bd28cb09890c6f"
+    },
+    {
+      "path": "examples/cosmos/ics20/ics20.qnt",
+      "sha256": "bfb5a1d308bd0a548a3812519c172be0e1e067c7814d1871b052835668825e34"
+    },
+    {
+      "path": "examples/cosmos/ics23/ics23.qnt",
+      "sha256": "211a47a7d9653d5f7e0b873c600734863f7362cd6d2e26b7c23a9cb09c7de96c"
+    },
+    {
+      "path": "examples/cosmos/lightclient/Blockchain.qnt",
+      "sha256": "f7b8887400d0097a58d06aa13afc437c858176b697f7ec1c79c301108a00b8d3"
+    },
+    {
+      "path": "examples/cosmos/lightclient/LCVerificationApi.qnt",
+      "sha256": "e066accff45246a83ed7463bb5d7daf6479957ca0831dc06fd4d8287694deb1f"
+    },
+    {
+      "path": "examples/cosmos/lightclient/Lightclient.qnt",
+      "sha256": "0011ed98b8d8e7cbd15c259d85ce010651a2a4291e3f387e2c255a2d58589a2a"
+    },
+    {
+      "path": "examples/cosmos/lightclient/typedefs.qnt",
+      "sha256": "5d2178e33bf76445c0effc13326812b283ab9b18750f85f47ce992cc0299dab3"
+    },
+    {
+      "path": "examples/cosmos/tendermint/Tendermint.qnt",
+      "sha256": "0f80f0c803fcaa4a26180c12ef5c4cc7584e0d091cba798ddcda06a4bf5b7f1f"
+    },
+    {
+      "path": "examples/cosmos/tendermint/TendermintModels.qnt",
+      "sha256": "d618472f7e39b1e2e273e22febb1a28d71861f9416c272cd754a6b951067487d"
+    },
+    {
+      "path": "examples/cosmos/tendermint/TendermintTest.qnt",
+      "sha256": "87584f615ec4cd169f58c3e01631bbac4a2059d7e0aa16e12725eba181bc5c18"
+    },
+    {
+      "path": "examples/cosmwasm/zero-to-hero/vote.qnt",
+      "sha256": "cef68fc8d16aafa2b03072c2d67b47e47ffc41d633ddd0a14292b9ff4092e195"
+    },
+    {
+      "path": "examples/cryptography/hashes/hashes.qnt",
+      "sha256": "27c7567d86fba5282f3455808b79bfcd098509bc7a251ceb003ef789ba2b2c77"
+    },
+    {
+      "path": "examples/cryptography/hashes/hashesTest.qnt",
+      "sha256": "ed8d797405898e6e4b9512da54c3deec3f1dd7545812dbef104272e61d4a6ed6"
+    },
+    {
+      "path": "examples/cryptography/utxo/utxo.qnt",
+      "sha256": "921659b4026288aa652b0b7254a23d45b451ab944aadee1d6f29f04abb4527c7"
+    },
+    {
+      "path": "examples/games/mafia_werewolf/play_mafia.qnt",
+      "sha256": "2d1a38a0ee2d34d36a1b62bb3f8b8ed5c1da2cbc56e998d8c71116c3bf2d535f"
+    },
+    {
+      "path": "examples/games/rock_paper_scissors/play_rock_paper_scissors.qnt",
+      "sha256": "4ae977c5845d3c5ca81de9783de571419a44aa2f88b204e357217974a2ee7f90"
+    },
+    {
+      "path": "examples/games/secret-santa/secret_santa.qnt",
+      "sha256": "90ec6a07aaffddcd149999ffd337ab19cbe638697bae991ce26462630b821f03"
+    },
+    {
+      "path": "examples/games/tictactoe/tictactoe.qnt",
+      "sha256": "464b6c5c37592905a49460b3a10c533098111c841b945fc05e6047d281a2df46"
+    },
+    {
+      "path": "examples/language-features/booleans.qnt",
+      "sha256": "ccde814cd9d7eab46e2eb2fbd311c81a8f6c2a8beb81c06b53bf66aebfeca18a"
+    },
+    {
+      "path": "examples/language-features/counters.qnt",
+      "sha256": "73fa5e2b001c6b77c069b728753c12ccbb34375330d705aff80b530bc5b56253"
+    },
+    {
+      "path": "examples/language-features/generate.qnt",
+      "sha256": "0f5806dcfe95d2689029cf17940862d72dc2810171b9bccd16cf2202acd5041d"
+    },
+    {
+      "path": "examples/language-features/importFrom.qnt",
+      "sha256": "aaa41c1315569e2b9d6cbf0ad34bd50bc2757d4339a40d86a9d1fa7cdef5c5ca"
+    },
+    {
+      "path": "examples/language-features/imports.qnt",
+      "sha256": "53a15e63cd3a81a73b6e42b62ea31776a46442e443fb25e065b1e2b268ba1017"
+    },
+    {
+      "path": "examples/language-features/instances.qnt",
+      "sha256": "9a5b285ce9cf407e1ed090b4b91c262eaff918639acbf6b62cad9cf2777f9b37"
+    },
+    {
+      "path": "examples/language-features/instancesFrom.qnt",
+      "sha256": "15d5d2b763dc4ef173c87e2eaa5b311500b62898117bd997332430e55a00a253"
+    },
+    {
+      "path": "examples/language-features/integers.qnt",
+      "sha256": "65fc439c2a639906acb007ee6683b4333aebdd0dae0befb9e9fa6ba52265cea5"
+    },
+    {
+      "path": "examples/language-features/lists.qnt",
+      "sha256": "f15bfb43714aa86f42cec578b648f1011421ad7c925ba0ec73f5d380842dd656"
+    },
+    {
+      "path": "examples/language-features/maps.qnt",
+      "sha256": "6ea0a6de76c64c27b016900b37d2125074199a9a013a5e9f6cf3af055499dc9f"
+    },
+    {
+      "path": "examples/language-features/nondetEx.qnt",
+      "sha256": "d77ad33b0b211af2906ca2f68e0c5ee15d4e9391cd55d0867e268ff9a3b59e1b"
+    },
+    {
+      "path": "examples/language-features/option.qnt",
+      "sha256": "12a62a7dc9bc63dcacab6aa4e389f59cda016216e232505e0e9149da9a3afdfb"
+    },
+    {
+      "path": "examples/language-features/records.qnt",
+      "sha256": "0ebb2d37e6fd324fd3f04ea24fbe60f30aa05ecb59e435f02e6e314080ccf24b"
+    },
+    {
+      "path": "examples/language-features/sets.qnt",
+      "sha256": "d6a385c1941bb2f026a432327a4f9476baf4d69901e6f684ab1d4e0f116be836"
+    },
+    {
+      "path": "examples/language-features/strongFairness.qnt",
+      "sha256": "201a39eeaa62d3161d2c53cbafce486c1a26f4e345c521d05879f4e0386858db"
+    },
+    {
+      "path": "examples/language-features/tuples.qnt",
+      "sha256": "c2ede2c56978a72467873f80988e2b212c333228e4f46859cf5d6cc8afc6d563"
+    },
+    {
+      "path": "examples/language-features/weakFairness.qnt",
+      "sha256": "41802acf33910f8bacb34a358b49dc56e52f9b6e51ee02f01fe0c077529e1f5f"
+    },
+    {
+      "path": "examples/puzzles/prisoners/prisoners.qnt",
+      "sha256": "02dfd566646270bf96c274731755c966839b9028635fad6eaa37e229f49a5241"
+    },
+    {
+      "path": "examples/puzzles/river/river.qnt",
+      "sha256": "a937324e48d6c66c9e7ea4f8858b5a0d1b6d581c684533346ed15f4791f3fc2a"
+    },
+    {
+      "path": "examples/solidity/ERC20/erc20.qnt",
+      "sha256": "69ec1887f08c93ba8a1847671edd0c8cbe29daf55225845e2023c12964eb0442"
+    },
+    {
+      "path": "examples/solidity/GradualPonzi/gradualPonzi.qnt",
+      "sha256": "4374d3ed87787d97bd5d46b29daf748aa4a2fd513d4377a44fccbb60b4dac268"
+    },
+    {
+      "path": "examples/solidity/SimpleAuction/SimpleAuction.qnt",
+      "sha256": "9c70ab3ca26a66495c90e38ca3f2b0edf254b5564fb14eb6a43df572c376d328"
+    },
+    {
+      "path": "examples/solidity/SimplePonzi/simplePonzi.qnt",
+      "sha256": "cf499f8e6379873f360fb61d38da1534131bc16a0b52c9518fc969707fad8bc8"
+    },
+    {
+      "path": "examples/solidity/icse23-fig7/lottery.qnt",
+      "sha256": "0e126b393c7216f1c935f555ff173e67910f44f4f0eb06d04665cc67c853914d"
+    },
+    {
+      "path": "examples/spells/BoundedUInt.qnt",
+      "sha256": "fc165d1cb49c3f18573d90de564eefd7684b26f19ad5540fc5e31c0adb5aa471"
+    },
+    {
+      "path": "examples/spells/basicSpells.qnt",
+      "sha256": "aa9d48cac721f4c3acb7998b027c3818ec84ea876cd2c677863ca5fb7c112d4f"
+    },
+    {
+      "path": "examples/spells/commonSpells.qnt",
+      "sha256": "8fcdeb18e27c2b6ba148be71977afbac10086e894474d9a6bafd889a869a12c3"
+    },
+    {
+      "path": "examples/spells/rareSpells.qnt",
+      "sha256": "9417c98f3bc563cc4291f1a3ede8e3fe82939470e4c6aeb0f6ca8b8665bfe883"
+    },
+    {
+      "path": "examples/tutorials/booleans.qnt",
+      "sha256": "bc351eed35498833ccc0247d06d3258efe102468ac7d8683f5f301ecb8dd393c"
+    },
+    {
+      "path": "examples/tutorials/coin.qnt",
+      "sha256": "bab987a06fa10781d3702b7e4040ead591a783e0256eebdaaa199bfc05eb19d4"
+    },
+    {
+      "path": "examples/tutorials/hello.qnt",
+      "sha256": "601b620d809909657d9da700a24c0d0370afd90c42fd12cb672cb04112bdf302"
+    },
+    {
+      "path": "examples/tutorials/integers.qnt",
+      "sha256": "1e21af1ce028f72bddba48fa83e8d7b74d4f929dbbf70b4442c5f9e572e5318e"
+    },
+    {
+      "path": "examples/tutorials/repl/kettle.qnt",
+      "sha256": "8d4f2cc907a3b8009fd36f8717049eeff316e5d10d78576f91515856167279a2"
+    },
+    {
+      "path": "examples/tutorials/sets.qnt",
+      "sha256": "3a8b11ff1470a4d306c3148ff36afb077266afac98c8c0385d5cf46202f6553b"
+    },
+    {
+      "path": "examples/verification/defaultOpNames.qnt",
+      "sha256": "5050ea2b5bfbdce60916519c731ab1ff54bbd821ef80c79cc5952664e4834d47"
+    },
+    {
+      "path": "quint/src/builtin.qnt",
+      "sha256": "8d1f0925f5276811e4704f0e01ff288aaeea4c9cca99b93059b541df3a445352"
+    },
+    {
+      "path": "quint/testFixture/ApalacheCompilation.qnt",
+      "sha256": "281e1f3f2cec0894ee84a28ee2f407f34e783e438951777c4cf178b85f8f67d7"
+    },
+    {
+      "path": "quint/testFixture/ApalacheCompilationError.qnt",
+      "sha256": "07e60742b66495afca9d6bd7eabf3c3d53f606b13cecd6d30c59e0793e8536d9"
+    },
+    {
+      "path": "quint/testFixture/SuperSpec.qnt",
+      "sha256": "77f2411f4a7e430e79557ec4cefe67c1b0825444b5d030a96a575cd8fec6c8e2"
+    },
+    {
+      "path": "quint/testFixture/TrivialTypeError.qnt",
+      "sha256": "3a60392a001a2e0d6ce3cdcd828dbc8e1084537ab7aa737cd65280caa1994636"
+    },
+    {
+      "path": "quint/testFixture/_0001emptyModule.qnt",
+      "sha256": "7d6aa0830f3f2ec9f5c861db3793d310922a1761ba8f6b2d0a035c70790a356c"
+    },
+    {
+      "path": "quint/testFixture/_0099unorderedDefs.qnt",
+      "sha256": "e193a33120411d552428f4645ebc979288938ac3c1e092224e4bb72077ffd18f"
+    },
+    {
+      "path": "quint/testFixture/_0100cyclicDefs.qnt",
+      "sha256": "84e84dd745d565a83ab107a15e29fbb297eed1e861a9a0d2a01788ef818f4d0e"
+    },
+    {
+      "path": "quint/testFixture/_0101noRecursion.qnt",
+      "sha256": "9d57ac1debd8590c0dbc1792ceaf35597073efeef8c705edba8088a0d2498c40"
+    },
+    {
+      "path": "quint/testFixture/_1010undefinedName.qnt",
+      "sha256": "3a90a3caafbcac49f8d0083c265198dc7042ee19e49593bfffaab69fbb978324"
+    },
+    {
+      "path": "quint/testFixture/_1011nameOutOfScope.qnt",
+      "sha256": "c6a54429d6d1556623640fe9a6a1210fe72626724e5127ffbdb30b62eca850cc"
+    },
+    {
+      "path": "quint/testFixture/_1012unknownType.qnt",
+      "sha256": "05628fb3ffb8b5f5094bda84499bc5f915939616cf08fcb140d4643e424108f4"
+    },
+    {
+      "path": "quint/testFixture/_1013unknownTypeLetIn.qnt",
+      "sha256": "b5dc1d2cb1a0cd0ee07026d36ed2f9090f696f5f9965dc93b17e2dc8dd2d23e3"
+    },
+    {
+      "path": "quint/testFixture/_1014conflictingNames.qnt",
+      "sha256": "5a3feea46ca03491e67952b8d5e1056f5ceddc4b5ccca90c8007385b5935f66b"
+    },
+    {
+      "path": "quint/testFixture/_1015noToplevelNondet.qnt",
+      "sha256": "31a3d52b2fb183d868145d9fae821fe146773de95ca5f904e23b7a7ba00280a8"
+    },
+    {
+      "path": "quint/testFixture/_1016nonConstOverride.qnt",
+      "sha256": "b47e19b2cfc17ed24e92c57a0a82a6d20e43c39a71c3cb9ef8047037d9b707e4"
+    },
+    {
+      "path": "quint/testFixture/_1017keywordsAsIdentifiers.qnt",
+      "sha256": "d3bd6d77b117a2290c67ef622fe0b00f1146227f89fc25f3070f10521bbf1b14"
+    },
+    {
+      "path": "quint/testFixture/_1020importFrom.qnt",
+      "sha256": "a0409f3da4a5a27c0f771fbb54fff0426fa2637f6786354e41652cd040820d1a"
+    },
+    {
+      "path": "quint/testFixture/_1021importee1.qnt",
+      "sha256": "54bd7f0b28eeb0cea4fdf957718ff30def03123c40d8839f9fd6927a72998269"
+    },
+    {
+      "path": "quint/testFixture/_1022importee2.qnt",
+      "sha256": "887069538a52efadd9889e60340a04a5276b3adb9413e838a241f675a7e1aacf"
+    },
+    {
+      "path": "quint/testFixture/_1023importFromUnresolved.qnt",
+      "sha256": "75e326d03e15e577810d1db3bf708c69b4cb23645a5c41e440f72a4db18ebf6d"
+    },
+    {
+      "path": "quint/testFixture/_1026importCycleA.qnt",
+      "sha256": "2a823a2241f2632b8cc91fc91427668bb7a1080ba5d4185a7167750b5724530b"
+    },
+    {
+      "path": "quint/testFixture/_1027importCycleB.qnt",
+      "sha256": "1d2674bd33ab3e6f2cd97642cf6f5c1d4efb5334c2c8ddebe47d706e3854e9a1"
+    },
+    {
+      "path": "quint/testFixture/_1028importCycleC.qnt",
+      "sha256": "c4b9736c36d8f58f9bb08a72db1e7e4cbcb7edca4ba40048d244ca6e677bc3bf"
+    },
+    {
+      "path": "quint/testFixture/_1030const.qnt",
+      "sha256": "e070f8388f6e346737689d2498549343ab8144f99bd0e7c6f41adfe56fe570c8"
+    },
+    {
+      "path": "quint/testFixture/_1031instance.qnt",
+      "sha256": "769701f25e05db011a5d76deddea510711a1f9cdd93bbb51ac932aaf6046b7fd"
+    },
+    {
+      "path": "quint/testFixture/_1032docstrings.qnt",
+      "sha256": "e673e7a6f858c60d13634bb336238caa2bd818dac7a1246fcf6b78278aa17d25"
+    },
+    {
+      "path": "quint/testFixture/_1040compileError.qnt",
+      "sha256": "c0b67b0b265a55dff38ddd5fd951ad17cf9355244843dbb260d769cf2ee55839"
+    },
+    {
+      "path": "quint/testFixture/_1041compileConst.qnt",
+      "sha256": "230facd9b83550aaea5c6550955c04b36e3acbbc5f8cda26c6849af2b3e8d23b"
+    },
+    {
+      "path": "quint/testFixture/_1043sumTypeDecl.qnt",
+      "sha256": "8318bf23be9b9cc6f318d837c9402f69384f7d00ddd75d282f4dfdfaf789b2c5"
+    },
+    {
+      "path": "quint/testFixture/_1044matchExpression.qnt",
+      "sha256": "ad03c0b85bf9a655b11230a655b07bf6aeb2d8b36bb66d27f510109e7d8902b8"
+    },
+    {
+      "path": "quint/testFixture/_1045polymorphicTypeDecl.qnt",
+      "sha256": "66f84925f26a8d3348213caf652e3ea1541ce65daf9e28d12a9dc481e8ac15a8"
+    },
+    {
+      "path": "quint/testFixture/_1050diffName.qnt",
+      "sha256": "4cbd3298be296c1feca0d23aa6ddc4cb6018df5f2971b6eef6bae72d02cd7844"
+    },
+    {
+      "path": "quint/testFixture/_1051manyTests.qnt",
+      "sha256": "2600401f29615076a13c618ec40a3c17fa1c7a27a2d5c95db125d14a3b9489a1"
+    },
+    {
+      "path": "quint/testFixture/_1052one.qnt",
+      "sha256": "fcdb597d91f7eb4c1759bf3d9c53a88d61698290dd24759b883cf38da4ba25aa"
+    },
+    {
+      "path": "quint/testFixture/_1053two.qnt",
+      "sha256": "f972c6be451a8b361d8d6725d67cab023d7ef6f47750cd44f6f87424307f93f4"
+    },
+    {
+      "path": "quint/testFixture/_1054sumTypesInItf.qnt",
+      "sha256": "061a7616be05c98ba0fdf23fa37413a1b243873b4674e57737329b8229df4f6c"
+    },
+    {
+      "path": "quint/testFixture/_1060case.qnt",
+      "sha256": "e9eab409abff130b411a95257e0b361a206b0fbb470b51d4c1b323b28db15dce"
+    },
+    {
+      "path": "quint/testFixture/_1080tupleDestructuring.qnt",
+      "sha256": "e71152253f9b9f0ce45ca830f1cfe2728d316803d63d8a87edfaf755ac88e92b"
+    },
+    {
+      "path": "quint/testFixture/_1090recordDestructuring.qnt",
+      "sha256": "18325bd4920c26ae9dc6bff0e2c921b68812275ac0021d60cdef211c7be188e8"
+    },
+    {
+      "path": "quint/testFixture/apalache/deadlock.qnt",
+      "sha256": "b61c6f21eca68b774e6a062212bf6f83e4674408e7b2c7baf31a02ef2f2b9f10"
+    },
+    {
+      "path": "quint/testFixture/apalache/genericRowParam.qnt",
+      "sha256": "fbbc9032352160c3c3bc4a9d8a5fb0be7b9a8233fd6fb44f3b3e669b6f0b36a2"
+    },
+    {
+      "path": "quint/testFixture/apalache/inferredStateVar.qnt",
+      "sha256": "c3f47845ebfec5afeb9d3f4b17c1682b1c62b6064bce492c9e8b81aa2150a820"
+    },
+    {
+      "path": "quint/testFixture/apalache/mapStateVar.qnt",
+      "sha256": "eae45d342cdd8797bc08ebbc21a48bc671cf8098a6184d8abc59bc2b4b687bd0"
+    },
+    {
+      "path": "quint/testFixture/apalache/polyStateVar.qnt",
+      "sha256": "1f825478a9565c4253f49da5e07b6ac784b4fe1d432b1c58eaaa5fa092395218"
+    },
+    {
+      "path": "quint/testFixture/apalache/temporalTest.qnt",
+      "sha256": "3319e79caae81860bf1fa1af6db2fc7bd22508f38b06aa5929875160c6bcb2b0"
+    },
+    {
+      "path": "quint/testFixture/apalache/tlcConfigError.qnt",
+      "sha256": "2c0c613598720014475536ee177dda1ff47490fdc7bab8aa8d90861634eceea4"
+    },
+    {
+      "path": "quint/testFixture/apalache/tlcCounter.qnt",
+      "sha256": "a2fbc1a23d720ddb8b951d559765fcc116f8b360e13a751438a024967c7e4059"
+    },
+    {
+      "path": "quint/testFixture/apalache/tlcLeadsTo.qnt",
+      "sha256": "3360e3762d86cb7deba9c25a58e3996d18ded8e7d20a3e97e9ba7cb726fb0a4c"
+    },
+    {
+      "path": "quint/testFixture/apalache/violateOnFive.qnt",
+      "sha256": "dd0109dc35a192e58147a399bb76ca2fb3c452ee3e4fdf645b1ffbfff3fac8f9"
+    },
+    {
+      "path": "quint/testFixture/bug1736setOfMaps.qnt",
+      "sha256": "efc28413bc64a44b0bd814976c67a781d1c97c2e626b6d629e29a4fe492c2d99"
+    },
+    {
+      "path": "quint/testFixture/bug843pureValCache.qnt",
+      "sha256": "d51284b9a4405b1d90ab7944f15a72be4328840dae0134e1160b476115fb3444"
+    },
+    {
+      "path": "quint/testFixture/expectNoStateDuplication.qnt",
+      "sha256": "7375d7ad394ef2b06f2394b3a5a7926de7aeb7e995290f2e7e41e836309f05cf"
+    },
+    {
+      "path": "quint/testFixture/nestedParameterizedCallsWithLet.qnt",
+      "sha256": "a54decdbc4c6be282bd21548b130c6e7ca528c71706da9b6faf2623fbfd3efc2"
+    },
+    {
+      "path": "quint/testFixture/runtimeErrorStackTrace.qnt",
+      "sha256": "25774ada47c9cdb6885a0fc3c938647844cfc68d209c7064c7e4d0f2c37f2876"
+    },
+    {
+      "path": "quint/testFixture/simulator/debugCounter.qnt",
+      "sha256": "938bc2d6e790e15716c6f6cef6e6615269e5afe7a02257a42ed64c680178e5c7"
+    },
+    {
+      "path": "quint/testFixture/simulator/failingTestCounters.qnt",
+      "sha256": "8d20a64a6d8899a46a45384adeb3448e230705261830d5ad3d5c10f4d7b34a37"
+    },
+    {
+      "path": "quint/testFixture/simulator/flushingDiagnostics.qnt",
+      "sha256": "98932a7d1f877b0aa13f85409cf5c7a12d5d12af45ce6e896a955ea8beeb20bd"
+    },
+    {
+      "path": "quint/testFixture/simulator/gettingStarted.qnt",
+      "sha256": "2f185314aeb637b8c4039f20ddc1397d284223e8e7d1c86a7524935a4b9ccb15"
+    },
+    {
+      "path": "quint/testFixture/simulator/lastActionInRun.qnt",
+      "sha256": "c351a276eb44bbf641dd7918f4c21aa4ac6daa551a0bbb941a10a5929386fd65"
+    },
+    {
+      "path": "quint/testFixture/simulator/runtimeError.qnt",
+      "sha256": "4b4de26075005e1ce9d06c624d365870988d86c3c7d531146e9f78f5cff387c9"
+    },
+    {
+      "path": "quint/testFixture/thenErrorMessages.qnt",
+      "sha256": "cf8ea8af860a9b6544686505d135f17f86c001ed2fdb12857e64518d2fdf5048"
+    },
+    {
+      "path": "quint/testFixture/typechecking/FileWithError.qnt",
+      "sha256": "5bea8b8275ee0a77aafa72fe95a791e447a9868aec411c9d493737a7f7a2598f"
+    },
+    {
+      "path": "quint/testFixture/typechecking/ImportFileWithError.qnt",
+      "sha256": "fc058b7d5fd56e27f9ff472454844cc4cbdbf687c5441866ad7c00c229259544"
+    },
+    {
+      "path": "quint/testFixture/typechecking/OverrideErrors.qnt",
+      "sha256": "ddf23ec5299ff55563c5dd12305a2e46a93db4f90c27eb25d4b4c15589c49b08"
+    }
+  ],
+  "invalidSources": [
+    {
+      "path": "docs/generated/adr006before.qnt",
+      "sha256": "ccd66c60fae01e62671daa593285d5276edc69618f33d85b809e2bad314ff0a1"
+    },
+    {
+      "path": "quint/testFixture/_1025importeeWithError.qnt",
+      "sha256": "25d70272d9501b40e7f05849815e55b2739d449ade3ba2315a1c2bc68ad1b5dd"
+    },
+    {
+      "path": "quint/testFixture/_1042qualifiersInRecordsFieldsError.qnt",
+      "sha256": "5c5b9b3fd9a7b39ba4e341d572f1391cc6833e129f52f9f19f460c738fa70b82"
+    },
+    {
+      "path": "quint/testFixture/_1070mapSyntax.qnt",
+      "sha256": "1de6cbe414d356624f54588521959ff54f8f6860dbb7b888d9acea1ec07af19e"
+    },
+    {
+      "path": "quint/testFixture/modulesAndJunk.qnt",
+      "sha256": "ca9688597cc99840d4b1e06d49bdb717314214930938b8ea5ea514f6cdbc897b"
+    }
+  ]
+}

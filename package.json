@@ -31,6 +31,9 @@
     "test:node-types": "node test/node-types.test.js",
     "test:types": "tsc --noEmit --strict --module node16 --moduleResolution node16 bindings/node/index_test.ts",
     "test:coverage": "node test/scripts/check-upstream-coverage.mjs",
+    "classify:upstream": "node test/scripts/classify-upstream-sources.mjs",
+    "test:upstream-sources": "node test/scripts/check-upstream-sources.mjs",
+    "diagnose:upstream-sources": "node test/scripts/diagnose-upstream-sources.mjs",
     "test:package": "node test/scripts/check-package.mjs",
     "test": "npm run test:corpus && npm run test:highlight && npm run test:node-types && npm run test:node && npm run test:types && npm run test:fixtures && npm run test:coverage && npm run check:generated && npm run test:package",
     "check:generated": "npm run generate && git diff --exit-code -- src/grammar.json src/node-types.json src/parser.c src/scanner.c src/tree_sitter"
