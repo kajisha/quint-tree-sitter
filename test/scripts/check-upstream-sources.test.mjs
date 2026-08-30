@@ -104,3 +104,23 @@ test('rejects a source path that escapes the pinned checkout', () => {
     }
   })
 })
+
+test('rejects a tracked source symlink that resolves outside the pinned checkout', () => {
+  const entry = originalManifest.validSources[0]
+  const sourcePath = path.join(checkout, entry.path)
+  const externalTarget = path.join(temporaryRoot, 'external-symlink-target.qnt')
+  fs.copyFileSync(sourcePath, externalTarget)
+  fs.unlinkSync(sourcePath)
+  fs.symlinkSync(externalTarget, sourcePath)
+
+  const result = runChecker(originalManifest)
+  assert.notEqual(
+    result.status,
+    0,
+    `outside-checkout symlink mutation was accepted\nstdout:\n${result.stdout}\nstderr:\n${result.stderr}`,
+  )
+  assert.ok(
+    result.stderr.includes(`source resolves outside the pinned checkout: ${entry.path}`),
+    `realpath containment diagnostic was missing\nstderr:\n${result.stderr}`,
+  )
+})

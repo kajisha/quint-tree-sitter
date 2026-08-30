@@ -32,5 +32,9 @@ jobs:
             fd772606588b40def9978d8c82da69c2db7a0e3b
           test "$(sha256sum "$RUNNER_TEMP/quint-upstream/quint/src/generated/Quint.g4" | cut -d ' ' -f 1)" = \
             4a7129cfd2e75f115a80cf4c1bb07273d7c3f2728b1f4421ec4112aace07bf36
+      - name: Check upstream manifest integrity mutations
+        env:
+          QUINT_UPSTREAM_CHECKOUT: ${{ runner.temp }}/quint-upstream
+        run: node --test test/scripts/check-upstream-sources.test.mjs
       - name: Check all officially valid Quint sources
         run: npm run test:upstream-sources -- "$RUNNER_TEMP/quint-upstream"
