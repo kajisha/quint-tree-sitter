@@ -213,3 +213,38 @@ module ReservedDestructuring {
       (ERROR)
       (identifier_pattern
         name: (identifier)))))
+
+==================
+error incomplete local declaration preserves later sibling
+==================
+
+module M {
+  def broken = {
+    val (x, y) = pair
+  }
+  val later = 1
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (block_expression
+        body: (declaration_expression
+          declaration: (operator_definition
+            qualifier: (operator_qualifier)
+            pattern: (tuple_pattern
+              element: (identifier_pattern
+                name: (identifier))
+              element: (identifier_pattern
+                name: (identifier)))
+            body: (identifier))
+          body: (MISSING identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (integer))))

@@ -506,3 +506,97 @@ module InvalidLambda {
       name: (identifier)
       (ERROR)
       body: (identifier))))
+
+==================
+local declaration preserves complete dot call rhs
+==================
+
+module M {
+  action step = {
+    nondet message = messages.filter(enabled).oneOf()
+    all { enabled(message), deliver(message) }
+  }
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (block_expression
+        body: (declaration_expression
+          declaration: (operator_definition
+            qualifier: (operator_qualifier)
+            name: (identifier)
+            body: (ufcs_expression
+              receiver: (ufcs_expression
+                receiver: (identifier)
+                function: (identifier)
+                arguments: (argument_list
+                  (identifier)))
+              function: (identifier)
+              arguments: (argument_list)))
+          body: (action_block
+            body: (call_expression
+              function: (identifier)
+              arguments: (argument_list
+                (identifier)))
+            element: (call_expression
+              function: (identifier)
+              arguments: (argument_list
+                (identifier)))))))))
+
+==================
+local destructuring leaves tuple body outside rhs
+==================
+
+module M {
+  def combine(t1, t2) = {
+    val (x1, y1) = t1
+    val (x2, y2) = t2
+    (x1 + x2, y1 + y2)
+  }
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      parameters: (parameter_list
+        (parameter
+          name: (identifier))
+        (parameter
+          name: (identifier)))
+      body: (block_expression
+        body: (declaration_expression
+          declaration: (operator_definition
+            qualifier: (operator_qualifier)
+            pattern: (tuple_pattern
+              element: (identifier_pattern
+                name: (identifier))
+              element: (identifier_pattern
+                name: (identifier)))
+            body: (identifier))
+          body: (declaration_expression
+            declaration: (operator_definition
+              qualifier: (operator_qualifier)
+              pattern: (tuple_pattern
+                element: (identifier_pattern
+                  name: (identifier))
+                element: (identifier_pattern
+                  name: (identifier)))
+              body: (identifier))
+            body: (tuple_expression
+              element: (binary_expression
+                left: (identifier)
+                right: (identifier))
+              element: (binary_expression
+                left: (identifier)
+                right: (identifier)))))))))

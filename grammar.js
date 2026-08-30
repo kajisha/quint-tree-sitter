@@ -32,6 +32,9 @@ module.exports = grammar({
     [$._qualified_expression_name, $._lambda_name_component],
     // `((x, y)) =>` is Quint's tuple-parameter sugar, not a grouped tuple value.
     [$.tuple_parameter],
+    [$._expression, $._call_name],
+    [$._call_name, $._identifier_component],
+    [$.ufcs_expression, $.field_access_expression],
   ],
 
   word: $ => $.identifier,
@@ -587,26 +590,26 @@ module.exports = grammar({
       '=',
       field('value', $._expression),
     )),
-    call_expression: $ => prec(PREC.POSTFIX, seq(
+    call_expression: $ => prec.dynamic(-1, prec(PREC.POSTFIX, seq(
       field('function', $._call_name),
       field('arguments', $.argument_list),
-    )),
-    _call_name: $ => prec(1, choice(
+    ))),
+    _call_name: $ => choice(
       $._expression_name,
       alias(choice('and', 'or', 'iff', 'implies', 'leadsTo'), $.identifier),
       alias(choice('Set', 'List'), $.type_identifier),
-    )),
+    ),
     _member_name: $ => choice(
       $._expression_name,
       alias(choice('and', 'or', 'iff', 'implies', 'leadsTo'), $.identifier),
     ),
-    ufcs_expression: $ => prec.left(PREC.POSTFIX, seq(
+    ufcs_expression: $ => prec.dynamic(1, prec.left(PREC.POSTFIX, seq(
       field('receiver', $._expression),
       '.',
       field('function', $._member_name),
       field('arguments', $.argument_list),
-    )),
-    field_access_expression: $ => prec.left(PREC.POSTFIX, seq(
+    ))),
+    field_access_expression: $ => prec(PREC.POSTFIX, seq(
       field('receiver', $._expression),
       '.',
       field('field', $._member_name),
@@ -647,10 +650,10 @@ module.exports = grammar({
       field('body', $._expression),
       '}',
     ),
-    declaration_expression: $ => prec.right(PREC.BLOCK, seq(
+    declaration_expression: $ => prec.dynamic(1, prec.right(PREC.BLOCK, seq(
       field('declaration', alias($._local_operator_definition, $.operator_definition)),
       field('body', choice($.declaration_expression, $._expression)),
-    )),
+    ))),
     _local_operator_definition: $ => choice(
       seq(
         field('qualifier', alias($._destructuring_qualifier, $.operator_qualifier)),
