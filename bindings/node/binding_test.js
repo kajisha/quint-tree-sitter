@@ -23,6 +23,47 @@ function alternatingLogicalModule(operatorCount) {
   return `module LogicalChain { val result = ${expression} }`
 }
 
+function consecutiveLocalModule(declarationCount, malformedFinalBody = false) {
+  const declarations = Array.from(
+    { length: declarationCount },
+    (_, index) => `val local${index} = ${index}`,
+  ).join(' ')
+  const body = malformedFinalBody ? '' : ` local${declarationCount - 1}`
+  return `module LocalChain { val result = ${declarations}${body} }`
+}
+
+function parseMilliseconds(parser, source, oldTree) {
+  const started = process.hrtime.bigint()
+  const tree = parser.parse(source, oldTree)
+  return { tree, milliseconds: Number(process.hrtime.bigint() - started) / 1e6 }
+}
+
+function assertRoughlyLinear(times, label) {
+  for (let index = 1; index < times.length; index += 1) {
+    assert.ok(
+      times[index] <= times[index - 1] * 3.5 + 5,
+      `${label} grows pathologically: ${times.map(time => time.toFixed(2)).join(', ')} ms`,
+    )
+  }
+  assert.ok(
+    times.at(-1) < 200,
+    `${label} must remain editor-oriented at 800 declarations: ${times.at(-1).toFixed(2)} ms`,
+  )
+}
+
+function assertLowPrecedenceOperand(node, expectedType) {
+  assert.equal(node.type, expectedType)
+  if (expectedType === 'lambda_expression') {
+    assert.equal(node.childForFieldName('parameter').type, 'parameter')
+    assert.equal(node.childrenForFieldName('body').at(-1).type, 'identifier')
+  } else {
+    const declaration = node.childForFieldName('declaration')
+    assert.equal(declaration.type, 'operator_definition')
+    assert.equal(declaration.childForFieldName('body').type, 'integer')
+    assert.equal(node.childrenForFieldName('body').at(-1).type, 'identifier')
+  }
+}
+
 function createTestPackage({ nodeTypes, highlights, injectionDirectory = false }) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'tree-sitter-quint-binding-'))
   fs.mkdirSync(path.join(root, 'bindings/node'), { recursive: true })
@@ -153,6 +194,109 @@ test('alternating logical chains parse fully and incrementally', () => {
   })
 
   assert.equal(parser.parse(editedSource, tree).rootNode.hasError, false)
+})
+
+test('lambda and declaration operands preserve the official public CST matrix', () => {
+  const parser = new Parser()
+  parser.setLanguage(Quint)
+  const operators = [
+    ['power', '^', 'binary_expression'],
+    ['multiply', '*', 'binary_expression'],
+    ['add', '+', 'binary_expression'],
+    ['compare', '==', 'binary_expression'],
+    ['and', 'and', 'binary_expression'],
+    ['or', 'or', 'binary_expression'],
+    ['iff', 'iff', 'binary_expression'],
+    ['leads', 'leadsTo', 'binary_expression'],
+    ['implies', 'implies', 'binary_expression'],
+    ['pair', '->', 'pair_expression'],
+  ]
+  const definitions = [
+    "action assignmentLambda = x' = x => x",
+    "action assignmentLet = x' = val y = 1 y",
+    ...operators.flatMap(([name, operator]) => [
+      `val ${name}Lambda = a ${operator} x => x`,
+      `val ${name}Let = a ${operator} val y = 1 y`,
+    ]),
+    'val unaryLambda = -x => x',
+    'val unaryLet = -val y = 1 y',
+  ]
+  const tree = parser.parse(`module OperandMatrix { ${definitions.join(' ')} }`)
+  const nodes = namedNodesOfType(tree.rootNode, 'operator_definition')
+    .filter(node => node.parent.type === 'module')
+  const bodies = new Map(nodes.map(node => [
+    node.childForFieldName('name').text,
+    node.childForFieldName('body'),
+  ]))
+
+  assert.equal(tree.rootNode.hasError, false)
+  assert.equal(bodies.get('assignmentLambda').type, 'delayed_assignment')
+  assertLowPrecedenceOperand(
+    bodies.get('assignmentLambda').childForFieldName('value'),
+    'lambda_expression',
+  )
+  assertLowPrecedenceOperand(
+    bodies.get('assignmentLet').childForFieldName('value'),
+    'declaration_expression',
+  )
+  for (const [name, , expressionType] of operators) {
+    assert.equal(bodies.get(`${name}Lambda`).type, expressionType)
+    const operandField = expressionType === 'pair_expression' ? 'value' : 'right'
+    assertLowPrecedenceOperand(
+      bodies.get(`${name}Lambda`).childForFieldName(operandField),
+      'lambda_expression',
+    )
+    assertLowPrecedenceOperand(
+      bodies.get(`${name}Let`).childForFieldName(operandField),
+      'declaration_expression',
+    )
+  }
+  assertLowPrecedenceOperand(
+    bodies.get('unaryLambda').childForFieldName('operand'),
+    'lambda_expression',
+  )
+  assertLowPrecedenceOperand(
+    bodies.get('unaryLet').childForFieldName('operand'),
+    'declaration_expression',
+  )
+})
+
+test('consecutive local declarations parse roughly linearly in full and incremental modes', t => {
+  const parser = new Parser()
+  parser.setLanguage(Quint)
+  const sizes = [100, 200, 400, 800]
+
+  parser.parse(consecutiveLocalModule(20))
+  for (const malformedFinalBody of [false, true]) {
+    const fullTimes = []
+    const incrementalTimes = []
+    for (const size of sizes) {
+      const source = consecutiveLocalModule(size, malformedFinalBody)
+      const full = parseMilliseconds(parser, source)
+      assert.equal(full.tree.rootNode.hasError, malformedFinalBody)
+      fullTimes.push(full.milliseconds)
+
+      const marker = `local${Math.floor(size / 2)} = `
+      const editIndex = source.indexOf(marker) + marker.length
+      const replacement = source[editIndex] === '9' ? '8' : '9'
+      const editedSource = `${source.slice(0, editIndex)}${replacement}${source.slice(editIndex + 1)}`
+      full.tree.edit({
+        startIndex: editIndex,
+        oldEndIndex: editIndex + 1,
+        newEndIndex: editIndex + 1,
+        startPosition: { row: 0, column: editIndex },
+        oldEndPosition: { row: 0, column: editIndex + 1 },
+        newEndPosition: { row: 0, column: editIndex + 1 },
+      })
+      const incremental = parseMilliseconds(parser, editedSource, full.tree)
+      assert.equal(incremental.tree.rootNode.hasError, malformedFinalBody)
+      incrementalTimes.push(incremental.milliseconds)
+    }
+    const label = malformedFinalBody ? 'malformed-final-body chain' : 'valid chain'
+    assertRoughlyLinear(fullTimes, `${label} full parse`)
+    assertRoughlyLinear(incrementalTimes, `${label} incremental parse`)
+    t.diagnostic(`${label}: ${JSON.stringify({ sizes, fullTimes, incrementalTimes })}`)
+  }
 })
 
 test('incomplete declarations preserve later named declaration siblings', () => {

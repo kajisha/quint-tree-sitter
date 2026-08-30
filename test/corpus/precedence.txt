@@ -394,6 +394,93 @@ module ReviewProbes {
               (integer))))))))
 
 ==================
+precedence low-precedence lambda and declaration operands
+==================
+
+module LowPrecedenceOperands {
+  action assignmentLambda = x' = x => x
+  action assignmentLet = x' = val y = 1 y
+  val addLambda = a + x => x
+  val addLet = a + val y = 1 y
+  val pairLambda = a -> x => x
+  val unaryLambda = -x => x
+  val unaryLet = -val y = 1 y
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (delayed_assignment
+        name: (identifier)
+        value: (lambda_expression
+          parameter: (parameter
+            name: (identifier))
+          body: (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (delayed_assignment
+        name: (identifier)
+        value: (declaration_expression
+          declaration: (operator_definition
+            qualifier: (operator_qualifier)
+            name: (identifier)
+            body: (integer))
+          body: (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (binary_expression
+        left: (identifier)
+        right: (lambda_expression
+          parameter: (parameter
+            name: (identifier))
+          body: (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (binary_expression
+        left: (identifier)
+        right: (declaration_expression
+          declaration: (operator_definition
+            qualifier: (operator_qualifier)
+            name: (identifier)
+            body: (integer))
+          body: (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (pair_expression
+        key: (identifier)
+        value: (lambda_expression
+          parameter: (parameter
+            name: (identifier))
+          body: (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (unary_expression
+        operand: (lambda_expression
+          parameter: (parameter
+            name: (identifier))
+          body: (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (unary_expression
+        operand: (declaration_expression
+          declaration: (operator_definition
+            qualifier: (operator_qualifier)
+            name: (identifier)
+            body: (integer))
+          body: (identifier))))))
+
+==================
 precedence pair associativity
 ==================
 

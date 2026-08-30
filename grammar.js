@@ -17,57 +17,6 @@ const PREC = {
   POSTFIX: 14,
 }
 
-const localOperatorDefinition = ($, body) => choice(
-  seq(
-    field('qualifier', alias($._destructuring_qualifier, $.operator_qualifier)),
-    field('pattern', choice($.tuple_pattern, $.record_pattern)),
-    '=',
-    field('body', body),
-    optional(';'),
-  ),
-  seq(
-    field('qualifier', $.operator_qualifier),
-    field('name', $._normal_call_name),
-    field('parameters', alias($._annotated_parameter_list, $.parameter_list)),
-    ':',
-    field('type', $._type),
-    '=',
-    field('body', body),
-    optional(';'),
-  ),
-  seq(
-    field('qualifier', $.operator_qualifier),
-    field('name', $._normal_call_name),
-    optional(field('parameters', alias($._untyped_parameter_list, $.parameter_list))),
-    optional(seq(':', field('type', $._type))),
-    '=',
-    field('body', body),
-    optional(';'),
-  ),
-)
-
-const localNamedOperatorDefinition = ($, body) => choice(
-  seq(
-    field('qualifier', $.operator_qualifier),
-    field('name', $._normal_call_name),
-    field('parameters', alias($._annotated_parameter_list, $.parameter_list)),
-    ':',
-    field('type', $._type),
-    '=',
-    field('body', body),
-    optional(';'),
-  ),
-  seq(
-    field('qualifier', $.operator_qualifier),
-    field('name', $._normal_call_name),
-    optional(field('parameters', alias($._untyped_parameter_list, $.parameter_list))),
-    optional(seq(':', field('type', $._type))),
-    '=',
-    field('body', body),
-    optional(';'),
-  ),
-)
-
 module.exports = grammar({
   name: 'quint',
 
@@ -86,9 +35,7 @@ module.exports = grammar({
     [$._primary_expression, $._call_name],
     [$._call_name, $._identifier_component],
     [$.ufcs_expression, $.field_access_expression],
-    [$._assignment_level, $._action_boundary_and_binary, $._boundary_local_operator_definition],
-    [$._assignment_level, $._boundary_local_operator_definition],
-    [$._assignment_level, $._action_boundary_local_operator_definition],
+    [$._action_boundary_local_operator_definition, $._local_operator_definition_header],
   ],
 
   word: $ => $.identifier,
@@ -589,12 +536,12 @@ module.exports = grammar({
     ),
     unary_expression: $ => seq(
       '-',
-      field('operand', $._unary_level),
+      field('operand', choice($._unary_level, $.declaration_expression, $.lambda_expression)),
     ),
     binary_expression: $ => prec.right(seq(
       field('left', $._postfix_expression),
       '^',
-      field('right', $._unary_level),
+      field('right', choice($._unary_level, $.declaration_expression, $.lambda_expression)),
     )),
     _pair_level: $ => prec.left(choice(
       $._implies_level,
@@ -609,11 +556,6 @@ module.exports = grammar({
       'implies',
       field('right', choice($._leads_level, $.declaration_expression, $.lambda_expression)),
     )),
-    _boundary_implies_expression: $ => prec.left(seq(
-      field('left', $.logical_block),
-      'implies',
-      field('right', choice($._leads_level, $.declaration_expression, $.lambda_expression)),
-    )),
     _leads_level: $ => prec.left(choice(
       $._iff_level,
       alias($._leads_binary, $.binary_expression),
@@ -621,7 +563,7 @@ module.exports = grammar({
     _leads_binary: $ => prec.left(seq(
       field('left', $._leads_level),
       'leadsTo',
-      field('right', $._iff_level),
+      field('right', choice($._iff_level, $.declaration_expression, $.lambda_expression)),
     )),
     _iff_level: $ => prec.left(choice(
       $._or_level,
@@ -630,7 +572,7 @@ module.exports = grammar({
     _iff_binary: $ => prec.left(seq(
       field('left', $._iff_level),
       'iff',
-      field('right', $._or_level),
+      field('right', choice($._or_level, $.declaration_expression, $.lambda_expression)),
     )),
     _or_level: $ => prec.left(choice(
       $._and_level,
@@ -639,7 +581,7 @@ module.exports = grammar({
     _or_binary: $ => prec.left(seq(
       field('left', $._or_level),
       'or',
-      field('right', $._and_level),
+      field('right', choice($._and_level, $.declaration_expression, $.lambda_expression)),
     )),
     _and_level: $ => prec.left(choice(
       $._assignment_level,
@@ -661,7 +603,7 @@ module.exports = grammar({
     _compare_binary: $ => prec.left(PREC.COMPARE, seq(
       field('left', $._compare_level),
       choice('>', '<', '>=', '<=', '!=', '=='),
-      field('right', $._add_level),
+      field('right', choice($._add_level, $.declaration_expression, $.lambda_expression)),
     )),
     _add_level: $ => prec.left(choice(
       $._multiply_level,
@@ -670,7 +612,7 @@ module.exports = grammar({
     _add_binary: $ => prec.left(PREC.ADD, seq(
       field('left', $._add_level),
       choice('+', '-'),
-      field('right', $._multiply_level),
+      field('right', choice($._multiply_level, $.declaration_expression, $.lambda_expression)),
     )),
     _multiply_level: $ => prec.left(choice(
       $._unary_level,
@@ -679,7 +621,7 @@ module.exports = grammar({
     _multiply_binary: $ => prec.left(PREC.MULTIPLY, seq(
       field('left', $._multiply_level),
       choice('*', '/', '%'),
-      field('right', $._unary_level),
+      field('right', choice($._unary_level, $.declaration_expression, $.lambda_expression)),
     )),
     _unary_level: $ => prec.right(choice(
       $._power_level,
@@ -698,13 +640,13 @@ module.exports = grammar({
     pair_expression: $ => prec.left(seq(
       field('key', $._pair_level),
       '->',
-      field('value', $._implies_level),
+      field('value', choice($._implies_level, $.declaration_expression, $.lambda_expression)),
     )),
     delayed_assignment: $ => prec.right(PREC.ASSIGN, seq(
       field('name', $._expression_name),
       "'",
       '=',
-      field('value', $._assignment_level),
+      field('value', choice($._assignment_level, $.declaration_expression, $.lambda_expression)),
     )),
     call_expression: $ => prec.dynamic(-1, prec(PREC.POSTFIX, seq(
       field('function', $._call_name),
@@ -767,26 +709,51 @@ module.exports = grammar({
       '}',
     ),
     declaration_expression: $ => choice(
-      prec.dynamic(1, prec.right(PREC.POSTFIX + 1, seq(
+      prec.dynamic(2, prec.right(PREC.BLOCK, seq(
         field('declaration', alias($._action_boundary_local_operator_definition, $.operator_definition)),
         field('body', $.action_block),
-      ))),
-      prec.dynamic(1, prec.right(PREC.POSTFIX + 1, seq(
-        field('declaration', alias($._boundary_local_operator_definition, $.operator_definition)),
-        field('body', choice(
-          $.call_expression,
-          $.logical_block,
-          $.declaration_expression,
-          alias($._boundary_implies_expression, $.binary_expression),
-        )),
       ))),
       prec.dynamic(1, prec.right(PREC.BLOCK, seq(
         field('declaration', alias($._local_operator_definition, $.operator_definition)),
         field('body', $._expression),
       ))),
     ),
-    _action_boundary_local_operator_definition: $ => localNamedOperatorDefinition(
-      $, choice($._compare_level, alias($._action_boundary_and_binary, $.binary_expression))),
+    _local_operator_definition: $ => seq(
+      $._local_operator_definition_header,
+      field('body', $._expression),
+      optional(';'),
+    ),
+    _action_boundary_local_operator_definition: $ => seq(
+      $._local_named_operator_definition_header,
+      field('body', choice($._compare_level, alias($._action_boundary_and_binary, $.binary_expression))),
+      optional(';'),
+    ),
+    _local_operator_definition_header: $ => choice(
+      $._local_destructuring_operator_definition_header,
+      $._local_named_operator_definition_header,
+    ),
+    _local_destructuring_operator_definition_header: $ => seq(
+      field('qualifier', alias($._destructuring_qualifier, $.operator_qualifier)),
+      field('pattern', choice($.tuple_pattern, $.record_pattern)),
+      '=',
+    ),
+    _local_named_operator_definition_header: $ => choice(
+      seq(
+        field('qualifier', $.operator_qualifier),
+        field('name', $._normal_call_name),
+        field('parameters', alias($._annotated_parameter_list, $.parameter_list)),
+        ':',
+        field('type', $._type),
+        '=',
+      ),
+      seq(
+        field('qualifier', $.operator_qualifier),
+        field('name', $._normal_call_name),
+        optional(field('parameters', alias($._untyped_parameter_list, $.parameter_list))),
+        optional(seq(':', field('type', $._type))),
+        '=',
+      ),
+    ),
     _action_boundary_and_binary: $ => prec.left(seq(
       field('left', $._compare_level),
       'and',
@@ -797,8 +764,6 @@ module.exports = grammar({
       choice('>', '<', '>=', '<=', '!=', '=='),
       field('right', $._add_level),
     )),
-    _boundary_local_operator_definition: $ => localNamedOperatorDefinition($, $._compare_level),
-    _local_operator_definition: $ => localOperatorDefinition($, $._expression),
     identifier: _ => /[a-z][A-Za-z0-9_]*|_[A-Za-z0-9_]+/,
     type_identifier: _ => /[A-Z][A-Za-z0-9_]*/,
     _identifier_component: $ => choice(

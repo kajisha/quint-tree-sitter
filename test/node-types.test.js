@@ -147,16 +147,32 @@ assert.equal(
   'parenthesized_expression keeps its required expression child',
 )
 
+for (const [nodeType, fieldName, includedTypes] of [
+  ['binary_expression', 'right', ['declaration_expression', 'lambda_expression']],
+  ['delayed_assignment', 'value', ['declaration_expression', 'lambda_expression']],
+  ['pair_expression', 'value', ['declaration_expression', 'lambda_expression']],
+  ['unary_expression', 'operand', ['declaration_expression', 'lambda_expression']],
+]) {
+  const actualTypes = nodesByType.get(nodeType).fields[fieldName].types.map(type => type.type)
+  for (const includedType of includedTypes) {
+    assert.equal(
+      actualTypes.includes(includedType),
+      true,
+      `${nodeType}.${fieldName} includes valid low-precedence ${includedType}`,
+    )
+  }
+}
+
 for (const [nodeType, fieldName, excludedTypes] of [
   ['binary_expression', 'left', ['declaration_expression', 'lambda_expression', 'pair_expression']],
   ['binary_expression', 'right', ['pair_expression']],
-  ['delayed_assignment', 'value', ['declaration_expression', 'lambda_expression', 'pair_expression']],
+  ['delayed_assignment', 'value', ['pair_expression']],
   ['field_access_expression', 'receiver', ['binary_expression', 'delayed_assignment', 'pair_expression', 'unary_expression']],
   ['index_expression', 'collection', ['binary_expression', 'delayed_assignment', 'pair_expression', 'unary_expression']],
   ['pair_expression', 'key', ['declaration_expression', 'lambda_expression']],
-  ['pair_expression', 'value', ['declaration_expression', 'lambda_expression', 'pair_expression']],
+  ['pair_expression', 'value', ['pair_expression']],
   ['ufcs_expression', 'receiver', ['binary_expression', 'delayed_assignment', 'pair_expression', 'unary_expression']],
-  ['unary_expression', 'operand', ['declaration_expression', 'delayed_assignment', 'lambda_expression', 'pair_expression']],
+  ['unary_expression', 'operand', ['delayed_assignment', 'pair_expression']],
 ]) {
   const actualTypes = nodesByType.get(nodeType).fields[fieldName].types.map(type => type.type)
   for (const excludedType of excludedTypes) {
