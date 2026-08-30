@@ -332,3 +332,23 @@ module Types {
         (sum_variant
           name: (type_identifier)
           type: (primitive_type))))))
+
+==================
+bare open record row
+==================
+
+module Types {
+  type Open[r] = { | r }
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (type_declaration
+      name: (qualified_name
+        (type_identifier))
+      type_parameter: (identifier)
+      value: (record_type
+        tail: (identifier)))))

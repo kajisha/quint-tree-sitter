@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import crypto from 'node:crypto'
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -9,6 +10,8 @@ const corpusDirectory = 'test/corpus'
 const fixtureDirectory = 'test/fixtures/quint-0.32.0'
 const expectedSha = 'fd772606588b40def9978d8c82da69c2db7a0e3b'
 const expectedSourceSha256 = '4a7129cfd2e75f115a80cf4c1bb07273d7c3f2728b1f4421ec4112aace07bf36'
+const expectedAlternativeCount = 197
+const expectedAlternativeNamesSha256 = '3787527312966ceed5cbda972b5f253c7ac3e27121c449e1445973a4549f0425'
 const expectedRules = [
   'modules', 'module', 'documentedDeclaration', 'declaration', 'operDef', 'typeDef',
   'typeDefHead', 'sumTypeDefinition', 'typeSumVariant', 'qualifier', 'importMod',
@@ -50,16 +53,101 @@ function assertInsideDirectory(candidatePath, directory, context) {
   )
 }
 
-function corpusSectionTitles(corpusPath) {
-  const contents = fs.readFileSync(corpusPath, 'utf8')
-  const lines = contents.split(/\r?\n/)
-  const titles = []
-  for (let index = 0; index < lines.length - 2; index += 1) {
-    if (!/^={10,}$/.test(lines[index])) continue
-    if (lines[index + 2] !== lines[index]) continue
-    titles.push(lines[index + 1])
+function platformName() {
+  if (process.platform === 'darwin') return 'macos'
+  if (process.platform === 'win32') return 'windows'
+  return process.platform
+}
+
+function parseCorpusAttributes(testNameAndMarkers) {
+  let name = ''
+  let seenMarker = false
+  let skip = false
+  let platform = null
+  for (const line of testNameAndMarkers.match(/[^\n]*\n/g) ?? []) {
+    const trimmedLine = line.trim()
+    const marker = trimmedLine.split('(')[0]
+    if (marker === ':skip') {
+      seenMarker = true
+      skip = true
+    } else if (marker === ':platform') {
+      const match = trimmedLine.match(/^:platform\((.*)\)$/)
+      if (match) {
+        seenMarker = true
+        platform = (platform ?? false) || match[1].trim() === platformName()
+      }
+    } else if (marker === ':language') {
+      if (/^:language\((.*)\)$/.test(trimmedLine)) seenMarker = true
+    } else if ([':fail-fast', ':error', ':cst'].includes(marker)) {
+      seenMarker = true
+    } else if (!seenMarker) {
+      name += line
+    }
   }
-  return titles
+  return {
+    executed: !skip && (platform ?? true),
+    name: name.replaceAll('\r\n', '\n').trimEnd(),
+  }
+}
+
+function corpusEntriesFromContents(contents) {
+  const headerRegex = /^(?<equals>={3,})(?<suffix1>[^=\r\n][^\r\n]*)?\r?\n(?<testNameAndMarkers>(?:(?:[^=\r\n]|\s+:)[^\r\n]*\r?\n)+)={3,}(?<suffix2>[^=\r\n][^\r\n]*)?\r?\n/gm
+  const dividerRegex = /^(?<hyphens>-{3,})(?<suffix>[^-\r\n][^\r\n]*)?\r?\n/gm
+  const headers = [...contents.matchAll(headerRegex)]
+  const firstSuffix = headers[0]?.groups?.suffix1 ?? null
+  const matchingHeaders = headers
+    .filter(match => (match.groups.suffix1 ?? null) === firstSuffix && (match.groups.suffix2 ?? null) === firstSuffix)
+    .map(match => ({
+      attributes: parseCorpusAttributes(match.groups.testNameAndMarkers),
+      end: match.index + match[0].length,
+      start: match.index,
+    }))
+
+  const entries = []
+  for (let index = 0; index < matchingHeaders.length; index += 1) {
+    const header = matchingHeaders[index]
+    const nextHeaderStart = matchingHeaders[index + 1]?.start ?? contents.length
+    const body = contents.slice(header.end, nextHeaderStart)
+    const dividers = [...body.matchAll(dividerRegex)]
+      .filter(match => (match.groups.suffix ?? null) === firstSuffix)
+    const divider = dividers.reduce(
+      (longest, candidate) => !longest || candidate[0].length >= longest[0].length ? candidate : longest,
+      null,
+    )
+    if (divider && header.attributes.executed && header.attributes.name.length > 0) {
+      entries.push(header.attributes.name)
+    }
+  }
+  return entries
+}
+
+function corpusEntries(corpusPath) {
+  return corpusEntriesFromContents(fs.readFileSync(corpusPath, 'utf8'))
+}
+
+function assertCorpusEntryParserConformance() {
+  assert.deepEqual(corpusEntriesFromContents(
+    '===suffix\r\nmultiline\r\nname   \r\n:error\r\n=====suffix\r\ninput\r\n---suffix\r\n(source_file)\r\n',
+  ), ['multiline\nname'])
+  assert.deepEqual(corpusEntriesFromContents(
+    '===\nduplicate\n===\ninput\n---\n(source_file)\n===\nduplicate   \n=====\ninput\n-----\n(source_file)\n',
+  ), ['duplicate', 'duplicate'])
+  assert.deepEqual(corpusEntriesFromContents(
+    '===\nskipped\n:skip\n===\ninput\n---\n(source_file)\n===\nexecuted error\n:error\n===\ninput\n---\n(source_file)\n',
+  ), ['executed error'])
+  assert.deepEqual(corpusEntriesFromContents(
+    '==\ntoo short\n==\ninput\n---\n(source_file)\n',
+  ), [])
+  assert.deepEqual(corpusEntriesFromContents(
+    '===suffix\ndifferent suffix\n===other\ninput\n---suffix\n(source_file)\n',
+  ), [])
+  assert.deepEqual(corpusEntriesFromContents(
+    '===\nmissing divider\n===\ninput\n(source_file)\n',
+  ), [])
+  assert.deepEqual(corpusEntriesFromContents(
+    '===\npseudo heading\n===\ninput\n--\n(source_file)\n',
+  ), [])
+  assert.deepEqual(corpusEntriesFromContents('===\nmalformed without closing delimiter\n'), [])
 }
 
 function validateEvidence(reference, context) {
@@ -80,7 +168,7 @@ function validateEvidence(reference, context) {
     assert.ok(fs.existsSync(corpusPath), `${context}: missing ${corpusReference}`)
     assert.ok(fs.statSync(corpusPath).isFile(), `${context}: corpus evidence must name a file: ${corpusReference}`)
     assertInsideDirectory(corpusPath, corpusDirectory, context)
-    const matches = corpusSectionTitles(corpusPath).filter(title => title === sectionTitle)
+    const matches = corpusEntries(corpusPath).filter(title => title === sectionTitle)
     assert.equal(matches.length, 1, `${context}: corpus section must exist exactly once: ${reference}`)
     return
   }
@@ -95,9 +183,25 @@ function validateEvidence(reference, context) {
   assertInsideDirectory(fixturePath, fixtureDirectory, context)
 }
 
+assertCorpusEntryParserConformance()
+
 assert.equal(inventory.upstream.commit, expectedSha)
 assert.equal(inventory.upstream.sourceSha256, expectedSourceSha256)
 assert.deepEqual(Object.keys(inventory.rules).sort(), expectedRules.sort())
+
+const alternativeCount = Object.values(inventory.rules)
+  .reduce((count, mapping) => count + mapping.alternatives.length, 0)
+assert.equal(alternativeCount, expectedAlternativeCount, 'reviewed alternative count changed')
+const alternativeNames = Object.fromEntries(
+  Object.entries(inventory.rules)
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([rule, mapping]) => [rule, mapping.alternatives.map(alternative => alternative.name)]),
+)
+assert.equal(
+  crypto.createHash('sha256').update(JSON.stringify(alternativeNames)).digest('hex'),
+  expectedAlternativeNamesSha256,
+  'reviewed alternative names or order changed',
+)
 
 for (const [upstreamRule, mapping] of Object.entries(inventory.rules)) {
   assert.ok(mapping.alternatives?.length > 0, `${upstreamRule}: alternatives are required`)
@@ -115,6 +219,17 @@ for (const [upstreamRule, mapping] of Object.entries(inventory.rules)) {
     assert.ok(alternative !== null && !Array.isArray(alternative), `${context}: alternative must be an object`)
     assert.equal(typeof alternative.name, 'string', `${context}: name must be a string`)
     assert.ok(alternative.name.trim().length > 0, `${context}: name is required`)
+    if (Object.hasOwn(alternative, 'disposition')) {
+      assert.equal(typeof alternative.disposition, 'string', `${context}: disposition must be a string`)
+      assert.ok(alternative.disposition.trim().length > 0, `${context}: disposition must be non-empty`)
+    }
+    const unreachable = alternative.upstreamReachability === 'unreachable'
+    if (unreachable) {
+      assert.ok(!Object.hasOwn(alternative, 'evidence'), `${context}: unreachable alternatives cannot claim evidence`)
+      assert.ok(alternative.disposition, `${context}: unreachable alternatives require a disposition`)
+      continue
+    }
+    assert.ok(!Object.hasOwn(alternative, 'upstreamReachability'), `${context}: invalid upstream reachability`)
     assert.ok(Array.isArray(alternative.evidence), `${context}: evidence must be an array`)
     assert.ok(alternative.evidence.length > 0, `${context}: evidence is required`)
     assert.equal(
@@ -131,8 +246,6 @@ for (const [upstreamRule, mapping] of Object.entries(inventory.rules)) {
   )
 }
 
-const alternativeCount = Object.values(inventory.rules)
-  .reduce((count, mapping) => count + mapping.alternatives.length, 0)
 console.log(
   `upstream coverage: ${expectedRules.length} Quint.g4 rules and ${alternativeCount} alternatives mapped at ${expectedSha}`,
 )

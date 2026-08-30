@@ -39,7 +39,7 @@
         {
           "name": "doc comments before declaration",
           "evidence": [
-            "test/corpus/lexical.txt#lexical forms"
+            "test/corpus/modules_and_declarations.txt#doc comment immediately before declaration"
           ]
         }
       ],
@@ -336,7 +336,7 @@
         {
           "name": "alias",
           "evidence": [
-            "test/fixtures/quint-0.32.0/modules-imports.qnt"
+            "test/corpus/imports_and_instances.txt#export alias and sourced instance"
           ]
         }
       ],
@@ -367,7 +367,7 @@
         {
           "name": "source",
           "evidence": [
-            "test/fixtures/quint-0.32.0/modules-imports.qnt"
+            "test/corpus/imports_and_instances.txt#export alias and sourced instance"
           ]
         }
       ],
@@ -506,8 +506,9 @@
         {
           "name": "wrong application recovery",
           "evidence": [
-            "test/corpus/types.txt#type rejects parameters on an abstract declaration"
-          ]
+            "test/corpus/errors.txt#error wrong parenthesized type application"
+          ],
+          "disposition": "ANTLR emits QNT009; the Tree-sitter evidence fixes ERROR recovery and does not claim the same diagnostic or CST."
         }
       ],
       "treeSitter": [
@@ -552,7 +553,7 @@
         {
           "name": "bare open row",
           "evidence": [
-            "test/corpus/types.txt#record row rejects a qualified tail"
+            "test/corpus/types.txt#bare open record row"
           ]
         }
       ],
@@ -605,8 +606,9 @@
         {
           "name": "parenthesized type arguments diagnostic",
           "evidence": [
-            "test/corpus/types.txt#type rejects parameters on an abstract declaration"
-          ]
+            "test/corpus/errors.txt#error wrong parenthesized type application"
+          ],
+          "disposition": "ANTLR emits QNT009; the Tree-sitter evidence fixes ERROR recovery and does not claim the same diagnostic or CST."
         }
       ],
       "disposition": "ANTLR parser-action diagnostic; Tree-sitter reports ordinary syntax recovery instead of reproducing QNT009"
@@ -845,26 +847,30 @@
         {
           "name": "declaration EOF",
           "evidence": [
-            "test/corpus/modules_and_declarations.txt#core declarations"
-          ]
+            "test/corpus/errors.txt#declarationOrExpr declaration source-file non-goal"
+          ],
+          "disposition": "Quint REPL-only entry alternative; this evidence executes source_file behavior and does not claim REPL support."
         },
         {
           "name": "expression EOF",
           "evidence": [
-            "test/corpus/expressions.txt#expressions primary and collection forms"
-          ]
+            "test/corpus/errors.txt#declarationOrExpr expression source-file non-goal"
+          ],
+          "disposition": "Quint REPL-only entry alternative; this evidence executes source_file behavior and does not claim REPL support."
         },
         {
           "name": "doc comment EOF",
           "evidence": [
-            "test/corpus/lexical.txt#lexical forms"
-          ]
+            "test/corpus/errors.txt#declarationOrExpr doc comment source-file non-goal"
+          ],
+          "disposition": "Quint REPL-only entry alternative; this evidence executes source_file behavior and does not claim REPL support."
         },
         {
           "name": "empty EOF",
           "evidence": [
-            "test/corpus/modules_and_declarations.txt#empty module"
-          ]
+            "test/corpus/errors.txt#declarationOrExpr empty source-file non-goal"
+          ],
+          "disposition": "Quint REPL-only entry alternative; this evidence executes source_file behavior and does not claim REPL support."
         }
       ],
       "disposition": "Quint REPL-only probe entry point; npm parser exposes source_file modules and Tree-sitter recovery"
@@ -1095,7 +1101,7 @@
         {
           "name": "callable infix keywords",
           "evidence": [
-            "test/fixtures/quint-0.32.0/upstream-SuperSpec.qnt"
+            "test/corpus/expressions.txt#dot-callable infix keywords"
           ]
         },
         {
@@ -1206,8 +1212,9 @@
         {
           "name": "qualified identifier diagnostic",
           "evidence": [
-            "test/corpus/types.txt#record row rejects a qualified tail"
-          ]
+            "test/corpus/errors.txt#error qualified simple identifier"
+          ],
+          "disposition": "ANTLR emits QNT008 after accepting the qualified branch; Tree-sitter evidence fixes contextual ERROR recovery and does not claim the same diagnostic or CST."
         }
       ],
       "treeSitter": [
@@ -1239,8 +1246,9 @@
         {
           "name": "reserved diagnostic",
           "evidence": [
-            "test/corpus/errors.txt#error reserved destructuring binder"
-          ]
+            "test/corpus/errors.txt#error all reserved identifier diagnostics"
+          ],
+          "disposition": "ANTLR emits QNT008 after accepting reserved tokens; Tree-sitter evidence fixes contextual ERROR recovery and does not claim the same diagnostic or CST."
         }
       ],
       "treeSitter": [
@@ -1285,50 +1293,58 @@
         {
           "name": "and",
           "evidence": [
-            "test/corpus/errors.txt#error reserved destructuring binder"
-          ]
+            "test/corpus/errors.txt#error all reserved identifier diagnostics"
+          ],
+          "disposition": "ANTLR emits QNT008 after accepting this reserved token; Tree-sitter evidence fixes contextual ERROR recovery and does not claim the same diagnostic or CST."
         },
         {
           "name": "or",
           "evidence": [
-            "test/corpus/precedence.txt#precedence all infix operators"
-          ]
+            "test/corpus/errors.txt#error all reserved identifier diagnostics"
+          ],
+          "disposition": "ANTLR emits QNT008 after accepting this reserved token; Tree-sitter evidence fixes contextual ERROR recovery and does not claim the same diagnostic or CST."
         },
         {
           "name": "iff",
           "evidence": [
-            "test/corpus/precedence.txt#precedence all infix operators"
-          ]
+            "test/corpus/errors.txt#error all reserved identifier diagnostics"
+          ],
+          "disposition": "ANTLR emits QNT008 after accepting this reserved token; Tree-sitter evidence fixes contextual ERROR recovery and does not claim the same diagnostic or CST."
         },
         {
           "name": "implies",
           "evidence": [
-            "test/corpus/precedence.txt#precedence all infix operators"
-          ]
+            "test/corpus/errors.txt#error all reserved identifier diagnostics"
+          ],
+          "disposition": "ANTLR emits QNT008 after accepting this reserved token; Tree-sitter evidence fixes contextual ERROR recovery and does not claim the same diagnostic or CST."
         },
         {
           "name": "leadsTo",
           "evidence": [
-            "test/corpus/precedence.txt#precedence all infix operators"
-          ]
+            "test/corpus/errors.txt#error all reserved identifier diagnostics"
+          ],
+          "disposition": "ANTLR emits QNT008 after accepting this reserved token; Tree-sitter evidence fixes contextual ERROR recovery and does not claim the same diagnostic or CST."
         },
         {
           "name": "match",
           "evidence": [
-            "test/corpus/errors.txt#error reserved match binder"
-          ]
+            "test/corpus/errors.txt#error all reserved identifier diagnostics"
+          ],
+          "disposition": "ANTLR emits QNT008 after accepting this reserved token; Tree-sitter evidence fixes contextual ERROR recovery and does not claim the same diagnostic or CST."
         },
         {
           "name": "import",
           "evidence": [
-            "test/corpus/imports_and_instances.txt#import modules and members"
-          ]
+            "test/corpus/errors.txt#error all reserved identifier diagnostics"
+          ],
+          "disposition": "ANTLR emits QNT008 after accepting this reserved token; Tree-sitter evidence fixes contextual ERROR recovery and does not claim the same diagnostic or CST."
         },
         {
           "name": "export",
           "evidence": [
-            "test/corpus/imports_and_instances.txt#export module members"
-          ]
+            "test/corpus/errors.txt#error all reserved identifier diagnostics"
+          ],
+          "disposition": "ANTLR emits QNT008 after accepting this reserved token; Tree-sitter evidence fixes contextual ERROR recovery and does not claim the same diagnostic or CST."
         }
       ],
       "disposition": "ANTLR QNT008 diagnostic helper; Tree-sitter rejects these contextually except normalCallName operator alternatives"
@@ -1713,9 +1729,8 @@
         },
         {
           "name": "underscore-prefixed overlap",
-          "evidence": [
-            "test/fixtures/quint-0.32.0/upstream-SuperSpec.qnt"
-          ]
+          "upstreamReachability": "unreachable",
+          "disposition": "Upstream-unreachable: LOW_ID precedes CAP_ID with the same underscore-prefixed branch, so ANTLR assigns these tokens to LOW_ID."
         }
       ],
       "treeSitter": [
@@ -1786,13 +1801,13 @@
         {
           "name": "tab",
           "evidence": [
-            "test/corpus/lexical.txt#lexical forms"
+            "test/corpus/lexical.txt#lexical tabs and carriage returns"
           ]
         },
         {
           "name": "carriage return",
           "evidence": [
-            "test/corpus/lexical.txt#lexical forms"
+            "test/corpus/lexical.txt#lexical tabs and carriage returns"
           ]
         },
         {

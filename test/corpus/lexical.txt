@@ -125,6 +125,34 @@ module Lexical {
     (ERROR
       (UNEXPECTED '\n'))))
 
+===
+lexical tabs and carriage returns
+=====
+
+module Whitespace {
+	val tabbed	=	true
+	val carriage=false
+	val crlf = true
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (boolean))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (boolean))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (boolean))))
+
 ==================
 lexical bare underscore is not an identifier
 ==================

@@ -384,3 +384,29 @@ module from::Set {
       body: (qualified_name
         (identifier)
         (type_identifier)))))
+
+==================
+doc comment immediately before declaration
+==================
+
+module Documented {
+  /// The documented constant.
+  const N: int
+  /// The documented operator.
+  val current = N
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    (comment)
+    body: (const_declaration
+      name: (type_identifier)
+      type: (primitive_type))
+    (comment)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (type_identifier))))

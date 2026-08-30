@@ -1052,6 +1052,64 @@ module ActionBoundarySingleLine { action f = { val x: bool = a or b; any { true 
             (boolean)))))))
 
 ==================
+dot-callable infix keywords
+==================
+
+module DotKeywords {
+  val conjunction = value.and(other)
+  val disjunction = value.or(other)
+  val equivalence = value.iff(other)
+  val implication = value.implies(other)
+  val leads = value.leadsTo(other)
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (ufcs_expression
+        receiver: (identifier)
+        function: (identifier)
+        arguments: (argument_list
+          (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (ufcs_expression
+        receiver: (identifier)
+        function: (identifier)
+        arguments: (argument_list
+          (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (ufcs_expression
+        receiver: (identifier)
+        function: (identifier)
+        arguments: (argument_list
+          (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (ufcs_expression
+        receiver: (identifier)
+        function: (identifier)
+        arguments: (argument_list
+          (identifier))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (ufcs_expression
+        receiver: (identifier)
+        function: (identifier)
+        arguments: (argument_list
+          (identifier))))))
+
+==================
 destructuring local rhs leaves action block body
 ==================
 

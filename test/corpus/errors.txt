@@ -246,3 +246,122 @@ module M {
       qualifier: (operator_qualifier)
       name: (identifier)
       (integer))))
+
+==================
+error wrong parenthesized type application
+==================
+
+module WrongTypeApplication {
+  const result: Result(int, str)
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (const_declaration
+      name: (identifier)
+      (ERROR
+        (type_identifier))
+      type: (tuple_type
+        element: (primitive_type)
+        element: (primitive_type)))))
+
+==================
+error qualified simple identifier
+==================
+
+module QualifiedSimpleIdentifier {
+  type Invalid = { Scope::field: int }
+  val { Scope::field } = record
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (type_declaration
+      name: (qualified_name
+        (type_identifier))
+      value: (record_type
+        (ERROR
+          (type_identifier))
+        (record_field
+          name: (identifier)
+          type: (primitive_type))))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      pattern: (record_pattern
+        field: (identifier_pattern
+          name: (type_identifier))
+        (ERROR
+          (identifier)))
+      body: (identifier))))
+
+==================
+error all reserved identifier diagnostics
+==================
+
+module ReservedIdentifiers {
+  val (and, or, iff, implies, leadsTo, match, import, export) = values
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    (ERROR
+      (operator_qualifier)
+      (ERROR)
+      (identifier_pattern
+        name: (identifier)))))
+
+==================
+declarationOrExpr declaration source-file non-goal
+==================
+
+val standalone = 1
+
+---
+
+(source_file
+  (ERROR
+    (identifier)
+    (identifier)
+    (integer)))
+
+==================
+declarationOrExpr expression source-file non-goal
+==================
+
+standalone + 1
+
+---
+
+(source_file
+  (ERROR
+    (identifier)
+    (integer)))
+
+==================
+declarationOrExpr doc comment source-file non-goal
+==================
+
+/// standalone documentation
+
+---
+
+(source_file
+  (comment))
+
+==================
+declarationOrExpr empty source-file non-goal
+==================
+
+
+---
+
+(source_file)

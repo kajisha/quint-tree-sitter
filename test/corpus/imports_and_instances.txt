@@ -57,6 +57,46 @@ module Exports {
       member: (wildcard))))
 
 ==================
+export alias and sourced instance
+==================
+
+module Directives {
+  export Root::Math as Alias::M
+  import Root::Voting(Config::Value = Set(0, 1)) as Alias::V from "./voting"
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (export_declaration
+      module: (qualified_name
+        (type_identifier)
+        (type_identifier))
+      alias: (qualified_name
+        (type_identifier)
+        (type_identifier)))
+    body: (instance_declaration
+      module: (qualified_name
+        (type_identifier)
+        (type_identifier))
+      overrides: (instance_overrides
+        (instance_override
+          name: (qualified_name
+            (type_identifier)
+            (type_identifier))
+          value: (call_expression
+            function: (type_identifier)
+            arguments: (argument_list
+              (integer)
+              (integer)))))
+      alias: (qualified_name
+        (type_identifier)
+        (type_identifier))
+      source: (string))))
+
+==================
 qualified import export and instance names
 ==================
 
