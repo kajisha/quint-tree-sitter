@@ -6,91 +6,1803 @@
     "sourceSha256": "4a7129cfd2e75f115a80cf4c1bb07273d7c3f2728b1f4421ec4112aace07bf36"
   },
   "rules": {
-    "modules": { "alternatives": ["optional hashbang, one or more modules"], "treeSitter": ["source_file"], "evidence": ["test/corpus/lexical.txt", "test/corpus/modules_and_declarations.txt"] },
-    "module": { "alternatives": ["documented qualified module"], "treeSitter": ["module", "comment"], "evidence": ["test/corpus/modules_and_declarations.txt"] },
-    "documentedDeclaration": { "alternatives": ["doc comments before declaration"], "treeSitter": ["comment", "module"], "evidence": ["test/corpus/lexical.txt"] },
-    "declaration": { "alternatives": ["const", "var", "assume", "instance", "operator", "type", "import", "export"], "treeSitter": ["const_declaration", "var_declaration", "assume_declaration", "instance_declaration", "operator_definition", "type_declaration", "import_declaration", "export_declaration"], "evidence": ["test/corpus/modules_and_declarations.txt", "test/corpus/imports_and_instances.txt", "test/corpus/types.txt"] },
-    "operDef": { "alternatives": ["annotated", "deprecated untyped", "val destructuring", "pure val destructuring"], "treeSitter": ["operator_definition", "parameter_list", "tuple_pattern", "record_pattern"], "evidence": ["test/corpus/modules_and_declarations.txt", "test/corpus/patterns_and_match.txt"] },
-    "typeDef": { "alternatives": ["abstract", "sum", "alias"], "treeSitter": ["type_declaration"], "evidence": ["test/corpus/types.txt"] },
-    "typeDefHead": { "alternatives": ["qualified name", "optional type variables"], "treeSitter": ["type_declaration", "qualified_name"], "evidence": ["test/corpus/types.txt"] },
-    "sumTypeDefinition": { "alternatives": ["optional leading separator", "one or more variants", "single variant"], "treeSitter": ["sum_type"], "evidence": ["test/corpus/types.txt"] },
-    "typeSumVariant": { "alternatives": ["nullary", "payload"], "treeSitter": ["sum_variant"], "evidence": ["test/corpus/types.txt"] },
-    "qualifier": { "alternatives": ["val", "def", "pure val", "pure def", "action", "run", "temporal", "nondet"], "treeSitter": ["operator_qualifier"], "evidence": ["test/corpus/modules_and_declarations.txt"] },
-    "importMod": { "alternatives": ["member import", "module import", "alias", "source"], "treeSitter": ["import_declaration"], "evidence": ["test/corpus/imports_and_instances.txt"] },
-    "exportMod": { "alternatives": ["member export", "module export", "alias"], "treeSitter": ["export_declaration"], "evidence": ["test/corpus/imports_and_instances.txt"] },
-    "instanceMod": { "alternatives": ["wildcard instance", "aliased instance", "trailing override comma", "source"], "treeSitter": ["instance_declaration", "instance_overrides", "instance_override"], "evidence": ["test/corpus/imports_and_instances.txt"] },
-    "moduleName": { "alternatives": ["qualId"], "treeSitter": ["qualified_name"], "evidence": ["test/corpus/imports_and_instances.txt"] },
-    "name": { "alternatives": ["qualId"], "treeSitter": ["qualified_name"], "evidence": ["test/corpus/imports_and_instances.txt"] },
-    "qualifiedName": { "alternatives": ["qualId"], "treeSitter": ["qualified_name"], "evidence": ["test/corpus/imports_and_instances.txt"] },
-    "fromSource": { "alternatives": ["string"], "treeSitter": ["string"], "evidence": ["test/corpus/imports_and_instances.txt"] },
-    "type": { "alternatives": ["function", "operator", "Set", "List", "unit", "tuple", "record", "primitive", "variable", "constant", "parenthesized", "application", "wrong application recovery"], "treeSitter": ["function_type", "operator_type", "type_application", "tuple_type", "record_type", "primitive_type", "named_type", "parenthesized_type"], "evidence": ["test/corpus/types.txt"] },
-    "typeVar": { "alternatives": ["lower identifier"], "treeSitter": ["identifier", "named_type"], "evidence": ["test/corpus/types.txt"] },
-    "row": { "alternatives": ["closed fields", "open row after fields", "bare open row"], "treeSitter": ["record_type", "record_field"], "evidence": ["test/corpus/types.txt"] },
-    "rowLabel": { "alternatives": ["simple identifier"], "treeSitter": ["record_field"], "evidence": ["test/corpus/types.txt"] },
-    "typeArgs": { "alternatives": ["one or more comma-separated types"], "treeSitter": ["type_application"], "evidence": ["test/corpus/types.txt"] },
-    "typeApplication": { "alternatives": ["qualified constructor with square-bracket arguments"], "treeSitter": ["type_application"], "evidence": ["test/corpus/types.txt"] },
-    "wrongTypeApplication": { "alternatives": ["parenthesized type arguments diagnostic"], "evidence": ["test/corpus/errors.txt"], "disposition": "ANTLR parser-action diagnostic; Tree-sitter reports ordinary syntax recovery instead of reproducing QNT009" },
-    "expr": { "alternatives": ["dot call", "lambda", "call", "index", "power", "unary", "arithmetic", "relations", "assignment", "logical blocks", "logical infix", "temporal infix", "match", "action blocks", "literal or id", "tuple", "unit", "pair", "record", "list", "conditional", "let-in", "parenthesized", "braces"], "treeSitter": ["ufcs_expression", "field_access_expression", "lambda_expression", "call_expression", "index_expression", "unary_expression", "binary_expression", "delayed_assignment", "logical_block", "match_expression", "action_block", "tuple_expression", "unit_expression", "pair_expression", "record_expression", "list_expression", "conditional_expression", "declaration_expression", "parenthesized_expression", "block_expression"], "evidence": ["test/corpus/expressions.txt", "test/corpus/precedence.txt"] },
-    "matchSumExpr": { "alternatives": ["optional leading separator and one or more cases"], "treeSitter": ["match_expression"], "evidence": ["test/corpus/patterns_and_match.txt"] },
-    "matchSumCase": { "alternatives": ["variant", "wildcard"], "treeSitter": ["match_arm"], "evidence": ["test/corpus/patterns_and_match.txt"] },
-    "matchSumVariant": { "alternatives": ["nullary", "identifier binder", "hole binder"], "treeSitter": ["variant_pattern", "identifier_pattern", "hole"], "evidence": ["test/corpus/patterns_and_match.txt"] },
-    "declarationOrExpr": { "alternatives": ["declaration EOF", "expression EOF", "doc comment EOF", "empty EOF"], "evidence": ["test/corpus/errors.txt"], "disposition": "Quint REPL-only probe entry point; npm parser exposes source_file modules and Tree-sitter recovery" },
-    "lambda": { "alternatives": ["unsugared", "tuple sugar"], "treeSitter": ["lambda_expression", "tuple_parameter"], "evidence": ["test/corpus/expressions.txt"] },
-    "lambdaUnsugared": { "alternatives": ["single parameter", "parenthesized parameter list"], "treeSitter": ["lambda_expression", "parameter_list"], "evidence": ["test/corpus/expressions.txt"] },
-    "lambdaTupleSugar": { "alternatives": ["double-parenthesized tuple parameter"], "treeSitter": ["lambda_expression", "tuple_parameter"], "evidence": ["test/corpus/expressions.txt"] },
-    "identOrHole": { "alternatives": ["hole", "qualId"], "treeSitter": ["hole", "qualified_name", "identifier", "type_identifier"], "evidence": ["test/corpus/modules_and_declarations.txt", "test/corpus/expressions.txt"] },
-    "parameter": { "alternatives": ["untyped identOrHole"], "treeSitter": ["parameter"], "evidence": ["test/corpus/modules_and_declarations.txt", "test/corpus/expressions.txt"] },
-    "annotatedParameter": { "alternatives": ["identOrHole with type"], "treeSitter": ["parameter"], "evidence": ["test/corpus/modules_and_declarations.txt"] },
-    "destructuringPattern": { "alternatives": ["tuple", "record"], "treeSitter": ["tuple_pattern", "record_pattern"], "evidence": ["test/corpus/patterns_and_match.txt"] },
-    "tuplePattern": { "alternatives": ["two or more identOrHole elements"], "treeSitter": ["tuple_pattern"], "evidence": ["test/corpus/patterns_and_match.txt"] },
-    "recordPattern": { "alternatives": ["one or more simple fields"], "treeSitter": ["record_pattern"], "evidence": ["test/corpus/patterns_and_match.txt"] },
-    "identOrStar": { "alternatives": ["wildcard", "qualId"], "treeSitter": ["wildcard", "qualified_name"], "evidence": ["test/corpus/imports_and_instances.txt"] },
-    "argList": { "alternatives": ["one or more comma-separated expressions"], "treeSitter": ["argument_list"], "evidence": ["test/corpus/expressions.txt"] },
-    "recElem": { "alternatives": ["named field", "spread"], "treeSitter": ["record_element"], "evidence": ["test/corpus/expressions.txt"] },
-    "normalCallName": { "alternatives": ["callable operator keywords", "qualId"], "treeSitter": ["identifier", "type_identifier", "qualified_name"], "evidence": ["test/corpus/modules_and_declarations.txt", "test/corpus/expressions.txt"] },
-    "nameAfterDot": { "alternatives": ["callable infix keywords", "qualId"], "treeSitter": ["ufcs_expression", "field_access_expression"], "evidence": ["test/corpus/expressions.txt"] },
-    "operator": { "alternatives": ["logical", "relational", "arithmetic", "power"], "treeSitter": ["binary_expression"], "evidence": ["test/corpus/precedence.txt"] },
-    "literal": { "alternatives": ["string", "boolean", "integer"], "treeSitter": ["string", "boolean", "integer"], "evidence": ["test/corpus/lexical.txt"] },
-    "qualId": { "alternatives": ["simple", "qualified", "keywordAsID components"], "treeSitter": ["identifier", "type_identifier", "qualified_name"], "evidence": ["test/corpus/modules_and_declarations.txt"] },
-    "simpleId": { "alternatives": ["unqualified identifier", "qualified identifier diagnostic"], "treeSitter": ["identifier", "type_identifier"], "evidence": ["test/corpus/patterns_and_match.txt", "test/corpus/types.txt"], "disposition": "QNT008 is semantic diagnostic behavior; qualified forms recover as syntax errors at simple-only sites" },
-    "identifier": { "alternatives": ["LOW_ID", "CAP_ID", "keywordAsID", "reserved diagnostic"], "treeSitter": ["identifier", "type_identifier"], "evidence": ["test/corpus/lexical.txt", "test/corpus/modules_and_declarations.txt"] },
-    "keywordAsID": { "alternatives": ["from", "as", "Set", "List"], "treeSitter": ["identifier", "type_identifier"], "evidence": ["test/corpus/modules_and_declarations.txt"] },
-    "reserved": { "alternatives": ["and", "or", "iff", "implies", "leadsTo", "match", "import", "export"], "evidence": ["test/corpus/errors.txt"], "disposition": "ANTLR QNT008 diagnostic helper; Tree-sitter rejects these contextually except normalCallName operator alternatives" },
-    "STRING": { "alternatives": ["double-quoted pseudo-identifier"], "treeSitter": ["string"], "evidence": ["test/corpus/lexical.txt"] },
-    "BOOL": { "alternatives": ["false", "true"], "treeSitter": ["boolean"], "evidence": ["test/corpus/lexical.txt"] },
-    "INT": { "alternatives": ["zero", "decimal with separators", "hex with separators"], "treeSitter": ["integer"], "evidence": ["test/corpus/lexical.txt"] },
-    "AND": { "alternatives": ["and"], "evidence": ["test/corpus/precedence.txt"], "disposition": "anonymous literal token in Tree-sitter" },
-    "OR": { "alternatives": ["or"], "evidence": ["test/corpus/precedence.txt"], "disposition": "anonymous literal token in Tree-sitter" },
-    "IFF": { "alternatives": ["iff"], "evidence": ["test/corpus/precedence.txt"], "disposition": "anonymous literal token in Tree-sitter" },
-    "IMPLIES": { "alternatives": ["implies"], "evidence": ["test/corpus/precedence.txt"], "disposition": "anonymous literal token in Tree-sitter" },
-    "LEADS_TO": { "alternatives": ["leadsTo"], "evidence": ["test/corpus/precedence.txt"], "disposition": "anonymous literal token in Tree-sitter" },
-    "MATCH": { "alternatives": ["match"], "evidence": ["test/corpus/patterns_and_match.txt"], "disposition": "anonymous literal token in Tree-sitter" },
-    "PLUS": { "alternatives": ["+"], "evidence": ["test/corpus/precedence.txt"], "disposition": "anonymous literal token in Tree-sitter" },
-    "MINUS": { "alternatives": ["-"], "evidence": ["test/corpus/precedence.txt"], "disposition": "anonymous literal token in Tree-sitter" },
-    "MUL": { "alternatives": ["*"], "evidence": ["test/corpus/precedence.txt"], "disposition": "anonymous literal token in Tree-sitter" },
-    "DIV": { "alternatives": ["/"], "evidence": ["test/corpus/precedence.txt"], "disposition": "anonymous literal token in Tree-sitter" },
-    "MOD": { "alternatives": ["%"], "evidence": ["test/corpus/precedence.txt"], "disposition": "anonymous literal token in Tree-sitter" },
-    "GT": { "alternatives": [">"], "evidence": ["test/corpus/precedence.txt"], "disposition": "anonymous literal token in Tree-sitter" },
-    "LT": { "alternatives": ["<"], "evidence": ["test/corpus/precedence.txt"], "disposition": "anonymous literal token in Tree-sitter" },
-    "GE": { "alternatives": [">="], "evidence": ["test/corpus/precedence.txt"], "disposition": "anonymous literal token in Tree-sitter" },
-    "LE": { "alternatives": ["<="], "evidence": ["test/corpus/precedence.txt"], "disposition": "anonymous literal token in Tree-sitter" },
-    "NE": { "alternatives": ["!="], "evidence": ["test/corpus/precedence.txt"], "disposition": "anonymous literal token in Tree-sitter" },
-    "EQ": { "alternatives": ["=="], "evidence": ["test/corpus/precedence.txt"], "disposition": "anonymous literal token in Tree-sitter" },
-    "ASGN": { "alternatives": ["="], "evidence": ["test/corpus/precedence.txt"], "disposition": "anonymous literal token in Tree-sitter" },
-    "LPAREN": { "alternatives": ["("], "evidence": ["test/corpus/expressions.txt"], "disposition": "anonymous literal token in Tree-sitter" },
-    "RPAREN": { "alternatives": [")"], "evidence": ["test/corpus/expressions.txt"], "disposition": "anonymous literal token in Tree-sitter" },
-    "SET": { "alternatives": ["Set"], "treeSitter": ["type_identifier"], "evidence": ["test/corpus/types.txt", "test/corpus/modules_and_declarations.txt"] },
-    "LIST": { "alternatives": ["List"], "treeSitter": ["type_identifier"], "evidence": ["test/corpus/types.txt", "test/corpus/modules_and_declarations.txt"] },
-    "IMPORT": { "alternatives": ["import"], "evidence": ["test/corpus/imports_and_instances.txt"], "disposition": "anonymous reserved literal token in Tree-sitter" },
-    "EXPORT": { "alternatives": ["export"], "evidence": ["test/corpus/imports_and_instances.txt"], "disposition": "anonymous reserved literal token in Tree-sitter" },
-    "FROM": { "alternatives": ["from"], "treeSitter": ["identifier"], "evidence": ["test/corpus/modules_and_declarations.txt", "test/corpus/imports_and_instances.txt"] },
-    "AS": { "alternatives": ["as"], "treeSitter": ["identifier"], "evidence": ["test/corpus/modules_and_declarations.txt", "test/corpus/imports_and_instances.txt"] },
-    "LOW_ID": { "alternatives": ["lowercase", "underscore-prefixed"], "treeSitter": ["identifier"], "evidence": ["test/corpus/lexical.txt"] },
-    "CAP_ID": { "alternatives": ["uppercase", "underscore-prefixed overlap"], "treeSitter": ["type_identifier", "identifier"], "evidence": ["test/corpus/lexical.txt"] },
-    "HASHBANG_LINE": { "alternatives": ["source-leading hashbang ending in newline"], "treeSitter": ["hash_bang_line"], "evidence": ["test/corpus/lexical.txt", "bindings/node/binding_test.js"] },
-    "DOCCOMMENT": { "alternatives": ["triple-slash line ending in newline"], "treeSitter": ["comment"], "evidence": ["test/corpus/lexical.txt"] },
-    "LINE_COMMENT": { "alternatives": ["double-slash line"], "treeSitter": ["comment"], "evidence": ["test/corpus/lexical.txt"] },
-    "COMMENT": { "alternatives": ["block comment"], "treeSitter": ["comment"], "evidence": ["test/corpus/lexical.txt"] },
-    "WS": { "alternatives": ["space", "tab", "carriage return", "newline"], "evidence": ["test/corpus/lexical.txt"], "disposition": "Tree-sitter extras regex" }
+    "modules": {
+      "alternatives": [
+        {
+          "name": "optional hashbang, one or more modules",
+          "evidence": [
+            "test/fixtures/quint-0.32.0/upstream-SuperSpec.qnt"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "source_file"
+      ]
+    },
+    "module": {
+      "alternatives": [
+        {
+          "name": "documented qualified module",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#qualified declaration names and parameter holes",
+            "test/corpus/lexical.txt#lexical forms"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "module",
+        "comment"
+      ]
+    },
+    "documentedDeclaration": {
+      "alternatives": [
+        {
+          "name": "doc comments before declaration",
+          "evidence": [
+            "test/corpus/lexical.txt#lexical forms"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "comment",
+        "module"
+      ]
+    },
+    "declaration": {
+      "alternatives": [
+        {
+          "name": "const",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#core declarations"
+          ]
+        },
+        {
+          "name": "var",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#core declarations"
+          ]
+        },
+        {
+          "name": "assume",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#core declarations"
+          ]
+        },
+        {
+          "name": "instance",
+          "evidence": [
+            "test/corpus/imports_and_instances.txt#instance with alias"
+          ]
+        },
+        {
+          "name": "operator",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#core declarations"
+          ]
+        },
+        {
+          "name": "type",
+          "evidence": [
+            "test/corpus/types.txt#abstract alias and polymorphic types"
+          ]
+        },
+        {
+          "name": "import",
+          "evidence": [
+            "test/corpus/imports_and_instances.txt#import modules and members"
+          ]
+        },
+        {
+          "name": "export",
+          "evidence": [
+            "test/corpus/imports_and_instances.txt#export module members"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "const_declaration",
+        "var_declaration",
+        "assume_declaration",
+        "instance_declaration",
+        "operator_definition",
+        "type_declaration",
+        "import_declaration",
+        "export_declaration"
+      ]
+    },
+    "operDef": {
+      "alternatives": [
+        {
+          "name": "annotated",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#declaration parameters and semicolons"
+          ]
+        },
+        {
+          "name": "deprecated untyped",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#declaration parameters and semicolons"
+          ]
+        },
+        {
+          "name": "val destructuring",
+          "evidence": [
+            "test/corpus/patterns_and_match.txt#tuple and record destructuring patterns"
+          ]
+        },
+        {
+          "name": "pure val destructuring",
+          "evidence": [
+            "test/corpus/patterns_and_match.txt#tuple and record destructuring patterns"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "operator_definition",
+        "parameter_list",
+        "tuple_pattern",
+        "record_pattern"
+      ]
+    },
+    "typeDef": {
+      "alternatives": [
+        {
+          "name": "abstract",
+          "evidence": [
+            "test/corpus/types.txt#abstract alias and polymorphic types"
+          ]
+        },
+        {
+          "name": "sum",
+          "evidence": [
+            "test/corpus/types.txt#sum type with optional leading separator"
+          ]
+        },
+        {
+          "name": "alias",
+          "evidence": [
+            "test/corpus/types.txt#abstract alias and polymorphic types"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "type_declaration"
+      ]
+    },
+    "typeDefHead": {
+      "alternatives": [
+        {
+          "name": "qualified name",
+          "evidence": [
+            "test/corpus/types.txt#unit tuple and qualified named types"
+          ]
+        },
+        {
+          "name": "optional type variables",
+          "evidence": [
+            "test/corpus/types.txt#abstract alias and polymorphic types"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "type_declaration",
+        "qualified_name"
+      ]
+    },
+    "sumTypeDefinition": {
+      "alternatives": [
+        {
+          "name": "optional leading separator",
+          "evidence": [
+            "test/corpus/types.txt#sum type with optional leading separator"
+          ]
+        },
+        {
+          "name": "one or more variants",
+          "evidence": [
+            "test/corpus/types.txt#sum type with optional leading separator"
+          ]
+        },
+        {
+          "name": "single variant",
+          "evidence": [
+            "test/corpus/types.txt#single sum variants retain sum type shape"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "sum_type"
+      ]
+    },
+    "typeSumVariant": {
+      "alternatives": [
+        {
+          "name": "nullary",
+          "evidence": [
+            "test/corpus/types.txt#sum type with optional leading separator"
+          ]
+        },
+        {
+          "name": "payload",
+          "evidence": [
+            "test/corpus/types.txt#sum type with optional leading separator"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "sum_variant"
+      ]
+    },
+    "qualifier": {
+      "alternatives": [
+        {
+          "name": "val",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#core declarations"
+          ]
+        },
+        {
+          "name": "def",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#core declarations"
+          ]
+        },
+        {
+          "name": "pure val",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#core declarations"
+          ]
+        },
+        {
+          "name": "pure def",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#core declarations"
+          ]
+        },
+        {
+          "name": "action",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#core declarations"
+          ]
+        },
+        {
+          "name": "run",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#core declarations"
+          ]
+        },
+        {
+          "name": "temporal",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#core declarations"
+          ]
+        },
+        {
+          "name": "nondet",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#nondet nested declaration expression"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "operator_qualifier"
+      ]
+    },
+    "importMod": {
+      "alternatives": [
+        {
+          "name": "member import",
+          "evidence": [
+            "test/corpus/imports_and_instances.txt#import modules and members"
+          ]
+        },
+        {
+          "name": "module import",
+          "evidence": [
+            "test/corpus/imports_and_instances.txt#import modules and members"
+          ]
+        },
+        {
+          "name": "alias",
+          "evidence": [
+            "test/corpus/imports_and_instances.txt#import modules and members"
+          ]
+        },
+        {
+          "name": "source",
+          "evidence": [
+            "test/corpus/imports_and_instances.txt#import modules and members"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "import_declaration"
+      ]
+    },
+    "exportMod": {
+      "alternatives": [
+        {
+          "name": "member export",
+          "evidence": [
+            "test/corpus/imports_and_instances.txt#qualified import export and instance names"
+          ]
+        },
+        {
+          "name": "module export",
+          "evidence": [
+            "test/corpus/imports_and_instances.txt#export module members"
+          ]
+        },
+        {
+          "name": "alias",
+          "evidence": [
+            "test/fixtures/quint-0.32.0/modules-imports.qnt"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "export_declaration"
+      ]
+    },
+    "instanceMod": {
+      "alternatives": [
+        {
+          "name": "wildcard instance",
+          "evidence": [
+            "test/corpus/imports_and_instances.txt#instance with wildcard and trailing override comma"
+          ]
+        },
+        {
+          "name": "aliased instance",
+          "evidence": [
+            "test/corpus/imports_and_instances.txt#instance with alias"
+          ]
+        },
+        {
+          "name": "trailing override comma",
+          "evidence": [
+            "test/corpus/imports_and_instances.txt#instance with wildcard and trailing override comma"
+          ]
+        },
+        {
+          "name": "source",
+          "evidence": [
+            "test/fixtures/quint-0.32.0/modules-imports.qnt"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "instance_declaration",
+        "instance_overrides",
+        "instance_override"
+      ]
+    },
+    "moduleName": {
+      "alternatives": [
+        {
+          "name": "qualId",
+          "evidence": [
+            "test/corpus/imports_and_instances.txt#qualified import export and instance names"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "qualified_name"
+      ]
+    },
+    "name": {
+      "alternatives": [
+        {
+          "name": "qualId",
+          "evidence": [
+            "test/corpus/imports_and_instances.txt#qualified import export and instance names"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "qualified_name"
+      ]
+    },
+    "qualifiedName": {
+      "alternatives": [
+        {
+          "name": "qualId",
+          "evidence": [
+            "test/corpus/imports_and_instances.txt#qualified import export and instance names"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "qualified_name"
+      ]
+    },
+    "fromSource": {
+      "alternatives": [
+        {
+          "name": "string",
+          "evidence": [
+            "test/corpus/imports_and_instances.txt#import modules and members"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "string"
+      ]
+    },
+    "type": {
+      "alternatives": [
+        {
+          "name": "function",
+          "evidence": [
+            "test/corpus/types.txt#function and operator types"
+          ]
+        },
+        {
+          "name": "operator",
+          "evidence": [
+            "test/corpus/types.txt#function and operator types"
+          ]
+        },
+        {
+          "name": "Set",
+          "evidence": [
+            "test/corpus/types.txt#applications and nested applications"
+          ]
+        },
+        {
+          "name": "List",
+          "evidence": [
+            "test/corpus/types.txt#applications and nested applications"
+          ]
+        },
+        {
+          "name": "unit",
+          "evidence": [
+            "test/corpus/types.txt#unit tuple and qualified named types"
+          ]
+        },
+        {
+          "name": "tuple",
+          "evidence": [
+            "test/corpus/types.txt#unit tuple and qualified named types"
+          ]
+        },
+        {
+          "name": "record",
+          "evidence": [
+            "test/corpus/types.txt#record types and rows"
+          ]
+        },
+        {
+          "name": "primitive",
+          "evidence": [
+            "test/corpus/types.txt#abstract alias and polymorphic types"
+          ]
+        },
+        {
+          "name": "variable",
+          "evidence": [
+            "test/corpus/types.txt#abstract alias and polymorphic types"
+          ]
+        },
+        {
+          "name": "constant",
+          "evidence": [
+            "test/corpus/types.txt#unit tuple and qualified named types"
+          ]
+        },
+        {
+          "name": "parenthesized",
+          "evidence": [
+            "test/corpus/types.txt#unit tuple and qualified named types"
+          ]
+        },
+        {
+          "name": "application",
+          "evidence": [
+            "test/corpus/types.txt#applications and nested applications"
+          ]
+        },
+        {
+          "name": "wrong application recovery",
+          "evidence": [
+            "test/corpus/types.txt#type rejects parameters on an abstract declaration"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "function_type",
+        "operator_type",
+        "type_application",
+        "tuple_type",
+        "record_type",
+        "primitive_type",
+        "named_type",
+        "parenthesized_type"
+      ]
+    },
+    "typeVar": {
+      "alternatives": [
+        {
+          "name": "lower identifier",
+          "evidence": [
+            "test/corpus/types.txt#abstract alias and polymorphic types"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "identifier",
+        "named_type"
+      ]
+    },
+    "row": {
+      "alternatives": [
+        {
+          "name": "closed fields",
+          "evidence": [
+            "test/corpus/types.txt#record types and rows"
+          ]
+        },
+        {
+          "name": "open row after fields",
+          "evidence": [
+            "test/corpus/types.txt#record types and rows"
+          ]
+        },
+        {
+          "name": "bare open row",
+          "evidence": [
+            "test/corpus/types.txt#record row rejects a qualified tail"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "record_type",
+        "record_field"
+      ]
+    },
+    "rowLabel": {
+      "alternatives": [
+        {
+          "name": "simple identifier",
+          "evidence": [
+            "test/corpus/types.txt#record types and rows"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "record_field"
+      ]
+    },
+    "typeArgs": {
+      "alternatives": [
+        {
+          "name": "one or more comma-separated types",
+          "evidence": [
+            "test/corpus/types.txt#applications and nested applications"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "type_application"
+      ]
+    },
+    "typeApplication": {
+      "alternatives": [
+        {
+          "name": "qualified constructor with square-bracket arguments",
+          "evidence": [
+            "test/corpus/types.txt#applications and nested applications"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "type_application"
+      ]
+    },
+    "wrongTypeApplication": {
+      "alternatives": [
+        {
+          "name": "parenthesized type arguments diagnostic",
+          "evidence": [
+            "test/corpus/types.txt#type rejects parameters on an abstract declaration"
+          ]
+        }
+      ],
+      "disposition": "ANTLR parser-action diagnostic; Tree-sitter reports ordinary syntax recovery instead of reproducing QNT009"
+    },
+    "expr": {
+      "alternatives": [
+        {
+          "name": "dot call",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions calls and access"
+          ]
+        },
+        {
+          "name": "lambda",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions conditionals and lambdas"
+          ]
+        },
+        {
+          "name": "call",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions calls and access"
+          ]
+        },
+        {
+          "name": "index",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions calls and access"
+          ]
+        },
+        {
+          "name": "power",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence arithmetic and associativity"
+          ]
+        },
+        {
+          "name": "unary",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence arithmetic and associativity"
+          ]
+        },
+        {
+          "name": "arithmetic",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence arithmetic and associativity"
+          ]
+        },
+        {
+          "name": "relations",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence all infix operators"
+          ]
+        },
+        {
+          "name": "assignment",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence comparison assignment and logic"
+          ]
+        },
+        {
+          "name": "logical blocks",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions logical action and ordinary blocks"
+          ]
+        },
+        {
+          "name": "logical infix",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence comparison assignment and logic"
+          ]
+        },
+        {
+          "name": "temporal infix",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence temporal logic pair and postfix"
+          ]
+        },
+        {
+          "name": "match",
+          "evidence": [
+            "test/corpus/patterns_and_match.txt#match variant identifier and wildcard patterns"
+          ]
+        },
+        {
+          "name": "action blocks",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions logical action and ordinary blocks"
+          ]
+        },
+        {
+          "name": "literal or id",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions primary and collection forms"
+          ]
+        },
+        {
+          "name": "tuple",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions primary and collection forms"
+          ]
+        },
+        {
+          "name": "unit",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions primary and collection forms"
+          ]
+        },
+        {
+          "name": "pair",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence temporal logic pair and postfix"
+          ]
+        },
+        {
+          "name": "record",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions primary and collection forms"
+          ]
+        },
+        {
+          "name": "list",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions primary and collection forms"
+          ]
+        },
+        {
+          "name": "conditional",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions conditionals and lambdas"
+          ]
+        },
+        {
+          "name": "let-in",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions allow unbraced local declarations"
+          ]
+        },
+        {
+          "name": "parenthesized",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions primary and collection forms"
+          ]
+        },
+        {
+          "name": "braces",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions logical action and ordinary blocks"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "ufcs_expression",
+        "field_access_expression",
+        "lambda_expression",
+        "call_expression",
+        "index_expression",
+        "unary_expression",
+        "binary_expression",
+        "delayed_assignment",
+        "logical_block",
+        "match_expression",
+        "action_block",
+        "tuple_expression",
+        "unit_expression",
+        "pair_expression",
+        "record_expression",
+        "list_expression",
+        "conditional_expression",
+        "declaration_expression",
+        "parenthesized_expression",
+        "block_expression"
+      ]
+    },
+    "matchSumExpr": {
+      "alternatives": [
+        {
+          "name": "optional leading separator and one or more cases",
+          "evidence": [
+            "test/corpus/patterns_and_match.txt#match variant identifier and wildcard patterns"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "match_expression"
+      ]
+    },
+    "matchSumCase": {
+      "alternatives": [
+        {
+          "name": "variant",
+          "evidence": [
+            "test/corpus/patterns_and_match.txt#match variant identifier and wildcard patterns"
+          ]
+        },
+        {
+          "name": "wildcard",
+          "evidence": [
+            "test/corpus/patterns_and_match.txt#match variant identifier and wildcard patterns"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "match_arm"
+      ]
+    },
+    "matchSumVariant": {
+      "alternatives": [
+        {
+          "name": "nullary",
+          "evidence": [
+            "test/corpus/patterns_and_match.txt#match variant identifier and wildcard patterns"
+          ]
+        },
+        {
+          "name": "identifier binder",
+          "evidence": [
+            "test/corpus/patterns_and_match.txt#match variant identifier and wildcard patterns"
+          ]
+        },
+        {
+          "name": "hole binder",
+          "evidence": [
+            "test/corpus/patterns_and_match.txt#match variant identifier and wildcard patterns"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "variant_pattern",
+        "identifier_pattern",
+        "hole"
+      ]
+    },
+    "declarationOrExpr": {
+      "alternatives": [
+        {
+          "name": "declaration EOF",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#core declarations"
+          ]
+        },
+        {
+          "name": "expression EOF",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions primary and collection forms"
+          ]
+        },
+        {
+          "name": "doc comment EOF",
+          "evidence": [
+            "test/corpus/lexical.txt#lexical forms"
+          ]
+        },
+        {
+          "name": "empty EOF",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#empty module"
+          ]
+        }
+      ],
+      "disposition": "Quint REPL-only probe entry point; npm parser exposes source_file modules and Tree-sitter recovery"
+    },
+    "lambda": {
+      "alternatives": [
+        {
+          "name": "unsugared",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions conditionals and lambdas"
+          ]
+        },
+        {
+          "name": "tuple sugar",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions lambda parameter forms and tuple continuation"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "lambda_expression",
+        "tuple_parameter"
+      ]
+    },
+    "lambdaUnsugared": {
+      "alternatives": [
+        {
+          "name": "single parameter",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions conditionals and lambdas"
+          ]
+        },
+        {
+          "name": "parenthesized parameter list",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions lambda parameter forms and tuple continuation"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "lambda_expression",
+        "parameter_list"
+      ]
+    },
+    "lambdaTupleSugar": {
+      "alternatives": [
+        {
+          "name": "double-parenthesized tuple parameter",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions lambda parameter forms and tuple continuation"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "lambda_expression",
+        "tuple_parameter"
+      ]
+    },
+    "identOrHole": {
+      "alternatives": [
+        {
+          "name": "hole",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions conditionals and lambdas"
+          ]
+        },
+        {
+          "name": "qualId",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions lambda parameter forms and tuple continuation"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "hole",
+        "qualified_name",
+        "identifier",
+        "type_identifier"
+      ]
+    },
+    "parameter": {
+      "alternatives": [
+        {
+          "name": "untyped identOrHole",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions conditionals and lambdas"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "parameter"
+      ]
+    },
+    "annotatedParameter": {
+      "alternatives": [
+        {
+          "name": "identOrHole with type",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#declaration parameters and semicolons"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "parameter"
+      ]
+    },
+    "destructuringPattern": {
+      "alternatives": [
+        {
+          "name": "tuple",
+          "evidence": [
+            "test/corpus/patterns_and_match.txt#tuple and record destructuring patterns"
+          ]
+        },
+        {
+          "name": "record",
+          "evidence": [
+            "test/corpus/patterns_and_match.txt#tuple and record destructuring patterns"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "tuple_pattern",
+        "record_pattern"
+      ]
+    },
+    "tuplePattern": {
+      "alternatives": [
+        {
+          "name": "two or more identOrHole elements",
+          "evidence": [
+            "test/corpus/patterns_and_match.txt#tuple and record destructuring patterns"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "tuple_pattern"
+      ]
+    },
+    "recordPattern": {
+      "alternatives": [
+        {
+          "name": "one or more simple fields",
+          "evidence": [
+            "test/corpus/patterns_and_match.txt#tuple and record destructuring patterns"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "record_pattern"
+      ]
+    },
+    "identOrStar": {
+      "alternatives": [
+        {
+          "name": "wildcard",
+          "evidence": [
+            "test/corpus/imports_and_instances.txt#import modules and members"
+          ]
+        },
+        {
+          "name": "qualId",
+          "evidence": [
+            "test/corpus/imports_and_instances.txt#import modules and members"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "wildcard",
+        "qualified_name"
+      ]
+    },
+    "argList": {
+      "alternatives": [
+        {
+          "name": "one or more comma-separated expressions",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions calls and access"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "argument_list"
+      ]
+    },
+    "recElem": {
+      "alternatives": [
+        {
+          "name": "named field",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions primary and collection forms"
+          ]
+        },
+        {
+          "name": "spread",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions primary and collection forms"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "record_element"
+      ]
+    },
+    "normalCallName": {
+      "alternatives": [
+        {
+          "name": "callable operator keywords",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions primary and collection forms"
+          ]
+        },
+        {
+          "name": "qualId",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions calls and access"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "identifier",
+        "type_identifier",
+        "qualified_name"
+      ]
+    },
+    "nameAfterDot": {
+      "alternatives": [
+        {
+          "name": "callable infix keywords",
+          "evidence": [
+            "test/fixtures/quint-0.32.0/upstream-SuperSpec.qnt"
+          ]
+        },
+        {
+          "name": "qualId",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions calls and access"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "ufcs_expression",
+        "field_access_expression"
+      ]
+    },
+    "operator": {
+      "alternatives": [
+        {
+          "name": "logical",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence all infix operators"
+          ]
+        },
+        {
+          "name": "relational",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence all infix operators"
+          ]
+        },
+        {
+          "name": "arithmetic",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence all infix operators"
+          ]
+        },
+        {
+          "name": "power",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence arithmetic and associativity"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "binary_expression"
+      ]
+    },
+    "literal": {
+      "alternatives": [
+        {
+          "name": "string",
+          "evidence": [
+            "test/corpus/lexical.txt#lexical forms"
+          ]
+        },
+        {
+          "name": "boolean",
+          "evidence": [
+            "test/corpus/lexical.txt#lexical forms"
+          ]
+        },
+        {
+          "name": "integer",
+          "evidence": [
+            "test/corpus/lexical.txt#lexical forms"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "string",
+        "boolean",
+        "integer"
+      ]
+    },
+    "qualId": {
+      "alternatives": [
+        {
+          "name": "simple",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#core declarations"
+          ]
+        },
+        {
+          "name": "qualified",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#qualified declaration names and parameter holes"
+          ]
+        },
+        {
+          "name": "keywordAsID components",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#upstream keyword identifier alternatives"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "identifier",
+        "type_identifier",
+        "qualified_name"
+      ]
+    },
+    "simpleId": {
+      "alternatives": [
+        {
+          "name": "unqualified identifier",
+          "evidence": [
+            "test/corpus/patterns_and_match.txt#tuple and record destructuring patterns"
+          ]
+        },
+        {
+          "name": "qualified identifier diagnostic",
+          "evidence": [
+            "test/corpus/types.txt#record row rejects a qualified tail"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "identifier",
+        "type_identifier"
+      ],
+      "disposition": "QNT008 is semantic diagnostic behavior; qualified forms recover as syntax errors at simple-only sites"
+    },
+    "identifier": {
+      "alternatives": [
+        {
+          "name": "LOW_ID",
+          "evidence": [
+            "test/corpus/lexical.txt#lexical forms"
+          ]
+        },
+        {
+          "name": "CAP_ID",
+          "evidence": [
+            "test/corpus/lexical.txt#lexical forms"
+          ]
+        },
+        {
+          "name": "keywordAsID",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#upstream keyword identifier alternatives"
+          ]
+        },
+        {
+          "name": "reserved diagnostic",
+          "evidence": [
+            "test/corpus/errors.txt#error reserved destructuring binder"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "identifier",
+        "type_identifier"
+      ]
+    },
+    "keywordAsID": {
+      "alternatives": [
+        {
+          "name": "from",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#upstream keyword identifier alternatives"
+          ]
+        },
+        {
+          "name": "as",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#upstream keyword identifier alternatives"
+          ]
+        },
+        {
+          "name": "Set",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#upstream keyword identifier alternatives"
+          ]
+        },
+        {
+          "name": "List",
+          "evidence": [
+            "test/corpus/modules_and_declarations.txt#upstream keyword identifier alternatives"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "identifier",
+        "type_identifier"
+      ]
+    },
+    "reserved": {
+      "alternatives": [
+        {
+          "name": "and",
+          "evidence": [
+            "test/corpus/errors.txt#error reserved destructuring binder"
+          ]
+        },
+        {
+          "name": "or",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence all infix operators"
+          ]
+        },
+        {
+          "name": "iff",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence all infix operators"
+          ]
+        },
+        {
+          "name": "implies",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence all infix operators"
+          ]
+        },
+        {
+          "name": "leadsTo",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence all infix operators"
+          ]
+        },
+        {
+          "name": "match",
+          "evidence": [
+            "test/corpus/errors.txt#error reserved match binder"
+          ]
+        },
+        {
+          "name": "import",
+          "evidence": [
+            "test/corpus/imports_and_instances.txt#import modules and members"
+          ]
+        },
+        {
+          "name": "export",
+          "evidence": [
+            "test/corpus/imports_and_instances.txt#export module members"
+          ]
+        }
+      ],
+      "disposition": "ANTLR QNT008 diagnostic helper; Tree-sitter rejects these contextually except normalCallName operator alternatives"
+    },
+    "STRING": {
+      "alternatives": [
+        {
+          "name": "double-quoted pseudo-identifier",
+          "evidence": [
+            "test/corpus/lexical.txt#lexical forms"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "string"
+      ]
+    },
+    "BOOL": {
+      "alternatives": [
+        {
+          "name": "false",
+          "evidence": [
+            "test/fixtures/quint-0.32.0/upstream-SuperSpec.qnt"
+          ]
+        },
+        {
+          "name": "true",
+          "evidence": [
+            "test/corpus/lexical.txt#lexical forms"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "boolean"
+      ]
+    },
+    "INT": {
+      "alternatives": [
+        {
+          "name": "zero",
+          "evidence": [
+            "test/fixtures/quint-0.32.0/upstream-SuperSpec.qnt"
+          ]
+        },
+        {
+          "name": "decimal with separators",
+          "evidence": [
+            "test/corpus/lexical.txt#lexical forms"
+          ]
+        },
+        {
+          "name": "hex with separators",
+          "evidence": [
+            "test/corpus/lexical.txt#lexical forms"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "integer"
+      ]
+    },
+    "AND": {
+      "alternatives": [
+        {
+          "name": "and",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence all infix operators"
+          ]
+        }
+      ],
+      "disposition": "anonymous literal token in Tree-sitter"
+    },
+    "OR": {
+      "alternatives": [
+        {
+          "name": "or",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence all infix operators"
+          ]
+        }
+      ],
+      "disposition": "anonymous literal token in Tree-sitter"
+    },
+    "IFF": {
+      "alternatives": [
+        {
+          "name": "iff",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence all infix operators"
+          ]
+        }
+      ],
+      "disposition": "anonymous literal token in Tree-sitter"
+    },
+    "IMPLIES": {
+      "alternatives": [
+        {
+          "name": "implies",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence all infix operators"
+          ]
+        }
+      ],
+      "disposition": "anonymous literal token in Tree-sitter"
+    },
+    "LEADS_TO": {
+      "alternatives": [
+        {
+          "name": "leadsTo",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence all infix operators"
+          ]
+        }
+      ],
+      "disposition": "anonymous literal token in Tree-sitter"
+    },
+    "MATCH": {
+      "alternatives": [
+        {
+          "name": "match",
+          "evidence": [
+            "test/corpus/patterns_and_match.txt#match variant identifier and wildcard patterns"
+          ]
+        }
+      ],
+      "disposition": "anonymous literal token in Tree-sitter"
+    },
+    "PLUS": {
+      "alternatives": [
+        {
+          "name": "+",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence all infix operators"
+          ]
+        }
+      ],
+      "disposition": "anonymous literal token in Tree-sitter"
+    },
+    "MINUS": {
+      "alternatives": [
+        {
+          "name": "-",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence all infix operators"
+          ]
+        }
+      ],
+      "disposition": "anonymous literal token in Tree-sitter"
+    },
+    "MUL": {
+      "alternatives": [
+        {
+          "name": "*",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence all infix operators"
+          ]
+        }
+      ],
+      "disposition": "anonymous literal token in Tree-sitter"
+    },
+    "DIV": {
+      "alternatives": [
+        {
+          "name": "/",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence all infix operators"
+          ]
+        }
+      ],
+      "disposition": "anonymous literal token in Tree-sitter"
+    },
+    "MOD": {
+      "alternatives": [
+        {
+          "name": "%",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence all infix operators"
+          ]
+        }
+      ],
+      "disposition": "anonymous literal token in Tree-sitter"
+    },
+    "GT": {
+      "alternatives": [
+        {
+          "name": ">",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence all infix operators"
+          ]
+        }
+      ],
+      "disposition": "anonymous literal token in Tree-sitter"
+    },
+    "LT": {
+      "alternatives": [
+        {
+          "name": "<",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence all infix operators"
+          ]
+        }
+      ],
+      "disposition": "anonymous literal token in Tree-sitter"
+    },
+    "GE": {
+      "alternatives": [
+        {
+          "name": ">=",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence all infix operators"
+          ]
+        }
+      ],
+      "disposition": "anonymous literal token in Tree-sitter"
+    },
+    "LE": {
+      "alternatives": [
+        {
+          "name": "<=",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence all infix operators"
+          ]
+        }
+      ],
+      "disposition": "anonymous literal token in Tree-sitter"
+    },
+    "NE": {
+      "alternatives": [
+        {
+          "name": "!=",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence all infix operators"
+          ]
+        }
+      ],
+      "disposition": "anonymous literal token in Tree-sitter"
+    },
+    "EQ": {
+      "alternatives": [
+        {
+          "name": "==",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence all infix operators"
+          ]
+        }
+      ],
+      "disposition": "anonymous literal token in Tree-sitter"
+    },
+    "ASGN": {
+      "alternatives": [
+        {
+          "name": "=",
+          "evidence": [
+            "test/corpus/precedence.txt#precedence comparison assignment and logic"
+          ]
+        }
+      ],
+      "disposition": "anonymous literal token in Tree-sitter"
+    },
+    "LPAREN": {
+      "alternatives": [
+        {
+          "name": "(",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions primary and collection forms"
+          ]
+        }
+      ],
+      "disposition": "anonymous literal token in Tree-sitter"
+    },
+    "RPAREN": {
+      "alternatives": [
+        {
+          "name": ")",
+          "evidence": [
+            "test/corpus/expressions.txt#expressions primary and collection forms"
+          ]
+        }
+      ],
+      "disposition": "anonymous literal token in Tree-sitter"
+    },
+    "SET": {
+      "alternatives": [
+        {
+          "name": "Set",
+          "evidence": [
+            "test/corpus/types.txt#applications and nested applications"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "type_identifier"
+      ]
+    },
+    "LIST": {
+      "alternatives": [
+        {
+          "name": "List",
+          "evidence": [
+            "test/corpus/types.txt#applications and nested applications"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "type_identifier"
+      ]
+    },
+    "IMPORT": {
+      "alternatives": [
+        {
+          "name": "import",
+          "evidence": [
+            "test/corpus/imports_and_instances.txt#import modules and members"
+          ]
+        }
+      ],
+      "disposition": "anonymous reserved literal token in Tree-sitter"
+    },
+    "EXPORT": {
+      "alternatives": [
+        {
+          "name": "export",
+          "evidence": [
+            "test/corpus/imports_and_instances.txt#export module members"
+          ]
+        }
+      ],
+      "disposition": "anonymous reserved literal token in Tree-sitter"
+    },
+    "FROM": {
+      "alternatives": [
+        {
+          "name": "from",
+          "evidence": [
+            "test/corpus/imports_and_instances.txt#import modules and members"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "identifier"
+      ]
+    },
+    "AS": {
+      "alternatives": [
+        {
+          "name": "as",
+          "evidence": [
+            "test/corpus/imports_and_instances.txt#import modules and members"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "identifier"
+      ]
+    },
+    "LOW_ID": {
+      "alternatives": [
+        {
+          "name": "lowercase",
+          "evidence": [
+            "test/corpus/lexical.txt#lexical forms"
+          ]
+        },
+        {
+          "name": "underscore-prefixed",
+          "evidence": [
+            "test/fixtures/quint-0.32.0/upstream-SuperSpec.qnt"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "identifier"
+      ]
+    },
+    "CAP_ID": {
+      "alternatives": [
+        {
+          "name": "uppercase",
+          "evidence": [
+            "test/corpus/lexical.txt#lexical forms"
+          ]
+        },
+        {
+          "name": "underscore-prefixed overlap",
+          "evidence": [
+            "test/fixtures/quint-0.32.0/upstream-SuperSpec.qnt"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "type_identifier",
+        "identifier"
+      ]
+    },
+    "HASHBANG_LINE": {
+      "alternatives": [
+        {
+          "name": "source-leading hashbang ending in newline",
+          "evidence": [
+            "test/corpus/lexical.txt#lexical forms"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "hash_bang_line"
+      ]
+    },
+    "DOCCOMMENT": {
+      "alternatives": [
+        {
+          "name": "triple-slash line ending in newline",
+          "evidence": [
+            "test/corpus/lexical.txt#lexical forms"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "comment"
+      ]
+    },
+    "LINE_COMMENT": {
+      "alternatives": [
+        {
+          "name": "double-slash line",
+          "evidence": [
+            "test/corpus/lexical.txt#lexical forms"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "comment"
+      ]
+    },
+    "COMMENT": {
+      "alternatives": [
+        {
+          "name": "block comment",
+          "evidence": [
+            "test/corpus/lexical.txt#lexical forms"
+          ]
+        }
+      ],
+      "treeSitter": [
+        "comment"
+      ]
+    },
+    "WS": {
+      "alternatives": [
+        {
+          "name": "space",
+          "evidence": [
+            "test/corpus/lexical.txt#lexical forms"
+          ]
+        },
+        {
+          "name": "tab",
+          "evidence": [
+            "test/corpus/lexical.txt#lexical forms"
+          ]
+        },
+        {
+          "name": "carriage return",
+          "evidence": [
+            "test/corpus/lexical.txt#lexical forms"
+          ]
+        },
+        {
+          "name": "newline",
+          "evidence": [
+            "test/corpus/lexical.txt#lexical forms"
+          ]
+        }
+      ],
+      "disposition": "Tree-sitter extras regex"
+    }
   }
 }
