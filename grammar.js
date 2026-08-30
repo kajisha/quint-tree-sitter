@@ -35,7 +35,7 @@ module.exports = grammar({
     [$._primary_expression, $._call_name],
     [$._call_name, $._identifier_component],
     [$.ufcs_expression, $.field_access_expression],
-    [$._action_boundary_local_operator_definition, $._local_operator_definition_header],
+    [$._complete_local_operator_definition, $._local_operator_definition_header],
   ],
 
   word: $ => $.identifier,
@@ -709,25 +709,145 @@ module.exports = grammar({
       '}',
     ),
     declaration_expression: $ => choice(
-      prec.dynamic(2, prec.right(PREC.BLOCK, seq(
-        field('declaration', alias($._action_boundary_local_operator_definition, $.operator_definition)),
-        field('body', $.action_block),
-      ))),
+      $._action_boundary_declaration_expression,
       prec.dynamic(1, prec.right(PREC.BLOCK, seq(
         field('declaration', alias($._local_operator_definition, $.operator_definition)),
         field('body', $._expression),
       ))),
+    ),
+    _action_boundary_declaration_expression: $ => choice(
+      prec.right(PREC.BLOCK, seq(
+        field('declaration', alias($._complete_local_operator_definition, $.operator_definition)),
+        field('body', $.action_block),
+      )),
+      prec.right(PREC.BLOCK, seq(
+        field('declaration', alias($._complete_local_operator_definition, $.operator_definition)),
+        field('body', alias($._action_boundary_declaration_expression, $.declaration_expression)),
+      )),
     ),
     _local_operator_definition: $ => seq(
       $._local_operator_definition_header,
       field('body', $._expression),
       optional(';'),
     ),
-    _action_boundary_local_operator_definition: $ => seq(
+    _complete_local_operator_definition: $ => seq(
       $._local_named_operator_definition_header,
-      field('body', choice($._compare_level, alias($._action_boundary_and_binary, $.binary_expression))),
+      field('body', $._complete_expression),
       optional(';'),
     ),
+    _complete_expression: $ => prec.right(choice(
+      $._complete_pair_level,
+      $.lambda_expression,
+      $.declaration_expression,
+    )),
+    _complete_pair_level: $ => prec.left(choice(
+      $._complete_implies_level,
+      alias($._complete_pair_expression, $.pair_expression),
+    )),
+    _complete_pair_expression: $ => prec.left(seq(
+      field('key', $._complete_pair_level),
+      '->',
+      field('value', choice($._complete_implies_level, $.declaration_expression, $.lambda_expression)),
+    )),
+    _complete_implies_level: $ => prec.left(choice(
+      $._complete_leads_level,
+      alias($._complete_implies_binary, $.binary_expression),
+    )),
+    _complete_implies_binary: $ => prec.left(seq(
+      field('left', $._complete_implies_level),
+      'implies',
+      field('right', choice($._complete_leads_level, $.declaration_expression, $.lambda_expression)),
+    )),
+    _complete_leads_level: $ => prec.left(choice(
+      $._complete_iff_level,
+      alias($._complete_leads_binary, $.binary_expression),
+    )),
+    _complete_leads_binary: $ => prec.left(seq(
+      field('left', $._complete_leads_level),
+      'leadsTo',
+      field('right', choice($._complete_iff_level, $.declaration_expression, $.lambda_expression)),
+    )),
+    _complete_iff_level: $ => prec.left(choice(
+      $._complete_or_level,
+      alias($._complete_iff_binary, $.binary_expression),
+    )),
+    _complete_iff_binary: $ => prec.left(seq(
+      field('left', $._complete_iff_level),
+      'iff',
+      field('right', choice($._complete_or_level, $.declaration_expression, $.lambda_expression)),
+    )),
+    _complete_or_level: $ => prec.left(choice(
+      $._complete_and_level,
+      alias($._complete_or_binary, $.binary_expression),
+    )),
+    _complete_or_binary: $ => prec.left(seq(
+      field('left', $._complete_or_level),
+      'or',
+      field('right', choice($._complete_and_level, $.declaration_expression, $.lambda_expression)),
+    )),
+    _complete_and_level: $ => prec.left(choice(
+      $._complete_assignment_level,
+      alias($._complete_and_binary, $.binary_expression),
+    )),
+    _complete_and_binary: $ => prec.left(seq(
+      field('left', $._complete_and_level),
+      'and',
+      field('right', choice($._complete_assignment_level, $.declaration_expression, $.lambda_expression)),
+    )),
+    _complete_assignment_level: $ => prec.right(choice(
+      $._complete_compare_level,
+      alias($._complete_delayed_assignment, $.delayed_assignment),
+    )),
+    _complete_compare_level: $ => prec.left(choice(
+      $._complete_add_level,
+      alias($._complete_compare_binary, $.binary_expression),
+    )),
+    _complete_compare_binary: $ => prec.left(PREC.COMPARE, seq(
+      field('left', $._complete_compare_level),
+      choice('>', '<', '>=', '<=', '!=', '=='),
+      field('right', choice($._complete_add_level, $.declaration_expression, $.lambda_expression)),
+    )),
+    _complete_add_level: $ => prec.left(choice(
+      $._complete_multiply_level,
+      alias($._complete_add_binary, $.binary_expression),
+    )),
+    _complete_add_binary: $ => prec.left(PREC.ADD, seq(
+      field('left', $._complete_add_level),
+      choice('+', '-'),
+      field('right', choice($._complete_multiply_level, $.declaration_expression, $.lambda_expression)),
+    )),
+    _complete_multiply_level: $ => prec.left(choice(
+      $._complete_unary_level,
+      alias($._complete_multiply_binary, $.binary_expression),
+    )),
+    _complete_multiply_binary: $ => prec.left(PREC.MULTIPLY, seq(
+      field('left', $._complete_multiply_level),
+      choice('*', '/', '%'),
+      field('right', choice($._complete_unary_level, $.declaration_expression, $.lambda_expression)),
+    )),
+    _complete_unary_level: $ => prec.right(choice(
+      $._complete_power_level,
+      alias($._complete_unary_expression, $.unary_expression),
+    )),
+    _complete_unary_expression: $ => seq(
+      '-',
+      field('operand', choice($._complete_unary_level, $.declaration_expression, $.lambda_expression)),
+    ),
+    _complete_power_level: $ => prec.right(choice(
+      $._postfix_expression,
+      alias($._complete_power_binary, $.binary_expression),
+    )),
+    _complete_power_binary: $ => prec.right(seq(
+      field('left', $._postfix_expression),
+      '^',
+      field('right', choice($._complete_unary_level, $.declaration_expression, $.lambda_expression)),
+    )),
+    _complete_delayed_assignment: $ => prec.right(PREC.ASSIGN, seq(
+      field('name', $._expression_name),
+      "'",
+      '=',
+      field('value', choice($._complete_assignment_level, $.declaration_expression, $.lambda_expression)),
+    )),
     _local_operator_definition_header: $ => choice(
       $._local_destructuring_operator_definition_header,
       $._local_named_operator_definition_header,
@@ -754,16 +874,6 @@ module.exports = grammar({
         '=',
       ),
     ),
-    _action_boundary_and_binary: $ => prec.left(seq(
-      field('left', $._compare_level),
-      'and',
-      field('right', alias($._action_boundary_compare_binary, $.binary_expression)),
-    )),
-    _action_boundary_compare_binary: $ => prec.left(PREC.COMPARE, seq(
-      field('left', $._add_level),
-      choice('>', '<', '>=', '<=', '!=', '=='),
-      field('right', $._add_level),
-    )),
     identifier: _ => /[a-z][A-Za-z0-9_]*|_[A-Za-z0-9_]+/,
     type_identifier: _ => /[A-Z][A-Za-z0-9_]*/,
     _identifier_component: $ => choice(

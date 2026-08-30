@@ -32,22 +32,66 @@ function consecutiveLocalModule(declarationCount, malformedFinalBody = false) {
   return `module LocalChain { val result = ${declarations}${body} }`
 }
 
-function parseMilliseconds(parser, source, oldTree) {
-  const started = process.hrtime.bigint()
-  const tree = parser.parse(source, oldTree)
-  return { tree, milliseconds: Number(process.hrtime.bigint() - started) / 1e6 }
+function actionBoundaryLocalModule(declarationCount, malformedFinalBody = false) {
+  const declarations = Array.from(
+    { length: declarationCount },
+    (_, index) => `val local${index} = a == b and c != d`,
+  ).join(' ')
+  const actionBody = malformedFinalBody ? 'any { }' : 'all { true }'
+  return `module ActionBoundaryChain { action result = { ${declarations} ${actionBody} } }`
 }
 
-function assertRoughlyLinear(times, label) {
+function parseMilliseconds(parser, source, oldTree, batchSize = 1) {
+  const started = process.hrtime.bigint()
+  let tree
+  for (let index = 0; index < batchSize; index += 1) tree = parser.parse(source, oldTree)
+  return {
+    tree,
+    milliseconds: Number(process.hrtime.bigint() - started) / 1e6 / batchSize,
+  }
+}
+
+function median(values) {
+  const sorted = [...values].sort((left, right) => left - right)
+  return sorted[Math.floor(sorted.length / 2)]
+}
+
+function benchmarkFullParse(parser, source, samples = 7, batchSize = 5) {
+  return median(Array.from(
+    { length: samples },
+    () => parseMilliseconds(parser, source, undefined, batchSize).milliseconds,
+  ))
+}
+
+function benchmarkIncrementalParse(parser, source, marker, samples = 7, batchSize = 5) {
+  const editIndex = source.indexOf(marker) + marker.length
+  assert.ok(editIndex >= marker.length, `edit marker ${marker} must exist`)
+  const replacement = source[editIndex] === '9' ? '8' : '9'
+  const editedSource = `${source.slice(0, editIndex)}${replacement}${source.slice(editIndex + 1)}`
+  return median(Array.from({ length: samples }, () => {
+    const tree = parser.parse(source)
+    tree.edit({
+      startIndex: editIndex,
+      oldEndIndex: editIndex + 1,
+      newEndIndex: editIndex + 1,
+      startPosition: { row: 0, column: editIndex },
+      oldEndPosition: { row: 0, column: editIndex + 1 },
+      newEndPosition: { row: 0, column: editIndex + 1 },
+    })
+    return parseMilliseconds(parser, editedSource, tree, batchSize).milliseconds
+  }))
+}
+
+function assertRoughlyLinear(times, label, absoluteThreshold = 200) {
   for (let index = 1; index < times.length; index += 1) {
     assert.ok(
-      times[index] <= times[index - 1] * 3.5 + 5,
+      times[index] <= times[index - 1] * 2.75,
       `${label} grows pathologically: ${times.map(time => time.toFixed(2)).join(', ')} ms`,
     )
   }
   assert.ok(
-    times.at(-1) < 200,
-    `${label} must remain editor-oriented at 800 declarations: ${times.at(-1).toFixed(2)} ms`,
+    times.at(-1) < absoluteThreshold,
+    `${label} must remain editor-oriented: ${times.at(-1).toFixed(2)} ms`,
   )
 }
 
@@ -261,10 +305,69 @@ test('lambda and declaration operands preserve the official public CST matrix', 
   )
 })
 
+test('complete local RHS preserves the official CST before all and any bodies', () => {
+  const parser = new Parser()
+  parser.setLanguage(Quint)
+  const cases = [
+    {
+      name: 'primary all single-line',
+      source: 'module M { action f = { val x = a all { true } } }',
+      expected: '(block_expression body: (declaration_expression declaration: (operator_definition qualifier: (operator_qualifier) name: (identifier) body: (identifier)) body: (action_block body: (boolean))))',
+    },
+    {
+      name: 'comparison any multiline',
+      source: 'module M {\n  action f = {\n    val x = a == b\n    any { true }\n  }\n}',
+      expected: '(block_expression body: (declaration_expression declaration: (operator_definition qualifier: (operator_qualifier) name: (identifier) body: (binary_expression left: (identifier) right: (identifier))) body: (action_block body: (boolean))))',
+    },
+    {
+      name: 'and all',
+      source: 'module M { action f = { val x = a and b all { true } } }',
+      expected: '(block_expression body: (declaration_expression declaration: (operator_definition qualifier: (operator_qualifier) name: (identifier) body: (binary_expression left: (identifier) right: (identifier))) body: (action_block body: (boolean))))',
+    },
+    {
+      name: 'or any',
+      source: 'module M { action f = { val x = a or b any { true } } }',
+      expected: '(block_expression body: (declaration_expression declaration: (operator_definition qualifier: (operator_qualifier) name: (identifier) body: (binary_expression left: (identifier) right: (identifier))) body: (action_block body: (boolean))))',
+    },
+    {
+      name: 'multiple logical all',
+      source: 'module M { action f = { val x = a == b and c != d and e == f all { true } } }',
+      expected: '(block_expression body: (declaration_expression declaration: (operator_definition qualifier: (operator_qualifier) name: (identifier) body: (binary_expression left: (binary_expression left: (binary_expression left: (identifier) right: (identifier)) right: (binary_expression left: (identifier) right: (identifier))) right: (binary_expression left: (identifier) right: (identifier)))) body: (action_block body: (boolean))))',
+    },
+    {
+      name: 'lambda any',
+      source: 'module M { action f = { val x = y => y any { true } } }',
+      expected: '(block_expression body: (declaration_expression declaration: (operator_definition qualifier: (operator_qualifier) name: (identifier) body: (lambda_expression parameter: (parameter name: (identifier)) body: (identifier))) body: (action_block body: (boolean))))',
+    },
+    {
+      name: 'declaration all',
+      source: 'module M { action f = { val x = val y = 1 y all { true } } }',
+      expected: '(block_expression body: (declaration_expression declaration: (operator_definition qualifier: (operator_qualifier) name: (identifier) body: (declaration_expression declaration: (operator_definition qualifier: (operator_qualifier) name: (identifier) body: (integer)) body: (identifier))) body: (action_block body: (boolean))))',
+    },
+    {
+      name: 'typed semicolon any',
+      source: 'module M { action f = { val x: bool = a == b and c != d; any { true } } }',
+      expected: '(block_expression body: (declaration_expression declaration: (operator_definition qualifier: (operator_qualifier) name: (identifier) type: (primitive_type) body: (binary_expression left: (binary_expression left: (identifier) right: (identifier)) right: (binary_expression left: (identifier) right: (identifier)))) body: (action_block body: (boolean))))',
+    },
+    {
+      name: 'two comparison-conjunction locals all',
+      source: 'module M {\n  action f = {\n    val x = a == b and c != d\n    val y = e == f and g != h\n    all { true }\n  }\n}',
+      expected: '(block_expression body: (declaration_expression declaration: (operator_definition qualifier: (operator_qualifier) name: (identifier) body: (binary_expression left: (binary_expression left: (identifier) right: (identifier)) right: (binary_expression left: (identifier) right: (identifier)))) body: (declaration_expression declaration: (operator_definition qualifier: (operator_qualifier) name: (identifier) body: (binary_expression left: (binary_expression left: (identifier) right: (identifier)) right: (binary_expression left: (identifier) right: (identifier)))) body: (action_block body: (boolean)))))',
+    },
+  ]
+
+  for (const fixture of cases) {
+    const tree = parser.parse(fixture.source)
+    const definition = tree.rootNode.namedChild(0).childForFieldName('body')
+    assert.equal(tree.rootNode.hasError, false, fixture.name)
+    assert.equal(definition.childForFieldName('body').toString(), fixture.expected, fixture.name)
+  }
+})
+
 test('consecutive local declarations parse roughly linearly in full and incremental modes', t => {
   const parser = new Parser()
   parser.setLanguage(Quint)
-  const sizes = [100, 200, 400, 800]
+  const sizes = [800, 1600, 3200]
 
   parser.parse(consecutiveLocalModule(20))
   for (const malformedFinalBody of [false, true]) {
@@ -272,27 +375,40 @@ test('consecutive local declarations parse roughly linearly in full and incremen
     const incrementalTimes = []
     for (const size of sizes) {
       const source = consecutiveLocalModule(size, malformedFinalBody)
-      const full = parseMilliseconds(parser, source)
-      assert.equal(full.tree.rootNode.hasError, malformedFinalBody)
-      fullTimes.push(full.milliseconds)
-
-      const marker = `local${Math.floor(size / 2)} = `
-      const editIndex = source.indexOf(marker) + marker.length
-      const replacement = source[editIndex] === '9' ? '8' : '9'
-      const editedSource = `${source.slice(0, editIndex)}${replacement}${source.slice(editIndex + 1)}`
-      full.tree.edit({
-        startIndex: editIndex,
-        oldEndIndex: editIndex + 1,
-        newEndIndex: editIndex + 1,
-        startPosition: { row: 0, column: editIndex },
-        oldEndPosition: { row: 0, column: editIndex + 1 },
-        newEndPosition: { row: 0, column: editIndex + 1 },
-      })
-      const incremental = parseMilliseconds(parser, editedSource, full.tree)
-      assert.equal(incremental.tree.rootNode.hasError, malformedFinalBody)
-      incrementalTimes.push(incremental.milliseconds)
+      assert.equal(parser.parse(source).rootNode.hasError, malformedFinalBody)
+      fullTimes.push(benchmarkFullParse(parser, source))
+      incrementalTimes.push(benchmarkIncrementalParse(
+        parser,
+        source,
+        `local${Math.floor(size / 2)} = `,
+      ))
     }
     const label = malformedFinalBody ? 'malformed-final-body chain' : 'valid chain'
+    assertRoughlyLinear(fullTimes, `${label} full parse`)
+    assertRoughlyLinear(incrementalTimes, `${label} incremental parse`)
+    t.diagnostic(`${label}: ${JSON.stringify({ sizes, fullTimes, incrementalTimes })}`)
+  }
+})
+
+test('action-boundary local chains parse roughly linearly in full and incremental modes', t => {
+  const parser = new Parser()
+  parser.setLanguage(Quint)
+  const sizes = [800, 1600, 3200]
+
+  for (const malformedFinalBody of [false, true]) {
+    const fullTimes = []
+    const incrementalTimes = []
+    for (const size of sizes) {
+      const source = actionBoundaryLocalModule(size, malformedFinalBody)
+      assert.equal(parser.parse(source).rootNode.hasError, malformedFinalBody)
+      fullTimes.push(benchmarkFullParse(parser, source))
+      incrementalTimes.push(benchmarkIncrementalParse(
+        parser,
+        source,
+        `local${Math.floor(size / 2)} = `,
+      ))
+    }
+    const label = malformedFinalBody ? 'malformed action-boundary chain' : 'valid action-boundary chain'
     assertRoughlyLinear(fullTimes, `${label} full parse`)
     assertRoughlyLinear(incrementalTimes, `${label} incremental parse`)
     t.diagnostic(`${label}: ${JSON.stringify({ sizes, fullTimes, incrementalTimes })}`)

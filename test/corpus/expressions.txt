@@ -986,3 +986,67 @@ module ChainSingleLine { def f = val values = items.map(item => item.id) and { v
               function: (type_identifier)
               arguments: (argument_list)))
           element: (boolean))))))
+
+==================
+complete local rhs leaves action block body
+==================
+
+module ActionBoundaryMultiline {
+  action f = {
+    val x = a == b and c != d
+    val y = e == f and g != h
+    all { true }
+  }
+}
+
+module ActionBoundarySingleLine { action f = { val x: bool = a or b; any { true } } }
+
+---
+
+(source_file
+  (module
+    (type_identifier)
+    (operator_definition
+      (operator_qualifier)
+      (identifier)
+      (block_expression
+        (declaration_expression
+          (operator_definition
+            (operator_qualifier)
+            (identifier)
+            (binary_expression
+              (binary_expression
+                (identifier)
+                (identifier))
+              (binary_expression
+                (identifier)
+                (identifier))))
+          (declaration_expression
+            (operator_definition
+              (operator_qualifier)
+              (identifier)
+              (binary_expression
+                (binary_expression
+                  (identifier)
+                  (identifier))
+                (binary_expression
+                  (identifier)
+                  (identifier))))
+            (action_block
+              (boolean)))))))
+  (module
+    (type_identifier)
+    (operator_definition
+      (operator_qualifier)
+      (identifier)
+      (block_expression
+        (declaration_expression
+          (operator_definition
+            (operator_qualifier)
+            (identifier)
+            (primitive_type)
+            (binary_expression
+              (identifier)
+              (identifier)))
+          (action_block
+            (boolean)))))))
