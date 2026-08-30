@@ -640,3 +640,349 @@ module M {
         (record_element
           name: (type_identifier)
           value: (boolean))))))
+
+==================
+local declarations leave logical block bodies
+==================
+
+module AndMultiline {
+  def f =
+    val x = 1
+    and { x == 1, true }
+}
+
+module AndSingleLine { def f = val x = 1 and { x == 1, true } }
+
+module OrMultiline {
+  def f =
+    val x = 1
+    or { x == 1, false }
+}
+
+module OrSingleLine { def f = val x = 1 or { x == 1, false } }
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (declaration_expression
+        declaration: (operator_definition
+          qualifier: (operator_qualifier)
+          name: (identifier)
+          body: (integer))
+        body: (logical_block
+          body: (binary_expression
+            left: (identifier)
+            right: (integer))
+          element: (boolean)))))
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (declaration_expression
+        declaration: (operator_definition
+          qualifier: (operator_qualifier)
+          name: (identifier)
+          body: (integer))
+        body: (logical_block
+          body: (binary_expression
+            left: (identifier)
+            right: (integer))
+          element: (boolean)))))
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (declaration_expression
+        declaration: (operator_definition
+          qualifier: (operator_qualifier)
+          name: (identifier)
+          body: (integer))
+        body: (logical_block
+          body: (binary_expression
+            left: (identifier)
+            right: (integer))
+          element: (boolean)))))
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (declaration_expression
+        declaration: (operator_definition
+          qualifier: (operator_qualifier)
+          name: (identifier)
+          body: (integer))
+        body: (logical_block
+          body: (binary_expression
+            left: (identifier)
+            right: (integer))
+          element: (boolean))))))
+
+==================
+match arm declarations leave ordinary call bodies
+==================
+
+module MatchMultiline {
+  def f = match value {
+    | Some(_) =>
+        val left = true
+        val right = false
+        or(left, right)
+    | None => true
+  }
+}
+
+module MatchSingleLine { def f = match value { | Some(_) => val left = true val right = false or(left, right) | None => true } }
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (match_expression
+        value: (identifier)
+        arm: (match_arm
+          pattern: (variant_pattern
+            name: (type_identifier)
+            argument: (wildcard_pattern))
+          body: (declaration_expression
+            declaration: (operator_definition
+              qualifier: (operator_qualifier)
+              name: (identifier)
+              body: (boolean))
+            body: (declaration_expression
+              declaration: (operator_definition
+                qualifier: (operator_qualifier)
+                name: (identifier)
+                body: (boolean))
+              body: (call_expression
+                function: (identifier)
+                arguments: (argument_list
+                  (identifier)
+                  (identifier))))))
+        arm: (match_arm
+          pattern: (variant_pattern
+            name: (type_identifier))
+          body: (boolean)))))
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (match_expression
+        value: (identifier)
+        arm: (match_arm
+          pattern: (variant_pattern
+            name: (type_identifier)
+            argument: (wildcard_pattern))
+          body: (declaration_expression
+            declaration: (operator_definition
+              qualifier: (operator_qualifier)
+              name: (identifier)
+              body: (boolean))
+            body: (declaration_expression
+              declaration: (operator_definition
+                qualifier: (operator_qualifier)
+                name: (identifier)
+                body: (boolean))
+              body: (call_expression
+                function: (identifier)
+                arguments: (argument_list
+                  (identifier)
+                  (identifier))))))
+        arm: (match_arm
+          pattern: (variant_pattern
+            name: (type_identifier))
+          body: (boolean))))))
+
+==================
+lambda declarations leave logical block bodies
+==================
+
+module LambdaMultiline {
+  def f = items.forall(item =>
+    val value = item
+    and { value > 0, true }
+  )
+}
+
+module LambdaSingleLine { def f = items.forall(item => val value = item and { value > 0, true }) }
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (ufcs_expression
+        receiver: (identifier)
+        function: (identifier)
+        arguments: (argument_list
+          (lambda_expression
+            parameter: (parameter
+              name: (identifier))
+            body: (declaration_expression
+              declaration: (operator_definition
+                qualifier: (operator_qualifier)
+                name: (identifier)
+                body: (identifier))
+              body: (logical_block
+                body: (binary_expression
+                  left: (identifier)
+                  right: (integer))
+                element: (boolean))))))))
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (ufcs_expression
+        receiver: (identifier)
+        function: (identifier)
+        arguments: (argument_list
+          (lambda_expression
+            parameter: (parameter
+              name: (identifier))
+            body: (declaration_expression
+              declaration: (operator_definition
+                qualifier: (operator_qualifier)
+                name: (identifier)
+                body: (identifier))
+              body: (logical_block
+                body: (binary_expression
+                  left: (identifier)
+                  right: (integer))
+                element: (boolean)))))))))
+
+==================
+implication blocks retain nested declaration bodies
+==================
+
+module ImpliesMultiline {
+  def f = ready implies {
+    val value = 1
+    and { value == 1, ready }
+  }
+}
+
+module ImpliesSingleLine { def f = ready implies { val value = 1 and { value == 1, ready } } }
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (binary_expression
+        left: (identifier)
+        right: (block_expression
+          body: (declaration_expression
+            declaration: (operator_definition
+              qualifier: (operator_qualifier)
+              name: (identifier)
+              body: (integer))
+            body: (logical_block
+              body: (binary_expression
+                left: (identifier)
+                right: (integer))
+              element: (identifier)))))))
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (binary_expression
+        left: (identifier)
+        right: (block_expression
+          body: (declaration_expression
+            declaration: (operator_definition
+              qualifier: (operator_qualifier)
+              name: (identifier)
+              body: (integer))
+            body: (logical_block
+              body: (binary_expression
+                left: (identifier)
+                right: (integer))
+              element: (identifier))))))))
+
+==================
+chained dot rhs leaves logical block body
+==================
+
+module ChainMultiline {
+  def f =
+    val values = items.map(item => item.id)
+    and { values != Set(), true }
+}
+
+module ChainSingleLine { def f = val values = items.map(item => item.id) and { values != Set(), true } }
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (declaration_expression
+        declaration: (operator_definition
+          qualifier: (operator_qualifier)
+          name: (identifier)
+          body: (ufcs_expression
+            receiver: (identifier)
+            function: (identifier)
+            arguments: (argument_list
+              (lambda_expression
+                parameter: (parameter
+                  name: (identifier))
+                body: (field_access_expression
+                  receiver: (identifier)
+                  field: (identifier))))))
+        body: (logical_block
+          body: (binary_expression
+            left: (identifier)
+            right: (call_expression
+              function: (type_identifier)
+              arguments: (argument_list)))
+          element: (boolean)))))
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (declaration_expression
+        declaration: (operator_definition
+          qualifier: (operator_qualifier)
+          name: (identifier)
+          body: (ufcs_expression
+            receiver: (identifier)
+            function: (identifier)
+            arguments: (argument_list
+              (lambda_expression
+                parameter: (parameter
+                  name: (identifier))
+                body: (field_access_expression
+                  receiver: (identifier)
+                  field: (identifier))))))
+        body: (logical_block
+          body: (binary_expression
+            left: (identifier)
+            right: (call_expression
+              function: (type_identifier)
+              arguments: (argument_list)))
+          element: (boolean))))))

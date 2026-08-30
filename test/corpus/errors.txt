@@ -102,13 +102,11 @@ module Unclosed {
     name: (type_identifier)
     (ERROR
       (operator_qualifier)))
-  (module
-    name: (type_identifier)
-    body: (operator_definition
-      qualifier: (operator_qualifier)
-      name: (identifier)
-      body: (integer))
-    (MISSING "}")))
+  (ERROR
+    (type_identifier)
+    (operator_qualifier)
+    (identifier)
+    (integer)))
 
 ==================
 error unsupported trailing pattern separators recover locally
@@ -232,19 +230,17 @@ module M {
     name: (type_identifier)
     body: (operator_definition
       qualifier: (operator_qualifier)
-      name: (identifier)
-      body: (block_expression
-        body: (declaration_expression
-          declaration: (operator_definition
-            qualifier: (operator_qualifier)
-            pattern: (tuple_pattern
-              element: (identifier_pattern
-                name: (identifier))
-              element: (identifier_pattern
-                name: (identifier)))
-            body: (identifier))
-          body: (MISSING identifier))))
-    body: (operator_definition
-      qualifier: (operator_qualifier)
-      name: (identifier)
-      body: (integer))))
+      name: (identifier))
+    (ERROR
+      (operator_definition
+        qualifier: (operator_qualifier)
+        pattern: (tuple_pattern
+          element: (identifier_pattern
+            name: (identifier))
+          element: (identifier_pattern
+            name: (identifier)))
+        body: (identifier))
+      (ERROR)
+      (operator_qualifier)
+      (identifier)
+      (integer))))

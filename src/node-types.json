@@ -551,10 +551,6 @@
             "named": true
           },
           {
-            "type": "pair_expression",
-            "named": true
-          },
-          {
             "type": "parenthesized_expression",
             "named": true
           },
@@ -658,10 +654,6 @@
           },
           {
             "type": "match_expression",
-            "named": true
-          },
-          {
-            "type": "pair_expression",
             "named": true
           },
           {
@@ -3549,10 +3541,6 @@
             "named": true
           },
           {
-            "type": "pair_expression",
-            "named": true
-          },
-          {
             "type": "parenthesized_expression",
             "named": true
           },
@@ -3679,7 +3667,7 @@
     "fields": {},
     "children": {
       "multiple": false,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "action_block",
@@ -4728,10 +4716,6 @@
             "named": true
           },
           {
-            "type": "pair_expression",
-            "named": true
-          },
-          {
             "type": "parenthesized_expression",
             "named": true
           },
@@ -4757,10 +4741,6 @@
           },
           {
             "type": "ufcs_expression",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
             "named": true
           },
           {

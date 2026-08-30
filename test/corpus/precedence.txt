@@ -173,6 +173,7 @@ module Operators {
   val arithmetic = a ^ b * c / d % e + f - g
   val comparisons = a > b and c < d and e >= f and g <= h and i != j and k == l
   val booleans = a and b or c iff d leadsTo e implies f
+  val andBindsBeforeOr = a or b and c
   val pair = a -> b
 }
 
@@ -237,6 +238,14 @@ module Operators {
             right: (identifier))
           right: (identifier))
         right: (identifier)))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (binary_expression
+        left: (identifier)
+        right: (binary_expression
+          left: (identifier)
+          right: (identifier))))
     body: (operator_definition
       qualifier: (operator_qualifier)
       name: (identifier)

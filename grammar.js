@@ -32,7 +32,22 @@ module.exports = grammar({
     [$._qualified_expression_name, $._lambda_name_component],
     // `((x, y)) =>` is Quint's tuple-parameter sugar, not a grouped tuple value.
     [$.tuple_parameter],
-    [$._expression, $._call_name],
+    [$._power_base_expression, $._call_name],
+    [$._expression, $.pair_expression],
+    [$._pair_level, $.pair_expression],
+    [$._pair_level, $._implies_binary],
+    [$._implies_level, $._implies_binary],
+    [$._implies_level, $._leads_binary],
+    [$._leads_level, $._leads_binary],
+    [$._leads_level, $._iff_binary],
+    [$._iff_level, $._iff_binary],
+    [$._iff_level, $._or_binary],
+    [$._or_level, $._or_binary],
+    [$._or_level, $._and_binary],
+    [$._and_level, $._and_binary],
+    [$._unary_operand, $._index_operand],
+    [$._unary_operand, $._field_operand, $._ufcs_operand],
+    [$._field_operand, $._ufcs_operand],
     [$._call_name, $._identifier_component],
     [$.ufcs_expression, $.field_access_expression],
   ],
@@ -354,7 +369,26 @@ module.exports = grammar({
       field('name', choice($.identifier, $.type_identifier)),
       optional(seq('(', field('type', $._type), ')')),
     )),
-    _expression: $ => choice(
+    _expression: $ => $._pair_level,
+    _non_logical_expression: $ => choice(
+      $._unary_operand,
+      $.unary_expression,
+      $.binary_expression,
+      $.ufcs_expression,
+      $.field_access_expression,
+      $.index_expression,
+    ),
+    _unary_operand: $ => choice(
+      $._postfix_operand,
+      alias($._power_binary, $.binary_expression),
+    ),
+    _postfix_operand: $ => choice(
+      $._power_base_expression,
+      alias($._index_operand, $.index_expression),
+      alias($._field_operand, $.field_access_expression),
+      alias($._ufcs_operand, $.ufcs_expression),
+    ),
+    _power_base_expression: $ => choice(
       $._expression_name,
       $.integer,
       $.string,
@@ -367,14 +401,8 @@ module.exports = grammar({
       $.conditional_expression,
       $.match_expression,
       $.lambda_expression,
-      $.unary_expression,
-      $.binary_expression,
-      $.pair_expression,
       $.delayed_assignment,
       $.call_expression,
-      $.ufcs_expression,
-      $.field_access_expression,
-      $.index_expression,
       $.logical_block,
       $.action_block,
       $.block_expression,
@@ -528,61 +556,85 @@ module.exports = grammar({
       ')',
       ')',
     ),
-    unary_expression: $ => prec(PREC.UNARY, seq(
+    unary_expression: $ => prec.dynamic(1, seq(
       '-',
-      field('operand', $._expression),
+      field('operand', $._unary_operand),
     )),
     binary_expression: $ => choice(
-      prec.right(PREC.POWER, seq(
-        field('left', $._expression),
-        '^',
-        field('right', $._expression),
-      )),
       prec.left(PREC.MULTIPLY, seq(
-        field('left', $._expression),
+        field('left', $._non_logical_expression),
         choice('*', '/', '%'),
-        field('right', $._expression),
+        field('right', $._non_logical_expression),
       )),
       prec.left(PREC.ADD, seq(
-        field('left', $._expression),
+        field('left', $._non_logical_expression),
         choice('+', '-'),
-        field('right', $._expression),
+        field('right', $._non_logical_expression),
       )),
       prec.left(PREC.COMPARE, seq(
-        field('left', $._expression),
+        field('left', $._non_logical_expression),
         choice('>', '<', '>=', '<=', '!=', '=='),
-        field('right', $._expression),
-      )),
-      prec.left(PREC.AND, seq(
-        field('left', $._expression),
-        'and',
-        field('right', $._expression),
-      )),
-      prec.left(PREC.OR, seq(
-        field('left', $._expression),
-        'or',
-        field('right', $._expression),
-      )),
-      prec.left(PREC.IFF, seq(
-        field('left', $._expression),
-        'iff',
-        field('right', $._expression),
-      )),
-      prec.left(PREC.LEADS_TO, seq(
-        field('left', $._expression),
-        'leadsTo',
-        field('right', $._expression),
-      )),
-      prec.left(PREC.IMPLIES, seq(
-        field('left', $._expression),
-        'implies',
-        field('right', $._expression),
+        field('right', $._non_logical_expression),
       )),
     ),
-    pair_expression: $ => prec.left(PREC.PAIR, seq(
-      field('key', $._expression),
+    _power_binary: $ => prec.right(PREC.POWER, seq(
+      field('left', $._postfix_operand),
+      '^',
+      field('right', $._unary_operand),
+    )),
+    _pair_level: $ => choice(
+      $._implies_level,
+      $.pair_expression,
+    ),
+    _implies_level: $ => choice(
+      $._leads_level,
+      alias($._implies_binary, $.binary_expression),
+    ),
+    _implies_binary: $ => prec.left(seq(
+      field('left', $._implies_level),
+      'implies',
+      field('right', $._leads_level),
+    )),
+    _leads_level: $ => choice(
+      $._iff_level,
+      alias($._leads_binary, $.binary_expression),
+    ),
+    _leads_binary: $ => prec.left(seq(
+      field('left', $._leads_level),
+      'leadsTo',
+      field('right', $._iff_level),
+    )),
+    _iff_level: $ => choice(
+      $._or_level,
+      alias($._iff_binary, $.binary_expression),
+    ),
+    _iff_binary: $ => prec.left(seq(
+      field('left', $._iff_level),
+      'iff',
+      field('right', $._or_level),
+    )),
+    _or_level: $ => choice(
+      $._and_level,
+      alias($._or_binary, $.binary_expression),
+    ),
+    _or_binary: $ => prec.left(seq(
+      field('left', $._or_level),
+      'or',
+      field('right', $._and_level),
+    )),
+    _and_level: $ => choice(
+      $._non_logical_expression,
+      alias($._and_binary, $.binary_expression),
+    ),
+    _and_binary: $ => prec.left(seq(
+      field('left', $._and_level),
+      'and',
+      field('right', $._non_logical_expression),
+    )),
+    pair_expression: $ => prec.left(seq(
+      field('key', $._pair_level),
       '->',
-      field('value', $._expression),
+      field('value', $._implies_level),
     )),
     delayed_assignment: $ => prec.right(PREC.ASSIGN, seq(
       field('name', $._expression_name),
@@ -620,6 +672,23 @@ module.exports = grammar({
       field('index', $._expression),
       ']',
     )),
+    _index_operand: $ => seq(
+      field('collection', $._postfix_operand),
+      '[',
+      field('index', $._expression),
+      ']',
+    ),
+    _field_operand: $ => seq(
+      field('receiver', $._postfix_operand),
+      '.',
+      field('field', $._member_name),
+    ),
+    _ufcs_operand: $ => seq(
+      field('receiver', $._postfix_operand),
+      '.',
+      field('function', $._member_name),
+      field('arguments', $.argument_list),
+    ),
     argument_list: $ => seq(
       '(',
       optional(seq(
