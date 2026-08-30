@@ -600,3 +600,43 @@ module M {
               element: (binary_expression
                 left: (identifier)
                 right: (identifier)))))))))
+
+==================
+keyword identifiers name record values
+==================
+
+module M {
+  val from = 1
+  val as = 2
+  val test = { from: 1, as: true, List: 1, Set: true }
+}
+
+---
+
+(source_file
+  (module
+    name: (type_identifier)
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (integer))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (integer))
+    body: (operator_definition
+      qualifier: (operator_qualifier)
+      name: (identifier)
+      body: (record_expression
+        (record_element
+          name: (identifier)
+          value: (integer))
+        (record_element
+          name: (identifier)
+          value: (boolean))
+        (record_element
+          name: (type_identifier)
+          value: (integer))
+        (record_element
+          name: (type_identifier)
+          value: (boolean))))))

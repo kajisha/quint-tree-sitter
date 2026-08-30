@@ -417,7 +417,7 @@ module.exports = grammar({
     ),
     record_element: $ => choice(
       seq(
-        field('name', choice($.identifier, $.type_identifier)),
+        field('name', $._identifier_component),
         ':',
         field('value', $._expression),
       ),
