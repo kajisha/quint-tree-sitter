@@ -47,10 +47,22 @@ try {
   assert.ok(!paths.has('test/fixtures/quint-0.32.0/LICENSE.Quint-Apache-2.0'))
 
   const tarball = path.join(packRoot, metadata.filename)
+  const dependencyTarballs = [
+    'tree-sitter',
+    'node-addon-api',
+    'node-gyp-build',
+  ].map(name => {
+    const packed = run(npmCommand, [
+      'pack', '--json', '--ignore-scripts', '--pack-destination', packRoot,
+      path.join(root, 'node_modules', name),
+    ])
+    const [dependencyMetadata] = JSON.parse(packed.stdout)
+    return path.join(packRoot, dependencyMetadata.filename)
+  })
   fs.writeFileSync(path.join(consumerRoot, 'package.json'), '{"private":true}')
   run(npmCommand, [
     'install', '--offline', '--no-audit', '--no-fund', tarball,
-    path.join(root, 'node_modules/tree-sitter'),
+    ...dependencyTarballs,
   ], { cwd: consumerRoot })
   assert.equal(
     fs.readFileSync(path.join(consumerRoot, 'node_modules/tree-sitter-quint/LICENSE'), 'utf8'),
